@@ -1,1 +1,1 @@
-# Flutter - Dollar Cost Averaging
+# Fluther - Dollar Cost Averaging
