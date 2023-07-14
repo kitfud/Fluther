@@ -22,3 +22,19 @@ front_end/node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# smart_contracts
+# Compiler files
+smart_contracts/cache/
+smart_contracts/out/
+
+# Ignores development broadcast logs
+smart_contracts/!/broadcast
+smart_contracts//broadcast/*/31337/
+smart_contracts//broadcast/**/dry-run/
+
+# Docs
+smart_contracts/docs/
+
+# Dotenv file
+smart_contracts/.env
