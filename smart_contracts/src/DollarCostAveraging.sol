@@ -1,97 +1,73 @@
 // SPDX-License-Identifier: UNLICENSED
-// This code is proprietary and confidential. All rights reserved.
-// Unauthorized copying of this file, via any medium is strictly prohibited.
-// Proprietary code by Levi Webb
+pragma solidity 0.8.19;
 
-pragma solidity ^0.8.19;
+/** @author Levi Webb (@DopaMIM)
+ *  @title Dollar cost averaging application smart contract
+ *  This code is proprietary and confidential. All rights reserved.
+ *  Unauthorized copying of this file, via any medium is strictly prohibited.
+ *  Proprietary code by Levi Webb
+ */
 
-interface IERC20 {
-    function transferFrom(
-        address sender,
-        address recipient,
-        uint256 amount
-    ) external returns (bool);
+/// -----------------------------------------------------------------------
+/// Imports
+/// -----------------------------------------------------------------------
 
-    function balanceOf(address account) external view returns (uint256);
+import {IDollarCostAveraging} from "./interfaces/IDollarCostAveraging.sol";
+import {IUniswapV2Router02} from "./interfaces/IUniswapV2Router02.sol";
+import {IAutomationLayer} from "./interfaces/IAutomationLayer.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {Pausable} from "@openzeppelin/contracts/security/Pausable.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-    function approve(address spender, uint256 amount) external returns (bool);
-}
+/// -----------------------------------------------------------------------
+/// Contract
+/// -----------------------------------------------------------------------
 
-interface IUniswapV2Router02 {
-    function swapExactTokensForTokens(
-        uint256 amountIn,
-        uint256 amountOutMin,
-        address[] calldata path,
-        address to,
-        uint256 deadline
-    ) external returns (uint256[] memory amounts);
+contract DollarCostAverage is
+    IDollarCostAveraging,
+    Ownable,
+    Pausable,
+    ReentrancyGuard
+{
+    /// -----------------------------------------------------------------------
+    /// Storage variables
+    /// -----------------------------------------------------------------------
 
-    function getAmountsOut(uint256 amountIn, address[] memory path)
-        external
-        view
-        returns (uint256[] memory amounts);
-}
+    /* solhint-disable */
+    // base types
+    uint256 private s_nextRecurringBuyId;
+    address private s_defaultRouter;
+    address private s_automationLayerAddress;
+    bool private s_acceptingNewRecurringBuys;
 
-contract DollarCostAverage {
-    struct RecurringBuys {
-        address sender;
-        uint256 amount;
-        address token1;
-        address token2;
-        uint256 timeIntervalSeconds;
-        address paymentInterface;
-        string[] additionalInformation;
-        uint256 paymentDue;
-        bool canceled;
+    // mappings and arrays
+    mapping(uint256 recurringBuyId => RecurringBuys data)
+        private s_recurringBuys;
+
+    // constants
+    address private constant WMATIC =
+        0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270;
+
+    /* solhint-enable */
+
+    /// -----------------------------------------------------------------------
+    /// Modifiers
+    /// -----------------------------------------------------------------------
+
+    /// -----------------------------------------------------------------------
+    /// Constructor
+    /// -----------------------------------------------------------------------
+
+    constructor(address defaultRouter, address automationLayerAddress) {
+        s_defaultRouter = defaultRouter;
+        s_automationLayerAddress = automationLayerAddress;
+        s_acceptingNewRecurringBuys = true;
     }
 
-    RecurringBuys[] public recurringBuys;
-
-    event RecurringBuyCreated(
-        address indexed sender,
-        uint256 amount,
-        address token1,
-        address token2,
-        uint256 timeIntervalSeconds,
-        address indexed paymentInterface,
-        string[] additionalInformation,
-        uint256 paymentDue,
-        bool canceled
-    );
-    event RecurringBuyCancelled(uint256 indexed index, address indexed sender);
-    event PaymentTransferred(uint256 indexed index);
-
-    address public owner;
-    uint256 public totalPayments;
-    address public duh;
-    uint256 public minimumDuh;
-    address public _uniswapRouterAddress =
-        0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff;
-    address public WMATIC = 0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270;
-
-    mapping(address => uint256[]) addressToIndices;
-
-    constructor() {
-        owner = msg.sender;
-        minimumDuh = 0;
-        duh = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174;
-    }
-
-    modifier onlyOwner() {
-        require(
-            msg.sender == owner,
-            "Only the contract owner can call this function."
-        );
-        _;
-    }
-
-    modifier hasSufficientTokens() {
-        require(
-            IERC20(duh).balanceOf(tx.origin) >= minimumDuh,
-            "Insufficient token balance."
-        );
-        _;
-    }
+    /// -----------------------------------------------------------------------
+    /// External state-change functions
+    /// -----------------------------------------------------------------------
 
     function createRecurringBuy(
         uint256 _amount,
@@ -99,95 +75,86 @@ contract DollarCostAverage {
         address _token2,
         uint256 _timeIntervalSeconds,
         address _interface,
-        string[] memory _additionalInformation
-    ) external {
+        address dexRouter
+    ) external nonReentrant whenNotPaused {
         require(_amount > 0, "Payment amount must be greater than zero");
-        address _sender = msg.sender;
-        totalPayments++;
-        uint256 paymentDue = block.timestamp;
-
+        require(
+            s_acceptingNewRecurringBuys,
+            "No longer accepting new recurring buys"
+        );
         RecurringBuys memory buy = RecurringBuys(
-            _sender,
-            _amount,
+            msg.sender,
             _token1,
             _token2,
+            _amount,
             _timeIntervalSeconds,
             _interface,
-            _additionalInformation,
-            paymentDue,
-            false
+            dexRouter == address(0) ? s_defaultRouter : dexRouter,
+            block.timestamp,
+            Status.SET
         );
-        recurringBuys.push(buy);
 
-        addressToIndices[_sender].push(recurringBuys.length - 1);
+        uint256 accountNumber = IAutomationLayer(s_automationLayerAddress)
+            .createAccount(s_nextRecurringBuyId);
 
-        addressToIndices[_interface].push(recurringBuys.length - 1);
-        addressToIndices[_token1].push(recurringBuys.length - 1);
+        s_recurringBuys[s_nextRecurringBuyId] = buy;
+        ++s_nextRecurringBuyId;
 
         emit RecurringBuyCreated(
-            _sender,
-            _amount,
-            _token1,
-            _token2,
-            _timeIntervalSeconds,
-            _interface,
-            _additionalInformation,
-            paymentDue,
-            false
+            s_nextRecurringBuyId,
+            accountNumber,
+            msg.sender,
+            buy
         );
     }
 
-    function transferFunds(uint256 index) external hasSufficientTokens {
-        require(index < totalPayments, "Invalid payment index");
+    function cancelRecurringPayment(
+        uint256 recurringBuyId
+    ) external nonReentrant whenNotPaused {
+        require(recurringBuyId < s_nextRecurringBuyId, "Invalid payment index");
 
-        RecurringBuys storage buy = recurringBuys[index];
-        require(!buy.canceled, "The recurring payment has been canceled.");
+        RecurringBuys storage buy = s_recurringBuys[recurringBuyId];
+
+        require(
+            msg.sender == buy.sender,
+            "Only the payment sender or recipient can cancel the recurring payment."
+        );
+
+        buy.status = Status.CANCELLED;
+
+        emit RecurringBuyCancelled(recurringBuyId, buy.sender);
+    }
+
+    function transferFunds(
+        uint256 recurringBuyId
+    ) public nonReentrant whenNotPaused {
+        RecurringBuys storage buy = s_recurringBuys[recurringBuyId];
+        require(
+            buy.status == Status.SET,
+            "The recurring payment has been canceled."
+        );
 
         require(
             block.timestamp >= buy.paymentDue,
             "Not enough time has passed since the last transfer."
         );
-        buy.paymentDue += buy.timeIntervalSeconds;
-
-        emit PaymentTransferred(index);
-
+        buy.paymentDue += buy.timeIntervalInSeconds;
         uint256 buyAmount = (buy.amount * 990) / 1000;
         uint256 fee = buy.amount - buyAmount;
         uint256 interfaceFee = fee / 3;
-        uint256 callerFee = fee / 3;
-        uint256 contractFee = fee - interfaceFee - callerFee;
 
-        // Transfer the tokens
+        uint256 contractFee = fee - interfaceFee;
+
+        emit PaymentTransferred(recurringBuyId);
+
         require(
-            IERC20(buy.token1).transferFrom(
-                buy.sender,
-                address(this),
-                buyAmount
-            ),
-            "Token transfer failed."
-        );
-        require(
-            IERC20(buy.token1).transferFrom(
-                buy.sender,
-                buy.paymentInterface,
-                contractFee
-            ),
-            "contract fee Token transfer failed."
-        );
-        require(
-            IERC20(buy.token1).transferFrom(buy.sender, msg.sender, callerFee),
-            "caller fee Token transfer failed."
-        );
-        require(
-            IERC20(buy.token1).transferFrom(buy.sender, owner, contractFee),
+            IERC20(buy.token1).transferFrom(buy.sender, owner(), contractFee),
             "contract fee Token transfer failed."
         );
 
-        IUniswapV2Router02 uniswapRouter = IUniswapV2Router02(
-            _uniswapRouterAddress
-        );
+        IUniswapV2Router02 uniswapRouter = IUniswapV2Router02(buy.dexRouter);
 
-        IERC20(buy.token1).approve(_uniswapRouterAddress, buyAmount);
+        IERC20(buy.token1).approve(buy.dexRouter, buyAmount);
 
         address[] memory path;
         if (buy.token1 == WMATIC || buy.token2 == WMATIC) {
@@ -206,8 +173,9 @@ contract DollarCostAverage {
             path
         );
 
-       //uint256 amountOutMin = (getAmountsOut[0] * 99) / 100;
-       uint256 amountOutMin = getAmountsOut[getAmountsOut.length - 1]*99/1000;
+        //uint256 amountOutMin = (getAmountsOut[0] * 99) / 100;
+        uint256 amountOutMin = (getAmountsOut[getAmountsOut.length - 1] * 99) /
+            1000;
 
         uniswapRouter.swapExactTokensForTokens(
             buyAmount,
@@ -218,82 +186,76 @@ contract DollarCostAverage {
         );
     }
 
+    function trigger(uint256 accountNumber) external {
+        transferFunds(accountNumber);
+    }
+
+    function setAutomationLayerAddress(
+        address automationLayerAddress
+    ) external onlyOwner {
+        s_automationLayerAddress = automationLayerAddress;
+    }
+
+    function setDefaultRouter(address defaultRouter) external onlyOwner {
+        s_defaultRouter = defaultRouter;
+    }
+
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    function unpause() external onlyOwner {
+        _unpause();
+    }
+
+    /// -----------------------------------------------------------------------
+    /// External view functions
+    /// -----------------------------------------------------------------------
+
+    function checkTrigger(uint256 recurringBuyId) external view returns (bool) {
+        RecurringBuys storage buy = s_recurringBuys[recurringBuyId];
+        return buy.paymentDue < block.timestamp && buy.status == Status.SET;
+    }
+
     function getCurrentBlockTimestamp() external view returns (uint256) {
         return block.timestamp;
     }
 
-    function getPaymentDue(uint256 index) external view returns (uint256) {
-        require(index < totalPayments, "Invalid payment index");
+    function getPaymentDue(
+        uint256 recurringBuyId
+    ) external view returns (uint256) {
+        require(recurringBuyId < s_nextRecurringBuyId, "Invalid payment index");
 
-        RecurringBuys storage payment = recurringBuys[index];
+        RecurringBuys storage buy = s_recurringBuys[recurringBuyId];
 
-        return payment.paymentDue;
+        return buy.paymentDue;
     }
 
-    function cancelRecurringPayment(uint256 index) external {
-        require(index < totalPayments, "Invalid payment index");
+    // function getRecurringPaymentIndices(
+    //     address account
+    // ) external view returns (uint256[] memory) {
+    //     return addressToIndices[account];
+    // }
 
-        RecurringBuys storage buy = recurringBuys[index];
+    function isSubscriptionValid(
+        uint256 recurringBuyId
+    ) external view returns (bool) {
+        require(recurringBuyId < s_nextRecurringBuyId, "Invalid payment index");
 
-        require(
-            msg.sender == buy.sender,
-            "Only the payment sender or recipient can cancel the recurring payment."
-        );
-
-        buy.canceled = true;
-
-        emit RecurringBuyCancelled(index, buy.sender);
-    }
-
-    function getRecurringPaymentIndices(address account)
-        external
-        view
-        returns (uint256[] memory)
-    {
-        return addressToIndices[account];
-    }
-
-    function isSubscriptionValid(uint256 index) external view returns (bool) {
-        require(index < totalPayments, "Invalid payment index");
-
-        RecurringBuys storage buy = recurringBuys[index];
+        RecurringBuys storage buy = s_recurringBuys[recurringBuyId];
 
         uint256 oneDayInSeconds = 24 * 60 * 60; // Number of seconds in a day
 
         return buy.paymentDue + oneDayInSeconds > block.timestamp;
     }
 
-    function isPaymentCanceled(uint256 index) external view returns (bool) {
-        require(index < totalPayments, "Invalid payment index");
+    function isPaymentCanceled(
+        uint256 recurringBuyId
+    ) external view returns (Status) {
+        require(recurringBuyId < s_nextRecurringBuyId, "Invalid payment index");
 
-        RecurringBuys storage payment = recurringBuys[index];
+        RecurringBuys storage payment = s_recurringBuys[recurringBuyId];
 
-        return payment.canceled;
-    }
-
-    function getAdditionalInformation(uint256 index)
-        external
-        view
-        returns (string[] memory)
-    {
-        require(index < totalPayments, "Invalid payment index");
-
-        RecurringBuys storage buy = recurringBuys[index];
-
-        return buy.additionalInformation;
-    }
-
-    function updateMinimumDuh(uint256 _minimumDuh) external onlyOwner {
-        minimumDuh = _minimumDuh;
-    }
-
-    function setDuhAddress(address tokenAddress) external onlyOwner {
-        duh = tokenAddress;
-    }
-
-    function transferOwnership(address newOwner) external onlyOwner {
-        require(newOwner != address(0), "Invalid new owner address");
-
-        owner = newOwner;
+        return payment.status;
     }
 }
