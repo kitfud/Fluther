@@ -180,7 +180,7 @@ contract DollarCostAverage is
         __whenNotPaused();
 
         RecurringBuy storage buy = s_recurringBuys[recurringBuyId];
-        if (buy.status != Status.SET || buy.paymentDue < block.timestamp) {
+        if (buy.status != Status.SET || buy.paymentDue > block.timestamp) {
             revert DollarCostAveraging__InvalidRecurringBuy();
         }
 
@@ -190,6 +190,8 @@ contract DollarCostAverage is
 
         uint256 clientFee = (fee * CLIENT_FEE_SHARE) / PRECISION;
         uint256 contractFee = fee - clientFee;
+
+        __transferERC20(buy.tokenToSpend, buy.sender, buy.paymentInterface, clientFee);
 
         __transferERC20(buy.tokenToSpend, buy.sender, owner(), contractFee);
 
