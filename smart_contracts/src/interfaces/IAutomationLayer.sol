@@ -20,27 +20,64 @@ interface IAutomationLayer {
     /// -----------------------------------------------------------------------
     /// Errors
     /// -----------------------------------------------------------------------
+
+    /// @dev error for when the caller is not allowed to call the function
+    error AutomationLayer__NotAllowed();
+
+    /// @dev error for when an invalid account number is provided
+    error AutomationLayer__InvalidAccountNumber();
+
     /// -----------------------------------------------------------------------
     /// Type declarations (structs and enums)
     /// -----------------------------------------------------------------------
 
-    struct Accounts {
-        address account;
+    /** @dev defines the status of each recurring buys ID.
+     *  @param UNSET: the recurring buy has not been set yet.
+     *  @param SET: the recurring buy has already been set.
+     *  @param CANCELLED: the recurring buy has been cancelled.
+     */
+    enum Status {
+        UNSET,
+        SET,
+        CANCELLED
+    }
+
+    struct Account {
+        address user;
+        address automatedContract;
         uint256 id;
-        bool cancelled;
+        Status status;
     }
 
     /// -----------------------------------------------------------------------
     /// Events
     /// -----------------------------------------------------------------------
 
-    event AccountCreated(address indexed customer);
-    event AccountCancelled(uint256 indexed index, address indexed account);
-    event TransactionSuccess(uint256 indexed index);
+    event AccountCreated(
+        address indexed user,
+        address indexed automatedContract,
+        uint256 id
+    );
+    event AccountCancelled(
+        uint256 indexed accountNumber,
+        address indexed user,
+        address indexed automatedContract
+    );
+    event TransactionSuccess(
+        uint256 indexed accountNumber,
+        address indexed user,
+        address indexed automatedContract
+    );
 
     /// -----------------------------------------------------------------------
     /// Functions
     /// -----------------------------------------------------------------------
 
-    function createAccount(uint256 id) external returns (uint256);
+    function createAccount(
+        uint256 id,
+        address user,
+        address contractAddress
+    ) external returns (uint256);
+
+    function cancelAccount(uint256 accountNumber) external;
 }

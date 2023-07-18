@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.19;
 
-/** @author Levi Webb (@DopaMIM)
+/** @author Levi Webb (@DopaMIM) and @EWCunha
  *  @title Dollar cost averaging application smart contract
  *  This code is proprietary and confidential. All rights reserved.
  *  Unauthorized copying of this file, via any medium is strictly prohibited.
@@ -13,6 +13,7 @@ pragma solidity 0.8.19;
 /// -----------------------------------------------------------------------
 
 import {IDollarCostAveraging} from "./interfaces/IDollarCostAveraging.sol";
+import {IAutomatedContract} from "./interfaces/IAutomatedContract.sol";
 import {IUniswapV2Router02} from "./interfaces/IUniswapV2Router02.sol";
 import {IAutomationLayer} from "./interfaces/IAutomationLayer.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -26,6 +27,7 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.
 
 contract DollarCostAverage is
     IDollarCostAveraging,
+    IAutomatedContract,
     Ownable,
     Pausable,
     ReentrancyGuard
@@ -38,224 +40,387 @@ contract DollarCostAverage is
     // base types
     uint256 private s_nextRecurringBuyId;
     address private s_defaultRouter;
-    address private s_automationLayerAddress;
+    IAutomationLayer private s_automationLayer;
     bool private s_acceptingNewRecurringBuys;
+    address private immutable wrapNative;
 
     // mappings and arrays
-    mapping(uint256 recurringBuyId => RecurringBuys data)
+    mapping(uint256 recurringBuyId => RecurringBuy data)
         private s_recurringBuys;
 
     // constants
-    address private constant WMATIC =
-        0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270;
+    uint256 private constant FEE = 100; // over 10000
+    uint256 private constant PRECISION = 10000;
+    uint256 private constant CLIENT_FEE_SHARE = 5000; // over 10000
+    uint256 private SLIPPAGE_PERCENTAGE = 100; // over 10000
 
     /* solhint-enable */
 
     /// -----------------------------------------------------------------------
-    /// Modifiers
+    /// Modifiers (or functions as modifiers)
     /// -----------------------------------------------------------------------
+
+    /// @dev Uses the nonReentrant modifier. This way reduces smart contract size.
+    function __nonReentrant() private nonReentrant {}
+
+    /// @dev Uses the whenNotPaused modifier. This way reduces smart contract size.
+    function __whenNotPaused() private view whenNotPaused {}
+
+    /// @dev Uses the onlyOwner modifier. This way reduces smart contract size.
+    function __onlyOwner() private view onlyOwner {}
 
     /// -----------------------------------------------------------------------
     /// Constructor
     /// -----------------------------------------------------------------------
 
-    constructor(address defaultRouter, address automationLayerAddress) {
+    /** @notice constructor logic.
+     *  @param defaultRouter: default DEX router address.
+     *  @param automationLayerAddress: address for the automation layer smart contract.
+     *  @param _wrapNative: ERC20 smart contract address for the wrapped version of the native blockchain coin.
+     */
+    constructor(
+        address defaultRouter,
+        address automationLayerAddress,
+        address _wrapNative
+    ) {
         s_defaultRouter = defaultRouter;
-        s_automationLayerAddress = automationLayerAddress;
+        s_automationLayer = IAutomationLayer(automationLayerAddress);
         s_acceptingNewRecurringBuys = true;
+        wrapNative = _wrapNative;
     }
 
     /// -----------------------------------------------------------------------
     /// External state-change functions
     /// -----------------------------------------------------------------------
 
+    /** @dev added nonReentrant and whenNotPaused third party modifiers. The amount input
+     *  should not be 0 and it reverts if acceptingNewRecurringBuys storage variable is false.
+     *  @inheritdoc IDollarCostAveraging
+     */
     function createRecurringBuy(
-        uint256 _amount,
-        address _token1,
-        address _token2,
-        uint256 _timeIntervalSeconds,
-        address _interface,
+        uint256 amount,
+        address token1,
+        address token2,
+        uint256 timeIntervalSeconds,
+        address paymentInterface,
         address dexRouter
-    ) external nonReentrant whenNotPaused {
-        require(_amount > 0, "Payment amount must be greater than zero");
-        require(
-            s_acceptingNewRecurringBuys,
-            "No longer accepting new recurring buys"
-        );
-        RecurringBuys memory buy = RecurringBuys(
+    ) external override(IDollarCostAveraging) {
+        __nonReentrant();
+        __whenNotPaused();
+
+        if (amount == 0) {
+            revert DollarCostAveraging__AmountIsZero();
+        }
+        if (!s_acceptingNewRecurringBuys) {
+            revert DollarCostAveraging__NotAcceptingNewRecurringBuys();
+        }
+
+        uint256 nextRecurringBuyId = s_nextRecurringBuyId;
+        uint256 accountNumber = s_automationLayer.createAccount(
+            nextRecurringBuyId,
             msg.sender,
-            _token1,
-            _token2,
-            _amount,
-            _timeIntervalSeconds,
-            _interface,
+            address(this)
+        );
+
+        RecurringBuy memory buy = RecurringBuy(
+            msg.sender,
+            amount,
+            token1,
+            token2,
+            timeIntervalSeconds,
+            paymentInterface,
             dexRouter == address(0) ? s_defaultRouter : dexRouter,
             block.timestamp,
+            accountNumber,
             Status.SET
         );
 
-        uint256 accountNumber = IAutomationLayer(s_automationLayerAddress)
-            .createAccount(s_nextRecurringBuyId);
+        s_recurringBuys[nextRecurringBuyId] = buy;
+        unchecked {
+            ++s_nextRecurringBuyId;
+        }
 
-        s_recurringBuys[s_nextRecurringBuyId] = buy;
-        ++s_nextRecurringBuyId;
-
-        emit RecurringBuyCreated(
-            s_nextRecurringBuyId,
-            accountNumber,
-            msg.sender,
-            buy
-        );
+        emit RecurringBuyCreated(nextRecurringBuyId, msg.sender, buy);
     }
 
+    /** @dev added nonReentrant and whenNotPaused third party modifiers. The given recurring buy ID
+     *  must be valid. It reverts if caller is not recurring buy sender.
+     *  @inheritdoc IDollarCostAveraging
+     */
     function cancelRecurringPayment(
         uint256 recurringBuyId
-    ) external nonReentrant whenNotPaused {
-        require(recurringBuyId < s_nextRecurringBuyId, "Invalid payment index");
+    ) external override(IDollarCostAveraging) {
+        __nonReentrant();
+        __whenNotPaused();
 
-        RecurringBuys storage buy = s_recurringBuys[recurringBuyId];
+        RecurringBuy storage buy = s_recurringBuys[recurringBuyId];
 
-        require(
-            msg.sender == buy.sender,
-            "Only the payment sender or recipient can cancel the recurring payment."
-        );
+        if (buy.status != Status.SET) {
+            revert DollarCostAveraging__InvalidRecurringBuyId();
+        }
+        if (msg.sender != buy.sender) {
+            revert DollarCostAveraging__CallerNotRecurringBuySender();
+        }
 
         buy.status = Status.CANCELLED;
+        s_automationLayer.cancelAccount(buy.accountNumber);
 
         emit RecurringBuyCancelled(recurringBuyId, buy.sender);
     }
 
+    /** @dev added nonReentrant and whenNotPaused third party modifiers. The given recurring buy ID
+     *  must be valid. It reverts if recurring buy is not valid, or if current block timestamp haven't reached
+     *  payment due, or if ERC20 transferFrom function doesn't work.
+     *  @inheritdoc IDollarCostAveraging
+     */
     function transferFunds(
         uint256 recurringBuyId
-    ) public nonReentrant whenNotPaused {
-        RecurringBuys storage buy = s_recurringBuys[recurringBuyId];
-        require(
-            buy.status == Status.SET,
-            "The recurring payment has been canceled."
-        );
+    ) public override(IDollarCostAveraging) {
+        __nonReentrant();
+        __whenNotPaused();
 
-        require(
-            block.timestamp >= buy.paymentDue,
-            "Not enough time has passed since the last transfer."
-        );
-        buy.paymentDue += buy.timeIntervalInSeconds;
-        uint256 buyAmount = (buy.amount * 990) / 1000;
-        uint256 fee = buy.amount - buyAmount;
-        uint256 interfaceFee = fee / 3;
-
-        uint256 contractFee = fee - interfaceFee;
-
-        emit PaymentTransferred(recurringBuyId);
-
-        require(
-            IERC20(buy.token1).transferFrom(buy.sender, owner(), contractFee),
-            "contract fee Token transfer failed."
-        );
-
-        IUniswapV2Router02 uniswapRouter = IUniswapV2Router02(buy.dexRouter);
-
-        IERC20(buy.token1).approve(buy.dexRouter, buyAmount);
-
-        address[] memory path;
-        if (buy.token1 == WMATIC || buy.token2 == WMATIC) {
-            path = new address[](2);
-            path[0] = buy.token1;
-            path[1] = buy.token2;
-        } else {
-            path = new address[](3);
-            path[0] = buy.token1;
-            path[1] = WMATIC;
-            path[2] = buy.token2;
+        RecurringBuy storage buy = s_recurringBuys[recurringBuyId];
+        if (buy.status != Status.SET || buy.paymentDue < block.timestamp) {
+            revert DollarCostAveraging__InvalidRecurringBuy();
         }
 
-        uint256[] memory getAmountsOut = uniswapRouter.getAmountsOut(
+        buy.paymentDue += buy.timeIntervalInSeconds;
+        uint256 fee = (buy.amountToSpend * FEE) / PRECISION;
+        uint256 buyAmount = buy.amountToSpend - fee;
+
+        uint256 clientFee = (fee * CLIENT_FEE_SHARE) / PRECISION;
+        uint256 contractFee = fee - clientFee;
+
+        __transferERC20(buy.tokenToSpend, buy.sender, owner(), contractFee);
+
+        IUniswapV2Router02 dexRouter = IUniswapV2Router02(buy.dexRouter);
+
+        IERC20(buy.tokenToSpend).approve(buy.dexRouter, buyAmount);
+
+        address[] memory path;
+        if (buy.tokenToSpend == wrapNative || buy.tokenToBuy == wrapNative) {
+            path = new address[](2);
+            path[0] = buy.tokenToSpend;
+            path[1] = buy.tokenToBuy;
+        } else {
+            path = new address[](3);
+            path[0] = buy.tokenToSpend;
+            path[1] = wrapNative;
+            path[2] = buy.tokenToBuy;
+        }
+
+        uint256[] memory getAmountsOut = dexRouter.getAmountsOut(
             buyAmount,
             path
         );
 
         //uint256 amountOutMin = (getAmountsOut[0] * 99) / 100;
-        uint256 amountOutMin = (getAmountsOut[getAmountsOut.length - 1] * 99) /
-            1000;
+        uint256 amountOutMin = (getAmountsOut[getAmountsOut.length - 1] *
+            SLIPPAGE_PERCENTAGE) / PRECISION;
 
-        uniswapRouter.swapExactTokensForTokens(
+        dexRouter.swapExactTokensForTokens(
             buyAmount,
             amountOutMin,
             path,
             buy.sender,
             block.timestamp
         );
+
+        emit PaymentTransferred(recurringBuyId, buy.sender);
     }
 
-    function trigger(uint256 accountNumber) external {
-        transferFunds(accountNumber);
+    /** @dev calls transferFunds public function
+     *  @inheritdoc IAutomatedContract
+     */
+    function simpleAutomation(
+        uint256 recurringBuyId
+    ) external override(IAutomatedContract) {
+        transferFunds(recurringBuyId);
     }
 
-    function setAutomationLayerAddress(
+    /** @dev added onlyOwner third party modifier.
+     *  @inheritdoc IDollarCostAveraging
+     */
+    function setAutomationLayer(
         address automationLayerAddress
-    ) external onlyOwner {
-        s_automationLayerAddress = automationLayerAddress;
+    ) external override(IDollarCostAveraging) {
+        __nonReentrant();
+        __whenNotPaused();
+        __onlyOwner();
+
+        s_automationLayer = IAutomationLayer(automationLayerAddress);
+
+        emit AutomationLayerSet(msg.sender, automationLayerAddress);
     }
 
-    function setDefaultRouter(address defaultRouter) external onlyOwner {
+    /** @dev added onlyOwner third party modifier.
+     *  @inheritdoc IDollarCostAveraging
+     */
+    function setDefaultRouter(
+        address defaultRouter
+    ) external override(IDollarCostAveraging) {
+        __nonReentrant();
+        __whenNotPaused();
+        __onlyOwner();
+
         s_defaultRouter = defaultRouter;
+
+        emit DefaultRouterSet(msg.sender, defaultRouter);
     }
 
-    function pause() external onlyOwner {
+    /** @dev added onlyOwner third party modifier. Calls third party pause internal function
+     *  @inheritdoc IDollarCostAveraging
+     */
+    function pause() external override(IDollarCostAveraging) {
+        __nonReentrant();
+        __whenNotPaused();
+        __onlyOwner();
+
         _pause();
     }
 
-    function unpause() external onlyOwner {
+    /** @dev added onlyOwner third party modifier. Calls third party unpause internal function
+     *  @inheritdoc IDollarCostAveraging
+     */
+    function unpause() external override(IDollarCostAveraging) {
+        __nonReentrant();
+        __whenNotPaused();
+        __onlyOwner();
+
         _unpause();
+    }
+
+    /// -----------------------------------------------------------------------
+    /// Internal and private state-change functions
+    /// -----------------------------------------------------------------------
+
+    /** @dev Performs transfer of ERC20 tokens using transferFrom function. The way this function does the
+     *  transfers is safer because it works when the ERC20 transferFrom returns or does not return any value.
+     *  @dev It reverts if the transfer was not successful (i.e. reverted) or if returned value is false.
+     *  @param token: ERC20 token smart contract address to transfer.
+     *  @param from: address from which tokens will be transferred.
+     *  @param to: address to which tokens will be transferred.
+     *  @param value: amount of ERC20 tokens to transfer.
+     */
+    function __transferERC20(
+        address token,
+        address from,
+        address to,
+        uint256 value
+    ) private {
+        (bool success, bytes memory data) = token.call(
+            abi.encodeWithSelector(
+                IERC20(token).transferFrom.selector,
+                from,
+                to,
+                value
+            )
+        );
+
+        if (!success || (data.length != 0 && !abi.decode(data, (bool)))) {
+            revert DollarCostAveraging__TokenTransferFailed();
+        }
     }
 
     /// -----------------------------------------------------------------------
     /// External view functions
     /// -----------------------------------------------------------------------
 
-    function checkTrigger(uint256 recurringBuyId) external view returns (bool) {
-        RecurringBuys storage buy = s_recurringBuys[recurringBuyId];
+    /// @inheritdoc IAutomatedContract
+    function checkSimpleAutomation(
+        uint256 recurringBuyId
+    ) external view override(IAutomatedContract) returns (bool) {
+        RecurringBuy memory buy = s_recurringBuys[recurringBuyId];
         return buy.paymentDue < block.timestamp && buy.status == Status.SET;
     }
 
-    function getCurrentBlockTimestamp() external view returns (uint256) {
+    /// @inheritdoc IDollarCostAveraging
+    function getCurrentBlockTimestamp()
+        external
+        view
+        override(IDollarCostAveraging)
+        returns (uint256)
+    {
         return block.timestamp;
     }
 
-    function getPaymentDue(
+    /// @inheritdoc IDollarCostAveraging
+    function getRecurringBuy(
         uint256 recurringBuyId
-    ) external view returns (uint256) {
-        require(recurringBuyId < s_nextRecurringBuyId, "Invalid payment index");
-
-        RecurringBuys storage buy = s_recurringBuys[recurringBuyId];
-
-        return buy.paymentDue;
+    )
+        external
+        view
+        override(IDollarCostAveraging)
+        returns (RecurringBuy memory)
+    {
+        return s_recurringBuys[recurringBuyId];
     }
 
-    // function getRecurringPaymentIndices(
-    //     address account
-    // ) external view returns (uint256[] memory) {
-    //     return addressToIndices[account];
-    // }
-
-    function isSubscriptionValid(
-        uint256 recurringBuyId
-    ) external view returns (bool) {
-        require(recurringBuyId < s_nextRecurringBuyId, "Invalid payment index");
-
-        RecurringBuys storage buy = s_recurringBuys[recurringBuyId];
-
-        uint256 oneDayInSeconds = 24 * 60 * 60; // Number of seconds in a day
-
-        return buy.paymentDue + oneDayInSeconds > block.timestamp;
+    /// @inheritdoc IDollarCostAveraging
+    function getNextRecurringBuyId()
+        external
+        view
+        override(IDollarCostAveraging)
+        returns (uint256)
+    {
+        return s_nextRecurringBuyId;
     }
 
-    function isPaymentCanceled(
-        uint256 recurringBuyId
-    ) external view returns (Status) {
-        require(recurringBuyId < s_nextRecurringBuyId, "Invalid payment index");
+    /// @inheritdoc IDollarCostAveraging
+    function getAutomationLayer()
+        external
+        view
+        override(IDollarCostAveraging)
+        returns (IAutomationLayer)
+    {
+        return s_automationLayer;
+    }
 
-        RecurringBuys storage payment = s_recurringBuys[recurringBuyId];
+    /// @inheritdoc IDollarCostAveraging
+    function getAcceptingNewRecurringBuys()
+        external
+        view
+        override(IDollarCostAveraging)
+        returns (bool)
+    {
+        return s_acceptingNewRecurringBuys;
+    }
 
-        return payment.status;
+    /// @inheritdoc IDollarCostAveraging
+    function getWrapNative()
+        external
+        view
+        override(IDollarCostAveraging)
+        returns (address)
+    {
+        return wrapNative;
+    }
+
+    /// @inheritdoc IDollarCostAveraging
+    function getRangeOfRecurringBuys(
+        uint256 startRecBuyId,
+        uint256 endRecBuyId
+    )
+        external
+        view
+        override(IDollarCostAveraging)
+        returns (RecurringBuy[] memory)
+    {
+        if (
+            !(startRecBuyId < endRecBuyId) &&
+            !(endRecBuyId < s_nextRecurringBuyId)
+        ) {
+            revert DollarCostAveraging__InvalidIndexRange();
+        }
+
+        RecurringBuy[] memory recurringBuys = new RecurringBuy[](
+            endRecBuyId - startRecBuyId
+        );
+
+        for (uint256 i = startRecBuyId; i < endRecBuyId; ++i) {
+            recurringBuys[i - startRecBuyId] = s_recurringBuys[i];
+        }
+
+        return recurringBuys;
     }
 }
