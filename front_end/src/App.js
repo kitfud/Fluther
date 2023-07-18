@@ -3,8 +3,50 @@ import './App.css';
 import { ConnectWallet } from "@thirdweb-dev/react";
 import { useAddress } from "@thirdweb-dev/react";
 import { ThemeProvider,createTheme } from '@mui/material';
+
+
 import {Grid,Box, TextField, Typography, Card, Button} from "@mui/material"
 
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#ece115',
+    },
+    secondary: {
+      main: '#15ece1',
+    },
+  },
+  typography: {
+    fontFamily: 'BlinkMacSystemFont',
+  },
+  components: {
+    // Name of the component 
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'teal',
+        },
+      },
+      inputProps:{
+        
+          style:{color:"red"}
+        
+      }
+    },
+    MuiCard: {
+      styleOverrides: {
+        // Name of the slot
+        root: {
+          // Some CSS
+          borderColor: "green",
+          borderRadius: 30,
+          position: "relative",
+          zIndex: 0,
+          raised:true
+        },
+  },
+
+}}})
 
 function App() {
   const [amount, setAmount] = useState("")
@@ -16,11 +58,7 @@ function App() {
   const [userAddress,setUserAddress] = useState(null)
 
   const address = useAddress();
-  const theme = createTheme({
-    palette:{
-      mode:"dark"
-    }
-  })
+  
 
 useEffect(()=>{
 if(amount!== "" && token1!== "" & token2!=="" & interval !=="")
@@ -42,7 +80,7 @@ console.log(JSON.stringify(data))
 {/* {address?console.log(address):null} */}
 
 <ThemeProvider theme={theme}>
-  <Box sx={{marginBottom:'10px', marginTop:'10px'}} display="flex" alignItems="center" justifyContent="center">
+  <Box sx={{marginBottom:'10px', marginTop:'4vh'}} display="flex" alignItems="center" justifyContent="center">
   <ConnectWallet
               dropdownPosition={{
                 side: "top",
@@ -56,12 +94,13 @@ console.log(JSON.stringify(data))
   alignItems="center"
   justify="center"
   style={{ minHeight: '100vh' }}>
-  <Card variant="outlined" sx={{ alignSelf:'center',display: 'inline-block', backgroundColor: "gray" }}>
-  <Typography color="primary" component="h1" sx={{ fontSize: 20, fontWeight: 600, padding: 2}}>Create Dollar Cost Average:</Typography>
+  <Card variant="outlined" sx={{ alignSelf:'center',display: 'inline-block', backgroundColor:theme.palette.secondary.main }}>
+  <Typography color="#1f25e2" component="h1" sx={{ fontSize: 20, fontWeight: 700, padding: 2}}>Create Dollar Cost Average:</Typography>
 
   
 <Box display="flex" alignItems="center" justifyContent="center">
-<TextField onChange={(e)=> setAmount(e.target.value)} id="filled-basic" label="Amount" variant="filled" ></TextField>
+<TextField     
+onChange={(e)=> setAmount(e.target.value)} id="filled-basic" label="Amount" variant="filled" ></TextField>
 </Box> 
 
 <Box display="flex" alignItems="center" justifyContent="center">
