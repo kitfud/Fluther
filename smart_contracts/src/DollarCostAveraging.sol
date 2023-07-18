@@ -98,21 +98,27 @@ contract DollarCostAverage is
      *  @inheritdoc IDollarCostAveraging
      */
     function createRecurringBuy(
-        uint256 amount,
-        address token1,
-        address token2,
-        uint256 timeIntervalSeconds,
+        uint256 amountToSpend,
+        address tokenToSpend,
+        address tokenToBuy,
+        uint256 timeIntervalInSeconds,
         address paymentInterface,
         address dexRouter
     ) external override(IDollarCostAveraging) {
         __nonReentrant();
         __whenNotPaused();
 
-        if (amount == 0) {
+        if (amountToSpend == 0) {
             revert DollarCostAveraging__AmountIsZero();
         }
         if (!s_acceptingNewRecurringBuys) {
             revert DollarCostAveraging__NotAcceptingNewRecurringBuys();
+        }
+        if (tokenToSpend == address(0) || tokenToBuy == address(0)) {
+            revert DollarCostAveraging__InvalidTokenAddresses();
+        }
+        if (timeIntervalInSeconds == 0) {
+            revert DollarCostAveraging__InvalidTimeInterval();
         }
 
         uint256 nextRecurringBuyId = s_nextRecurringBuyId;
@@ -124,10 +130,10 @@ contract DollarCostAverage is
 
         RecurringBuy memory buy = RecurringBuy(
             msg.sender,
-            amount,
-            token1,
-            token2,
-            timeIntervalSeconds,
+            amountToSpend,
+            tokenToSpend,
+            tokenToBuy,
+            timeIntervalInSeconds,
             paymentInterface,
             dexRouter == address(0) ? s_defaultRouter : dexRouter,
             block.timestamp,
@@ -191,7 +197,14 @@ contract DollarCostAverage is
         uint256 clientFee = (fee * CLIENT_FEE_SHARE) / PRECISION;
         uint256 contractFee = fee - clientFee;
 
-        __transferERC20(buy.tokenToSpend, buy.sender, buy.paymentInterface, clientFee);
+        if (buy.paymentInterface != address(0)) {
+            __transferERC20(
+                buy.tokenToSpend,
+                buy.sender,
+                buy.paymentInterface,
+                clientFee
+            );
+        }
 
         __transferERC20(buy.tokenToSpend, buy.sender, owner(), contractFee);
 

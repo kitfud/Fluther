@@ -41,6 +41,12 @@ interface IDollarCostAveraging {
     /// @dev error for when an invalid range of recurring buy IDs is given
     error DollarCostAveraging__InvalidIndexRange();
 
+    /// @dev error for when any of the given token address is zero.
+    error DollarCostAveraging__InvalidTokenAddresses();
+
+    /// @dev error for when any of the given time interval is zero.
+    error DollarCostAveraging__InvalidTimeInterval();
+
     /// -----------------------------------------------------------------------
     /// Type declarations (structs and enums)
     /// -----------------------------------------------------------------------
