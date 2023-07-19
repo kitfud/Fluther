@@ -226,6 +226,8 @@ contract DollarCostAverage is
         uint256 amountOutMin = (amountsOut[amountsOut.length - 1] *
             SLIPPAGE_PERCENTAGE) / PRECISION;
 
+        __transferERC20(buy.tokenToSpend, buy.sender, address(this), buyAmount);
+
         uint256[] memory amounts = dexRouter.swapExactTokensForTokens(
             buyAmount,
             amountOutMin,
@@ -234,11 +236,7 @@ contract DollarCostAverage is
             block.timestamp
         );
 
-        emit PaymentTransferred(
-            recurringBuyId,
-            buy.sender,
-            amounts[amounts.length - 1]
-        );
+        emit PaymentTransferred(recurringBuyId, buy.sender, amounts);
     }
 
     /** @dev calls transferFunds public function

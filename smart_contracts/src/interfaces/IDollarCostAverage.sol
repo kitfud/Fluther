@@ -114,12 +114,12 @@ interface IDollarCostAverage {
     /** @dev event for when the payment of a recurring buy is transferred.
      *  @param recBuyId: recurring buy ID.
      *  @param sender: address of the recurring buy sender.
-     *  @param amountBought: amount of tokens bought.
+     *  @param amounts: array of the token amounts swaped.
      */
     event PaymentTransferred(
         uint256 indexed recBuyId,
         address indexed sender,
-        uint256 amountBought
+        uint256[] amounts
     );
 
     /** @dev event for when the a new automation layer contract is set.

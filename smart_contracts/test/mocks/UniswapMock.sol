@@ -31,7 +31,7 @@ contract UniswapMock {
         address tokenToSpend = path[0];
         address tokenToBuy = path[path.length - 1];
 
-        IERC20(tokenToSpend).transferFrom(sender, address(this), buyAmount);
+        IERC20(tokenToSpend).transferFrom(msg.sender, address(this), buyAmount);
         IERC20(tokenToBuy).transfer(sender, amountOutMin);
 
         uint256[] memory amounts = new uint256[](path.length);
