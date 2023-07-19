@@ -207,9 +207,6 @@ contract DollarCostAverage is
         }
 
         __transferERC20(buy.tokenToSpend, buy.sender, owner(), contractFee);
-
-        IUniswapV2Router02 dexRouter = IUniswapV2Router02(buy.dexRouter);
-
         IERC20(buy.tokenToSpend).approve(buy.dexRouter, buyAmount);
 
         address[] memory path;
@@ -224,13 +221,9 @@ contract DollarCostAverage is
             path[2] = buy.tokenToBuy;
         }
 
-        uint256[] memory getAmountsOut = dexRouter.getAmountsOut(
-            buyAmount,
-            path
-        );
-
-        //uint256 amountOutMin = (getAmountsOut[0] * 99) / 100;
-        uint256 amountOutMin = (getAmountsOut[getAmountsOut.length - 1] *
+        IUniswapV2Router02 dexRouter = IUniswapV2Router02(buy.dexRouter);
+        uint256[] memory amountsOut = dexRouter.getAmountsOut(buyAmount, path);
+        uint256 amountOutMin = (amountsOut[amountsOut.length - 1] *
             SLIPPAGE_PERCENTAGE) / PRECISION;
 
         dexRouter.swapExactTokensForTokens(
