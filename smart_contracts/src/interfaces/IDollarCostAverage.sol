@@ -15,7 +15,7 @@ import {IAutomationLayer} from "./IAutomationLayer.sol";
 /// Interface
 /// -----------------------------------------------------------------------
 
-interface IDollarCostAveraging {
+interface IDollarCostAverage {
     /// -----------------------------------------------------------------------
     /// Errors
     /// -----------------------------------------------------------------------
@@ -114,8 +114,13 @@ interface IDollarCostAveraging {
     /** @dev event for when the payment of a recurring buy is transferred.
      *  @param recBuyId: recurring buy ID.
      *  @param sender: address of the recurring buy sender.
+     *  @param amountBought: amount of tokens bought.
      */
-    event PaymentTransferred(uint256 indexed recBuyId, address indexed sender);
+    event PaymentTransferred(
+        uint256 indexed recBuyId,
+        address indexed sender,
+        uint256 amountBought
+    );
 
     /** @dev event for when the a new automation layer contract is set.
      *  @param caller: caller's address.

@@ -27,11 +27,17 @@ contract UniswapMock {
         address[] calldata path,
         address sender,
         uint256 /* timestamp */
-    ) external {
+    ) external returns (uint256[] memory) {
         address tokenToSpend = path[0];
         address tokenToBuy = path[path.length - 1];
 
-        IERC20(tokenToSpend).transferFrom(sender, address(this), amountOutMin);
-        IERC20(tokenToBuy).transferFrom(address(this), sender, buyAmount);
+        IERC20(tokenToSpend).transferFrom(sender, address(this), buyAmount);
+        IERC20(tokenToBuy).transfer(sender, amountOutMin);
+
+        uint256[] memory amounts = new uint256[](path.length);
+        amounts[0] = buyAmount;
+        amounts[path.length - 1] = amountOutMin;
+
+        return amounts;
     }
 }

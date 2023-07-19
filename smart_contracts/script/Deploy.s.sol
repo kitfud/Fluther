@@ -12,15 +12,13 @@ contract Deploy is Script {
     HelperConfig public config;
     address public token1;
     address public token2;
+    address public defaultRouter;
 
-    function run()
-        public
-        returns (AutomationLayer, DollarCostAverage, address, address)
-    {
+    function run() public {
         config = new HelperConfig();
         (
             address wrapNative,
-            address defaultRouter,
+            address defaultRouter_,
             address duhToken,
             uint256 minimumDuh,
             address sequencerAddress,
@@ -33,6 +31,7 @@ contract Deploy is Script {
 
         token1 = token1_;
         token2 = token2_;
+        defaultRouter = defaultRouter_;
 
         vm.startBroadcast(deployerKey);
         automation = new AutomationLayer(
@@ -49,7 +48,5 @@ contract Deploy is Script {
             wrapNative
         );
         vm.stopBroadcast();
-
-        return (automation, dca, token1, token2);
     }
 }

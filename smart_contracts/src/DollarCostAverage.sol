@@ -12,7 +12,7 @@ pragma solidity 0.8.19;
 /// Imports
 /// -----------------------------------------------------------------------
 
-import {IDollarCostAveraging} from "./interfaces/IDollarCostAveraging.sol";
+import {IDollarCostAverage} from "./interfaces/IDollarCostAverage.sol";
 import {IAutomatedContract} from "./interfaces/IAutomatedContract.sol";
 import {IUniswapV2Router02} from "./interfaces/IUniswapV2Router02.sol";
 import {IAutomationLayer} from "./interfaces/IAutomationLayer.sol";
@@ -26,7 +26,7 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.
 /// -----------------------------------------------------------------------
 
 contract DollarCostAverage is
-    IDollarCostAveraging,
+    IDollarCostAverage,
     IAutomatedContract,
     Ownable,
     Pausable,
@@ -95,7 +95,7 @@ contract DollarCostAverage is
 
     /** @dev added nonReentrant and whenNotPaused third party modifiers. The amount input
      *  should not be 0 and it reverts if acceptingNewRecurringBuys storage variable is false.
-     *  @inheritdoc IDollarCostAveraging
+     *  @inheritdoc IDollarCostAverage
      */
     function createRecurringBuy(
         uint256 amountToSpend,
@@ -104,7 +104,7 @@ contract DollarCostAverage is
         uint256 timeIntervalInSeconds,
         address paymentInterface,
         address dexRouter
-    ) external override(IDollarCostAveraging) {
+    ) external override(IDollarCostAverage) {
         __nonReentrant();
         __whenNotPaused();
 
@@ -151,11 +151,11 @@ contract DollarCostAverage is
 
     /** @dev added nonReentrant and whenNotPaused third party modifiers. The given recurring buy ID
      *  must be valid. It reverts if caller is not recurring buy sender.
-     *  @inheritdoc IDollarCostAveraging
+     *  @inheritdoc IDollarCostAverage
      */
     function cancelRecurringPayment(
         uint256 recurringBuyId
-    ) external override(IDollarCostAveraging) {
+    ) external override(IDollarCostAverage) {
         __nonReentrant();
         __whenNotPaused();
 
@@ -177,11 +177,11 @@ contract DollarCostAverage is
     /** @dev added nonReentrant and whenNotPaused third party modifiers. The given recurring buy ID
      *  must be valid. It reverts if recurring buy is not valid, or if current block timestamp haven't reached
      *  payment due, or if ERC20 transferFrom function doesn't work.
-     *  @inheritdoc IDollarCostAveraging
+     *  @inheritdoc IDollarCostAverage
      */
     function transferFunds(
         uint256 recurringBuyId
-    ) public override(IDollarCostAveraging) {
+    ) public override(IDollarCostAverage) {
         __nonReentrant();
         __whenNotPaused();
 
@@ -226,7 +226,7 @@ contract DollarCostAverage is
         uint256 amountOutMin = (amountsOut[amountsOut.length - 1] *
             SLIPPAGE_PERCENTAGE) / PRECISION;
 
-        dexRouter.swapExactTokensForTokens(
+        uint256[] memory amounts = dexRouter.swapExactTokensForTokens(
             buyAmount,
             amountOutMin,
             path,
@@ -234,7 +234,11 @@ contract DollarCostAverage is
             block.timestamp
         );
 
-        emit PaymentTransferred(recurringBuyId, buy.sender);
+        emit PaymentTransferred(
+            recurringBuyId,
+            buy.sender,
+            amounts[amounts.length - 1]
+        );
     }
 
     /** @dev calls transferFunds public function
@@ -247,11 +251,11 @@ contract DollarCostAverage is
     }
 
     /** @dev added onlyOwner third party modifier.
-     *  @inheritdoc IDollarCostAveraging
+     *  @inheritdoc IDollarCostAverage
      */
     function setAutomationLayer(
         address automationLayerAddress
-    ) external override(IDollarCostAveraging) {
+    ) external override(IDollarCostAverage) {
         __nonReentrant();
         __whenNotPaused();
         __onlyOwner();
@@ -262,11 +266,11 @@ contract DollarCostAverage is
     }
 
     /** @dev added onlyOwner third party modifier.
-     *  @inheritdoc IDollarCostAveraging
+     *  @inheritdoc IDollarCostAverage
      */
     function setDefaultRouter(
         address defaultRouter
-    ) external override(IDollarCostAveraging) {
+    ) external override(IDollarCostAverage) {
         __nonReentrant();
         __whenNotPaused();
         __onlyOwner();
@@ -277,9 +281,9 @@ contract DollarCostAverage is
     }
 
     /** @dev added onlyOwner third party modifier. Calls third party pause internal function
-     *  @inheritdoc IDollarCostAveraging
+     *  @inheritdoc IDollarCostAverage
      */
-    function pause() external override(IDollarCostAveraging) {
+    function pause() external override(IDollarCostAverage) {
         __nonReentrant();
         __whenNotPaused();
         __onlyOwner();
@@ -288,9 +292,9 @@ contract DollarCostAverage is
     }
 
     /** @dev added onlyOwner third party modifier. Calls third party unpause internal function
-     *  @inheritdoc IDollarCostAveraging
+     *  @inheritdoc IDollarCostAverage
      */
-    function unpause() external override(IDollarCostAveraging) {
+    function unpause() external override(IDollarCostAverage) {
         __nonReentrant();
         __whenNotPaused();
         __onlyOwner();
@@ -342,76 +346,71 @@ contract DollarCostAverage is
         return buy.paymentDue < block.timestamp && buy.status == Status.SET;
     }
 
-    /// @inheritdoc IDollarCostAveraging
+    /// @inheritdoc IDollarCostAverage
     function getCurrentBlockTimestamp()
         external
         view
-        override(IDollarCostAveraging)
+        override(IDollarCostAverage)
         returns (uint256)
     {
         return block.timestamp;
     }
 
-    /// @inheritdoc IDollarCostAveraging
+    /// @inheritdoc IDollarCostAverage
     function getRecurringBuy(
         uint256 recurringBuyId
-    )
-        external
-        view
-        override(IDollarCostAveraging)
-        returns (RecurringBuy memory)
-    {
+    ) external view override(IDollarCostAverage) returns (RecurringBuy memory) {
         return s_recurringBuys[recurringBuyId];
     }
 
-    /// @inheritdoc IDollarCostAveraging
+    /// @inheritdoc IDollarCostAverage
     function getNextRecurringBuyId()
         external
         view
-        override(IDollarCostAveraging)
+        override(IDollarCostAverage)
         returns (uint256)
     {
         return s_nextRecurringBuyId;
     }
 
-    /// @inheritdoc IDollarCostAveraging
+    /// @inheritdoc IDollarCostAverage
     function getAutomationLayer()
         external
         view
-        override(IDollarCostAveraging)
+        override(IDollarCostAverage)
         returns (IAutomationLayer)
     {
         return s_automationLayer;
     }
 
-    /// @inheritdoc IDollarCostAveraging
+    /// @inheritdoc IDollarCostAverage
     function getAcceptingNewRecurringBuys()
         external
         view
-        override(IDollarCostAveraging)
+        override(IDollarCostAverage)
         returns (bool)
     {
         return s_acceptingNewRecurringBuys;
     }
 
-    /// @inheritdoc IDollarCostAveraging
+    /// @inheritdoc IDollarCostAverage
     function getWrapNative()
         external
         view
-        override(IDollarCostAveraging)
+        override(IDollarCostAverage)
         returns (address)
     {
         return wrapNative;
     }
 
-    /// @inheritdoc IDollarCostAveraging
+    /// @inheritdoc IDollarCostAverage
     function getRangeOfRecurringBuys(
         uint256 startRecBuyId,
         uint256 endRecBuyId
     )
         external
         view
-        override(IDollarCostAveraging)
+        override(IDollarCostAverage)
         returns (RecurringBuy[] memory)
     {
         if (

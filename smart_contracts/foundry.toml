@@ -6,5 +6,8 @@ remappings = [
     "@openzeppelin/contracts=lib/openzeppelin-contracts/contracts",
     "@uniswap/contracts=lib/v2-periphery/contracts",
 ]
+optimizer = true
+optimezer_runs = 1000
+# via_ir = true
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config

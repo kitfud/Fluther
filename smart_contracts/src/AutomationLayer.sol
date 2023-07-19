@@ -14,8 +14,6 @@ pragma solidity 0.8.19;
 
 import {IAutomationLayer} from "./interfaces/IAutomationLayer.sol";
 import {INodeSequencer} from "./interfaces/INodeSequencer.sol";
-import {IUniswapV2Router02} from "./interfaces/IUniswapV2Router02.sol";
-import {IDollarCostAveraging} from "./interfaces/IDollarCostAveraging.sol";
 import {IAutomatedContract} from "./interfaces/IAutomatedContract.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
