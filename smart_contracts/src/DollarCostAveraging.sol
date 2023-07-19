@@ -98,27 +98,21 @@ contract DollarCostAverage is
      *  @inheritdoc IDollarCostAveraging
      */
     function createRecurringBuy(
-        uint256 amountToSpend,
-        address tokenToSpend,
-        address tokenToBuy,
-        uint256 timeIntervalInSeconds,
+        uint256 amount,
+        address token1,
+        address token2,
+        uint256 timeIntervalSeconds,
         address paymentInterface,
         address dexRouter
     ) external override(IDollarCostAveraging) {
         __nonReentrant();
         __whenNotPaused();
 
-        if (amountToSpend == 0) {
+        if (amount == 0) {
             revert DollarCostAveraging__AmountIsZero();
         }
         if (!s_acceptingNewRecurringBuys) {
             revert DollarCostAveraging__NotAcceptingNewRecurringBuys();
-        }
-        if (tokenToSpend == address(0) || tokenToBuy == address(0)) {
-            revert DollarCostAveraging__InvalidTokenAddresses();
-        }
-        if (timeIntervalInSeconds == 0) {
-            revert DollarCostAveraging__InvalidTimeInterval();
         }
 
         uint256 nextRecurringBuyId = s_nextRecurringBuyId;
@@ -130,10 +124,10 @@ contract DollarCostAverage is
 
         RecurringBuy memory buy = RecurringBuy(
             msg.sender,
-            amountToSpend,
-            tokenToSpend,
-            tokenToBuy,
-            timeIntervalInSeconds,
+            amount,
+            token1,
+            token2,
+            timeIntervalSeconds,
             paymentInterface,
             dexRouter == address(0) ? s_defaultRouter : dexRouter,
             block.timestamp,
@@ -197,6 +191,14 @@ contract DollarCostAverage is
         uint256 clientFee = (fee * CLIENT_FEE_SHARE) / PRECISION;
         uint256 contractFee = fee - clientFee;
 
+        require(
+            IERC20(buy.tokenToSpend).transferFrom(
+                buy.sender,
+                address(this),
+                buyAmount
+            ),
+            "Token transfer failed.");
+
         if (buy.paymentInterface != address(0)) {
             __transferERC20(
                 buy.tokenToSpend,
@@ -204,13 +206,13 @@ contract DollarCostAverage is
                 buy.paymentInterface,
                 clientFee
             );
-        }
 
-        __transferERC20(buy.tokenToSpend, buy.sender, owner(), contractFee);
 
+        }        
+        __transferERC20(buy.tokenToSpend, buy.sender, buy.paymentInterface, contractFee);
         IUniswapV2Router02 dexRouter = IUniswapV2Router02(buy.dexRouter);
 
-        IERC20(buy.tokenToSpend).approve(buy.dexRouter, buyAmount);
+        require(IERC20(buy.tokenToSpend).approve(buy.dexRouter, buyAmount), "failed to approve token to swap");
 
         address[] memory path;
         if (buy.tokenToSpend == wrapNative || buy.tokenToBuy == wrapNative) {
