@@ -83,6 +83,13 @@ contract DollarCostAverage is
         address automationLayerAddress,
         address _wrapNative
     ) {
+        if (defaultRouter == address(0)) {
+            revert DollarCostAverage__InvalidDefaultRouterAddress();
+        }
+        if (automationLayerAddress == address(0)) {
+            revert DollarCostAverage__InvalidAutomationLayerAddress();
+        }
+
         s_defaultRouter = defaultRouter;
         s_automationLayer = IAutomationLayer(automationLayerAddress);
         s_acceptingNewRecurringBuys = true;
@@ -94,7 +101,9 @@ contract DollarCostAverage is
     /// -----------------------------------------------------------------------
 
     /** @dev added nonReentrant and whenNotPaused third party modifiers. The amount input
-     *  should not be 0 and it reverts if acceptingNewRecurringBuys storage variable is false.
+     *  should not be 0 and it reverts if acceptingNewRecurringBuys storage variable is false. It
+     *  also reverts if the address of any given token is address(0) and reverts if time interval
+     *  is 0.
      *  @inheritdoc IDollarCostAverage
      */
     function createRecurringBuy(
@@ -109,16 +118,16 @@ contract DollarCostAverage is
         __whenNotPaused();
 
         if (amountToSpend == 0) {
-            revert DollarCostAveraging__AmountIsZero();
+            revert DollarCostAverage__AmountIsZero();
         }
         if (!s_acceptingNewRecurringBuys) {
-            revert DollarCostAveraging__NotAcceptingNewRecurringBuys();
+            revert DollarCostAverage__NotAcceptingNewRecurringBuys();
         }
         if (tokenToSpend == address(0) || tokenToBuy == address(0)) {
-            revert DollarCostAveraging__InvalidTokenAddresses();
+            revert DollarCostAverage__InvalidTokenAddresses();
         }
         if (timeIntervalInSeconds == 0) {
-            revert DollarCostAveraging__InvalidTimeInterval();
+            revert DollarCostAverage__InvalidTimeInterval();
         }
 
         uint256 nextRecurringBuyId = s_nextRecurringBuyId;
@@ -162,10 +171,10 @@ contract DollarCostAverage is
         RecurringBuy storage buy = s_recurringBuys[recurringBuyId];
 
         if (buy.status != Status.SET) {
-            revert DollarCostAveraging__InvalidRecurringBuyId();
+            revert DollarCostAverage__InvalidRecurringBuyId();
         }
         if (msg.sender != buy.sender) {
-            revert DollarCostAveraging__CallerNotRecurringBuySender();
+            revert DollarCostAverage__CallerNotRecurringBuySender();
         }
 
         buy.status = Status.CANCELLED;
@@ -187,7 +196,7 @@ contract DollarCostAverage is
 
         RecurringBuy storage buy = s_recurringBuys[recurringBuyId];
         if (buy.status != Status.SET || buy.paymentDue > block.timestamp) {
-            revert DollarCostAveraging__InvalidRecurringBuy();
+            revert DollarCostAverage__InvalidRecurringBuy();
         }
 
         buy.paymentDue += buy.timeIntervalInSeconds;
@@ -207,7 +216,7 @@ contract DollarCostAverage is
         }
 
         __transferERC20(buy.tokenToSpend, buy.sender, owner(), contractFee);
-        IERC20(buy.tokenToSpend).approve(buy.dexRouter, buyAmount);
+        __approveERC20(buy.tokenToSpend, buy.dexRouter, buyAmount);
 
         address[] memory path;
         if (buy.tokenToSpend == wrapNative || buy.tokenToBuy == wrapNative) {
@@ -248,7 +257,7 @@ contract DollarCostAverage is
         transferFunds(recurringBuyId);
     }
 
-    /** @dev added onlyOwner third party modifier.
+    /** @dev added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
      *  @inheritdoc IDollarCostAverage
      */
     function setAutomationLayer(
@@ -263,7 +272,7 @@ contract DollarCostAverage is
         emit AutomationLayerSet(msg.sender, automationLayerAddress);
     }
 
-    /** @dev added onlyOwner third party modifier.
+    /** @dev added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
      *  @inheritdoc IDollarCostAverage
      */
     function setDefaultRouter(
@@ -276,6 +285,21 @@ contract DollarCostAverage is
         s_defaultRouter = defaultRouter;
 
         emit DefaultRouterSet(msg.sender, defaultRouter);
+    }
+
+    /** @dev added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
+     *  @inheritdoc IDollarCostAverage
+     */
+    function setAcceptingNewRecurringBuys(
+        bool acceptingNewRecurringBuys
+    ) external override(IDollarCostAverage) {
+        __nonReentrant();
+        __whenNotPaused();
+        __onlyOwner();
+
+        s_acceptingNewRecurringBuys = acceptingNewRecurringBuys;
+
+        emit AcceptingRecurringBuysSet(msg.sender, acceptingNewRecurringBuys);
     }
 
     /** @dev added onlyOwner third party modifier. Calls third party pause internal function
@@ -328,13 +352,59 @@ contract DollarCostAverage is
         );
 
         if (!success || (data.length != 0 && !abi.decode(data, (bool)))) {
-            revert DollarCostAveraging__TokenTransferFailed();
+            revert DollarCostAverage__TokenTransferFailed();
+        }
+    }
+
+    /** @dev Approves the specific amount as allowance to the given address of the given token
+     *  @dev It reverts if the approve is not sucessfull (i.e. reverted) or if returned value is false.
+     *  @param token: ERC20 token smart contract address to approve.
+     *  @param to: address to which tokens will be approved.
+     *  @param amount: amount to be approved.
+     */
+    function __approveERC20(address token, address to, uint256 amount) private {
+        (bool success, bytes memory data) = token.call(
+            abi.encodeWithSelector(IERC20(token).approve.selector, to, amount)
+        );
+
+        if (!success || (data.length != 0 && !abi.decode(data, (bool)))) {
+            revert DollarCostAverage__TokenApprovalFailed();
         }
     }
 
     /// -----------------------------------------------------------------------
     /// External view functions
     /// -----------------------------------------------------------------------
+
+    /// @inheritdoc IDollarCostAverage
+    function getNextRecurringBuyId()
+        external
+        view
+        override(IDollarCostAverage)
+        returns (uint256)
+    {
+        return s_nextRecurringBuyId;
+    }
+
+    /// @inheritdoc IDollarCostAverage
+    function getDefaultRouter()
+        external
+        view
+        override(IDollarCostAverage)
+        returns (address)
+    {
+        return s_defaultRouter;
+    }
+
+    /// @inheritdoc IDollarCostAverage
+    function getAutomationLayer()
+        external
+        view
+        override(IDollarCostAverage)
+        returns (IAutomationLayer)
+    {
+        return s_automationLayer;
+    }
 
     /// @inheritdoc IAutomatedContract
     function checkSimpleAutomation(
@@ -359,26 +429,6 @@ contract DollarCostAverage is
         uint256 recurringBuyId
     ) external view override(IDollarCostAverage) returns (RecurringBuy memory) {
         return s_recurringBuys[recurringBuyId];
-    }
-
-    /// @inheritdoc IDollarCostAverage
-    function getNextRecurringBuyId()
-        external
-        view
-        override(IDollarCostAverage)
-        returns (uint256)
-    {
-        return s_nextRecurringBuyId;
-    }
-
-    /// @inheritdoc IDollarCostAverage
-    function getAutomationLayer()
-        external
-        view
-        override(IDollarCostAverage)
-        returns (IAutomationLayer)
-    {
-        return s_automationLayer;
     }
 
     /// @inheritdoc IDollarCostAverage
@@ -415,7 +465,7 @@ contract DollarCostAverage is
             !(startRecBuyId < endRecBuyId) &&
             !(endRecBuyId < s_nextRecurringBuyId)
         ) {
-            revert DollarCostAveraging__InvalidIndexRange();
+            revert DollarCostAverage__InvalidIndexRange();
         }
 
         RecurringBuy[] memory recurringBuys = new RecurringBuy[](

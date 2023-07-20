@@ -340,7 +340,9 @@ contract AutomationLayer is
         __validateAccountNumber(account.status);
 
         return
-            IAutomatedContract(account.user).checkSimpleAutomation(account.id);
+            IAutomatedContract(account.automatedContract).checkSimpleAutomation(
+                account.id
+            );
     }
 
     /// @inheritdoc IAutomationLayer

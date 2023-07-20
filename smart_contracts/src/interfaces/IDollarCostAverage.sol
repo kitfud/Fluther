@@ -21,31 +21,40 @@ interface IDollarCostAverage {
     /// -----------------------------------------------------------------------
 
     /// @dev error for when given amount of tokens to spend is zero
-    error DollarCostAveraging__AmountIsZero();
+    error DollarCostAverage__AmountIsZero();
 
     /// @dev error for when the contract is not accepting new recurring buys (i.e. s_acceptingNewRecurringBuys = false)
-    error DollarCostAveraging__NotAcceptingNewRecurringBuys();
+    error DollarCostAverage__NotAcceptingNewRecurringBuys();
 
     /// @dev error for when an invalid recurring buy ID is given
-    error DollarCostAveraging__InvalidRecurringBuyId();
+    error DollarCostAverage__InvalidRecurringBuyId();
 
     /// @dev error for when the function caller is not recurring buy sender/creator
-    error DollarCostAveraging__CallerNotRecurringBuySender();
+    error DollarCostAverage__CallerNotRecurringBuySender();
 
     /// @dev error for when the recurring buy is not valid or not enough time has past
-    error DollarCostAveraging__InvalidRecurringBuy();
+    error DollarCostAverage__InvalidRecurringBuy();
 
     /// @dev error for when ERC20 token transfer fails
-    error DollarCostAveraging__TokenTransferFailed();
+    error DollarCostAverage__TokenTransferFailed();
 
     /// @dev error for when an invalid range of recurring buy IDs is given
-    error DollarCostAveraging__InvalidIndexRange();
+    error DollarCostAverage__InvalidIndexRange();
 
     /// @dev error for when any of the given token address is zero.
-    error DollarCostAveraging__InvalidTokenAddresses();
+    error DollarCostAverage__InvalidTokenAddresses();
 
     /// @dev error for when any of the given time interval is zero.
-    error DollarCostAveraging__InvalidTimeInterval();
+    error DollarCostAverage__InvalidTimeInterval();
+
+    /// @dev error for when given default DEX router address is address(0).
+    error DollarCostAverage__InvalidDefaultRouterAddress();
+
+    /// @dev error for when given automation layer address is address(0).
+    error DollarCostAverage__InvalidAutomationLayerAddress();
+
+    /// @dev error for when
+    error DollarCostAverage__TokenApprovalFailed();
 
     /// -----------------------------------------------------------------------
     /// Type declarations (structs and enums)
@@ -140,6 +149,15 @@ interface IDollarCostAverage {
         address indexed defaultRouter
     );
 
+    /** @dev event for when the a new default DEX router address is set.
+     *  @param caller: caller's address.
+     *  @param acceptingRecurringBuys: true if accepting, false otherwise.
+     */
+    event AcceptingRecurringBuysSet(
+        address indexed caller,
+        bool acceptingRecurringBuys
+    );
+
     /// -----------------------------------------------------------------------
     /// Functions
     /// -----------------------------------------------------------------------
@@ -180,6 +198,13 @@ interface IDollarCostAverage {
      *  @param defaultRouter: new default DEX smart contract address.
      */
     function setDefaultRouter(address defaultRouter) external;
+
+    /** @notice sets new default DEX router to perform the recurring buy.
+     *  @param acceptingNewRecurringBuys: true if accepting, false otherwise.
+     */
+    function setAcceptingNewRecurringBuys(
+        bool acceptingNewRecurringBuys
+    ) external;
 
     /** @notice pauses the smart contract so that any function won't work. */
     function pause() external;
@@ -229,4 +254,9 @@ interface IDollarCostAverage {
         uint256 startRecBuyId,
         uint256 endRecBuyId
     ) external view returns (RecurringBuy[] memory);
+
+    /** @notice reads the defaultRouter storage variable.
+     *  @return address for the default DEX router.
+     */
+    function getDefaultRouter() external view returns (address);
 }
