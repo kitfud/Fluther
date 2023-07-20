@@ -50,7 +50,7 @@ function App() {
   const [amount, setAmount] = useState("")
   const [token1,setToken1] = useState("")
   const [token2,setToken2] = useState("")
-  const [interval, setInterval] = useState("")
+  const [interval, setI] = useState("")
 
   const [contractParamsSet, setContractParams] = useState(false)
   const [userAddress,setUserAddress] = useState(null)
@@ -163,7 +163,8 @@ function App() {
                   id="filled-basic"
                   label="Time frequency"
                   variant="filled"
-                  onChange={ (e) => setInterval(e.target.value) }
+                  onChange={ (e) => setI(e.target.value) }
+                  value={interval}
                 >
                   {/* WILL FIGURE OUT A BETTER WAY TO DO THIS PART LATER */}
                   <MenuItem value={300}>5 Minute</MenuItem>
