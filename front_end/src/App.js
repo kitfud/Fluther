@@ -157,7 +157,7 @@ function App() {
            
               <FormControl sx={{width:'70%', marginTop:'40px'}}>
                 <InputLabel id="demo-simple-select-label">
-                  Set Investment Interval
+                  Investment Interval
                 </InputLabel>
                 <Select
                   id="filled-basic"
