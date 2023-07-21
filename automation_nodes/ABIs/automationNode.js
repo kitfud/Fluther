@@ -1,5 +1,5 @@
 //import required dependencies
-const {dollarCostAverageABI, automationLayerABI, nodeSequencerABI} = require('./automation_nodes/ABIs')
+const {dollarCostAverageABI, automationLayerABI, nodeSequencerABI} = require('.')
 console.log(dollarCostAverageABI)
 
 
