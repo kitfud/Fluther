@@ -51,8 +51,8 @@ contract NodeSequencer is INodeSequencer, Ownable, Pausable, ReentrancyGuard {
 
         minimumDuh = 0;
         blockNumberRange = 1000;
-        //duh = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174; //USDC on Polygon
-        duh = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2; //WETH on Ethereum
+        duh = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174; //USDC on Polygon
+        //duh = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2; //WETH on Ethereum
     }
 
     /// -----------------------------------------------------------------------
