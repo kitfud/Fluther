@@ -9,6 +9,8 @@ const theme = createTheme({
   palette: {
     primary: {
       main: '#ed7615',
+      //current color orange
+      //previous color yellow #ece115
     },
     secondary: {
       main: '#15ece1',
@@ -127,17 +129,6 @@ function App() {
                 Create Dollar Cost Average:
             </Typography>
 
-            {/* AMOUNT BOX FIELD */}  
-            <Box display="flex" alignItems="center" justifyContent="center">
-              <TextField
-                onChange={ (e) => setAmount(e.target.value) }
-                id="filled-basic"
-                label="Amount"
-                variant="filled"
-              >
-              </TextField>
-            </Box>
-
             {/* TOKEN 1 BOX FIELD */}
             <Box display="flex" alignItems="center" justifyContent="center">
               <TextField
@@ -159,6 +150,17 @@ function App() {
               >
               </TextField>
             </Box> 
+
+            {/* AMOUNT BOX FIELD */}  
+            <Box display="flex" alignItems="center" justifyContent="center">
+              <TextField
+                onChange={ (e) => setAmount(e.target.value) }
+                id="filled-basic"
+                label="Amount"
+                variant="filled"
+              >
+              </TextField>
+            </Box>
 
             {/* TIME INTERVAL BOX FIELD */}
             <Box 
