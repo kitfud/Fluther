@@ -8,7 +8,7 @@ import { Grid, Box, TextField, Typography, Card, Button, InputLabel, MenuItem, F
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#ece115',
+      main: '#ed7615',
     },
     secondary: {
       main: '#15ece1',
@@ -30,6 +30,14 @@ const theme = createTheme({
           style:{color:"red"}  
       }
     },
+    MuiFormControl: {
+      styleOverrides: {
+        // Name of the slot
+        root: {
+          backgroundColor: 'teal',
+        },
+      },
+    },
     MuiCard: {
       styleOverrides: {
         // Name of the slot
@@ -42,7 +50,7 @@ const theme = createTheme({
           raised:true
         },
       },
-    }
+    },
   }
 })
 
@@ -153,49 +161,36 @@ function App() {
             </Box> 
 
             {/* TIME INTERVAL BOX FIELD */}
-            <Box display="flex" alignItems="center" justifyContent="center" >
-              <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">
-                  Hours
+            <Box 
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              marginLeft="10%"
+              marginRight="10.25%"
+            >
+              <FormControl fullWidth variant="filled" >
+                <InputLabel>
+                  Time Interval
                 </InputLabel>
                 <Select
                   id="filled-basic"
-                  label="Time frequency"
+                  label="Interval"
                   variant="filled"
                   onChange={ (e) => setInterval(e.target.value) }
                 >
-                  {/* WILL FIGURE OUT A BETTER WAY TO DO THIS PART LATER */}
-                  <MenuItem value={1}>1</MenuItem>
-                  <MenuItem value={2}>2</MenuItem>
-                  <MenuItem value={3}>3</MenuItem>
-                  <MenuItem value={4}>4</MenuItem>
-                  <MenuItem value={5}>5</MenuItem>
-                  <MenuItem value={6}>6</MenuItem>
-                  <MenuItem value={7}>7</MenuItem>
-                  <MenuItem value={8}>8</MenuItem>
-                  <MenuItem value={9}>9</MenuItem>
-                  <MenuItem value={10}>10</MenuItem>
-                  <MenuItem value={11}>11</MenuItem>
-                  <MenuItem value={12}>12</MenuItem>
-                  <MenuItem value={13}>13</MenuItem>
-                  <MenuItem value={14}>14</MenuItem>
-                  <MenuItem value={15}>15</MenuItem>
-                  <MenuItem value={16}>16</MenuItem>
-                  <MenuItem value={17}>17</MenuItem>
-                  <MenuItem value={18}>18</MenuItem>
-                  <MenuItem value={19}>19</MenuItem>
-                  <MenuItem value={20}>20</MenuItem>
-                  <MenuItem value={21}>21</MenuItem>
-                  <MenuItem value={22}>22</MenuItem>
-                  <MenuItem value={23}>23</MenuItem>
-                  <MenuItem value={24}>24</MenuItem>
-                </Select>
+                  {/*
+                  WILL FIGURE OUT A BETTER WAY TO DO THIS PART LATER
+                  DAILY = 86400 SECONDS/DAY = (60 * 60 * 24)
+                  WEEKLY = 604800 SECONDS/WEEK = (60 * 60 * 24 * 7) 
+                  MONTHLY = 2419200 SECONDS/MONTH = (60 * 60 * 24 * 7 * 4) 
+                   */}
 
+                  <MenuItem value={86400}>Daily</MenuItem>
+                  <MenuItem value={604800}>Weekly</MenuItem>
+                  <MenuItem value={2419200}>Monthly</MenuItem>
+
+                </Select>
               </FormControl>
-              {/* 
-              <TextField onChange={(e)=> setInterval(e.target.value)} id="filled-basic" label="Time Interval (sec)" variant="filled" >
-              </TextField>
-            */}
             </Box> 
 
             {/* "SUBMIT AGREEMENT" BUTTON LOGIC
