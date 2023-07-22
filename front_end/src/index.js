@@ -3,11 +3,16 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { ThirdwebProvider } from "@thirdweb-dev/react";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+const activeChain = "ethereum";
+
 root.render(
   <React.StrictMode>
-    <App />
+    <ThirdwebProvider activeChain={activeChain}>
+      <App />
+    </ThirdwebProvider>
   </React.StrictMode>
 );
 
