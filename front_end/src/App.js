@@ -8,7 +8,9 @@ import { Grid, Box, TextField, Typography, Card, Button, InputLabel, MenuItem, F
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#ece115',
+      main: '#ed7615',
+      //current color orange
+      //previous color yellow #ece115
     },
     secondary: {
       main: '#15ece1',
@@ -30,6 +32,14 @@ const theme = createTheme({
           style:{color:"red"}  
       }
     },
+    MuiFormControl: {
+      styleOverrides: {
+        // Name of the slot
+        root: {
+          backgroundColor: 'teal',
+        },
+      },
+    },
     MuiCard: {
       styleOverrides: {
         // Name of the slot
@@ -42,7 +52,7 @@ const theme = createTheme({
           raised:true
         },
       },
-    }
+    },
   }
 })
 
@@ -119,17 +129,6 @@ function App() {
                 Create Dollar Cost Average:
             </Typography>
 
-            {/* AMOUNT BOX FIELD */}  
-            <Box display="flex" alignItems="center" justifyContent="center">
-              <TextField
-                onChange={ (e) => setAmount(e.target.value) }
-                id="filled-basic"
-                label="Amount"
-                variant="filled"
-              >
-              </TextField>
-            </Box>
-
             {/* TOKEN 1 BOX FIELD */}
             <Box display="flex" alignItems="center" justifyContent="center">
               <TextField
@@ -150,14 +149,30 @@ function App() {
                 variant="filled"
               >
               </TextField>
+            </Box>
+
+            {/* AMOUNT BOX FIELD */}  
+            <Box display="flex" alignItems="center" justifyContent="center">
+              <TextField
+                onChange={ (e) => setAmount(e.target.value) }
+                id="filled-basic"
+                label="Amount"
+                variant="filled"
+              >
+              </TextField>
             </Box> 
 
             {/* TIME INTERVAL BOX FIELD */}
-            <Box display="flex" alignItems="center" justifyContent="center"  >
-           
-              <FormControl sx={{width:'70%', marginTop:'40px'}}>
-                <InputLabel id="demo-simple-select-label">
-                  Investment Interval
+            <Box 
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              marginLeft="10%"
+              marginRight="10.25%"
+            >
+              <FormControl fullWidth variant="filled">
+                <InputLabel>
+                  Time Interval
                 </InputLabel>
                 <Select
                   id="filled-basic"
@@ -167,17 +182,12 @@ function App() {
                   value={interval}
                 >
                   {/* WILL FIGURE OUT A BETTER WAY TO DO THIS PART LATER */}
-                  <MenuItem value={300}>5 Minute</MenuItem>
-                  <MenuItem value={3600}>Hourly</MenuItem>
+                  <MenuItem value={300}>5 Minutes</MenuItem>
                   <MenuItem value={86400}>Daily</MenuItem>
                   <MenuItem value={604800}>Weekly</MenuItem>
+                  <MenuItem value={2419200}>Monthly</MenuItem>
                 </Select>
               </FormControl>
-        
-              {/* 
-              <TextField onChange={(e)=> setInterval(e.target.value)} id="filled-basic" label="Time Interval (sec)" variant="filled" >
-              </TextField>
-            */}
             </Box> 
 
             {/* "SUBMIT AGREEMENT" BUTTON LOGIC
