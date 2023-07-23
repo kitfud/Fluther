@@ -46,7 +46,6 @@ contract AutomationLayer is
 
     // mappings and arrays
     mapping(uint256 accountNumber => Account) private s_accounts;
-    mapping(address => bool) private s_isNodeRegistered;
 
     /* solhint-enable */
 
@@ -67,7 +66,7 @@ contract AutomationLayer is
      *  @param status: the status of the account
      */
     function __validateAccountNumber(Status status) private pure {
-        if (status != Status.SET) {
+        if (!__isValidAccount(status)) {
             revert AutomationLayer__InvalidAccountNumber();
         }
     }
@@ -200,11 +199,7 @@ contract AutomationLayer is
 
         Account memory account = s_accounts[accountNumber];
 
-        __validateAccountNumber(account.status);
-
-        IAutomatedContract(account.automatedContract).simpleAutomation(
-            account.id
-        );
+        __performSimpleAutomation(accountNumber, true);
         // Transfer the tokens
         /*  require(
             IERC20(duh).transferFrom(account.account, tx.origin, automationFee),
@@ -219,7 +214,27 @@ contract AutomationLayer is
         );
     }
 
-    /** @dev added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
+    /** @dev added nonReentrant and whenNotPaused third party modifiers. It reverts if
+     *  node does not have enough DUH balance or if it is not an allowed node.
+     *  @inheritdoc IAutomationLayer
+     */
+    function simpleAutomationBatch(
+        uint256[] calldata accountNumbers
+    ) external override(IAutomationLayer) {
+        __nonReentrant();
+        __whenNotPaused();
+        __hasSufficientTokens();
+        __isCurrentNode();
+
+        bool[] memory success = new bool[](accountNumbers.length);
+        for (uint256 ii = 0; ii < accountNumbers.length; ++ii) {
+            success[ii] = __performSimpleAutomation(accountNumbers[ii], false);
+        }
+
+        emit BatchSimpleAutomationDone(msg.sender, accountNumbers, success);
+    }
+
+    /** @dev Added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
      *  @inheritdoc IAutomationLayer
      */
     function withdraw(uint256 amount) external override(IAutomationLayer) {
@@ -232,29 +247,52 @@ contract AutomationLayer is
         emit Withdrawn(owner(), amount);
     }
 
-    /** @dev added onlyOwner third party modifier. Calls third party pause internal function
+    /** @dev Added onlyOwner and nonReentrant third party modifiers. Calls third party pause internal function
      *  @inheritdoc IAutomationLayer
      */
     function pause() external override(IAutomationLayer) {
         __nonReentrant();
-        __whenNotPaused();
+
         __onlyOwner();
 
         _pause();
     }
 
-    /** @dev added onlyOwner third party modifier. Calls third party unpause internal function
+    /** @dev Added onlyOwner and nonReentrant third party modifiers. Calls third party unpause internal function
      *  @inheritdoc IAutomationLayer
      */
     function unpause() external override(IAutomationLayer) {
         __nonReentrant();
-        __whenNotPaused();
         __onlyOwner();
 
         _unpause();
     }
 
-    /** @dev added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
+    /** @dev Added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
+     *  @inheritdoc IAutomationLayer
+     */
+    function setDuh(address duh) external override(IAutomationLayer) {
+        __nonReentrant();
+        __whenNotPaused();
+        __onlyOwner();
+
+        s_duh = duh;
+    }
+
+    /** @dev Added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
+     *  @inheritdoc IAutomationLayer
+     */
+    function setMinimumDuh(
+        uint256 minimumDuh
+    ) external override(IAutomationLayer) {
+        __nonReentrant();
+        __whenNotPaused();
+        __onlyOwner();
+
+        s_minimumDuh = minimumDuh;
+    }
+
+    /** @dev Added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
      *  @inheritdoc IAutomationLayer
      */
     function setSequencerAddress(
@@ -269,7 +307,7 @@ contract AutomationLayer is
         emit SequencerAddressSet(msg.sender, sequencerAddress);
     }
 
-    /** @dev added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
+    /** @dev Added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
      *  @inheritdoc IAutomationLayer
      */
     function setOracleAddress(
@@ -284,7 +322,7 @@ contract AutomationLayer is
         emit OracleAddressSet(msg.sender, oracleAddress);
     }
 
-    /** @dev added nonReentrant and whenNotPaused third party modifiers.
+    /** @dev Added nonReentrant and whenNotPaused third party modifiers.
      *  Only oracle contract can call this function.
      *  @inheritdoc IAutomationLayer
      */
@@ -300,8 +338,7 @@ contract AutomationLayer is
         emit AutomationFeeSet(msg.sender, automationFee);
     }
 
-    /** @dev added nonReentrant and whenNotPaused third party modifiers.
-     *  Only oracle contract can call this function.
+    /** @dev Added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
      *  @inheritdoc IAutomationLayer
      */
     function setAcceptingNewAccounts(
@@ -309,22 +346,46 @@ contract AutomationLayer is
     ) external override(IAutomationLayer) {
         __nonReentrant();
         __whenNotPaused();
-        __onlyOracle();
+        __onlyOwner();
 
         s_acceptingNewAccounts = acceptingNewAccounts;
     }
 
-    /** @dev added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
-     *  @inheritdoc IAutomationLayer
+    /// -----------------------------------------------------------------------
+    /// Internal state-change functions
+    /// -----------------------------------------------------------------------
+
+    /** @dev performs simple automation process.
+     *  @param accountNumber: number of account.
+     *  @param revert_: true to revert, false otherwise.
+     *  @return bool that specifies if it was successful (true) or not (false), if it does not revert.
      */
-    function setNode(address node, bool isNodeRegistered) external {
-        __nonReentrant();
-        __whenNotPaused();
-        __onlyOwner();
+    function __performSimpleAutomation(
+        uint256 accountNumber,
+        bool revert_
+    ) private returns (bool) {
+        Account memory account = s_accounts[accountNumber];
 
-        s_isNodeRegistered[node] = isNodeRegistered;
+        if (__isValidAccount(account.status)) {
+            (bool success, ) = account.automatedContract.call(
+                abi.encodeWithSelector(
+                    IAutomatedContract(account.automatedContract)
+                        .simpleAutomation
+                        .selector,
+                    account.id
+                )
+            );
 
-        emit NodeSet(msg.sender, node, isNodeRegistered);
+            if (revert_ && !success) {
+                revert AutomationLayer__SimpleAutomationFailed();
+            }
+
+            return success;
+        }
+        if (revert_) {
+            revert AutomationLayer__InvalidAccountNumber();
+        }
+        return false;
     }
 
     /// -----------------------------------------------------------------------
@@ -353,13 +414,6 @@ contract AutomationLayer is
     }
 
     /// @inheritdoc IAutomationLayer
-    function getIsNodeRegistered(
-        address node
-    ) external view override(IAutomationLayer) returns (bool) {
-        return s_isNodeRegistered[node];
-    }
-
-    /// @inheritdoc IAutomationLayer
     function getNextAccountNumber()
         external
         view
@@ -380,7 +434,7 @@ contract AutomationLayer is
     }
 
     /// @inheritdoc IAutomationLayer
-    function getMinimumDug()
+    function getMinimumDuh()
         external
         view
         override(IAutomationLayer)
@@ -427,5 +481,17 @@ contract AutomationLayer is
         returns (bool)
     {
         return s_acceptingNewAccounts;
+    }
+
+    /// -----------------------------------------------------------------------
+    /// Internal view functions
+    /// -----------------------------------------------------------------------
+
+    /** @dev checks if account is valid.
+     *  @param status: status of account.
+     *  @return bool true if account is valid, false otherwise.
+     */
+    function __isValidAccount(Status status) private pure returns (bool) {
+        return status == Status.SET;
     }
 }
