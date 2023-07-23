@@ -232,7 +232,8 @@ setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
                   Approve Spending Amount
                 </Button>
               </Box>:null
-}
+            }
+
             {/* TIME INTERVAL BOX FIELD */}
 
             {
