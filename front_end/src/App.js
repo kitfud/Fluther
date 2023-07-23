@@ -8,9 +8,8 @@ import { Grid, Box, TextField, Typography, Card, Button, InputLabel, MenuItem, F
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#ed7615',
+      main: '#af0079',
       //previously yellow #ece115
-      //changed to orange for visibility #
     },
     secondary: {
       main: '#15ece1',
@@ -117,14 +116,15 @@ function App() {
             sx={{ 
               alignSelf:'center',
               display: 'inline-block',
-              backgroundColor:theme.palette.secondary.main
+              backgroundColor:theme.palette.secondary.main,
+              opacity: 0.9,
             }}
           >
-            <Typography color="#1f25e2" component="h1" sx={{
-               fontSize: 20,
-               fontWeight: 700,
-               padding: 2
-              }}>
+            <Typography color="#af0079" component="h1" sx={{
+              fontSize: 20,
+              fontWeight: 700,
+              padding: 2
+            }}>
                 Create Dollar Cost Average:
             </Typography>
 
