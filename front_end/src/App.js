@@ -125,7 +125,7 @@ function App() {
               fontWeight: 700,
               padding: 2
             }}>
-                Create Dollar Cost Average:
+                Create Dollar:
             </Typography>
 
             {/* TOKEN 1 BOX FIELD */}
