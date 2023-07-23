@@ -162,6 +162,17 @@ function App() {
               </TextField>
             </Box> 
 
+            {/* AMOUNT BOX FIELD */}  
+            <Box display="flex" alignItems="center" justifyContent="center">
+              <TextField
+                onChange={ (e) => setAmount(e.target.value) }
+                id="filled-basic"
+                label="Amount"
+                variant="filled"
+              >
+              </TextField>
+            </Box>
+
             {/* TIME INTERVAL BOX FIELD */}
             <Box 
               display="flex"
@@ -176,7 +187,7 @@ function App() {
                 </InputLabel>
                 <Select
                   id="filled-basic"
-                  label="Time frequency"
+                  label="Interval"
                   variant="filled"
                   onChange={ (e) => setI(e.target.value) }
                   value={interval}
