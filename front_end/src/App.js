@@ -66,12 +66,9 @@ function App() {
   const [intervalAmount, setIntervalAmount] = useState("")
 
   const [erc20contract, setErc20Contract]= useState(null)
-
   const [contractParamsSet, setContractParams] = useState(false)
-
   const [provider, setProvider] = useState(null)
   const [signer, setSigner] = useState(null)
-
   const [spendingApproved, setSpendingApproved] = useState(false)
   //const [dollarCostContract,setDollarCostContract] = useState(null)
   const [disableText, setDisabledTextFeild] = useState(false)
@@ -87,24 +84,19 @@ function App() {
   //address below is for testing on Sepolia testnet
   const quickSwapRouterAddress = '0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008'
 
-  useEffect(()=>{
+  useEffect(() => {
     updateEthers()
   },[])
 
-
-  useEffect(()=>{
-if(provider !==null){
-
-//setting contract to approve spending amount, wEth in this case
-setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
-}
+  useEffect(() => {
+    if(provider !== null){
+      //setting contract to approve spending amount, wEth in this case
+      setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
+    }
   },[provider])
 
-
-
-
-  useEffect( () => {
-    if(amount!== "" && token1!== "" & token2!=="" & interval !=="" & intervalAmount !== "") {
+  useEffect(() => {
+    if(amount !== "" && token1 !== "" & token2 !=="" & interval !== "" & intervalAmount !== "") {
       setContractParams(true)
     }
     else {
@@ -120,19 +112,17 @@ setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
     let tempSigner = await tempProvider.getSigner();
     setSigner(tempSigner);
 
-
     //lines below prepped for direct contract interaction [en future]....
     // let tempContract = await new ethers.Contract(address,abi, tempProvider);
     // setDollarCostContract(tempContract);
-
   }
 
   const approveSpending = async()=>{
     console.log(erc20contract)
     try{
-    await erc20contract.connect(signer).approve(quickSwapRouterAddress,parseInt(amount))
-    setSpendingApproved(true)
-    setDisabledTextFeild(true)
+      await erc20contract.connect(signer).approve(quickSwapRouterAddress,parseInt(amount))
+      setSpendingApproved(true)
+      setDisabledTextFeild(true)
     }
     catch(err){
       console.log(err)
@@ -159,7 +149,15 @@ setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
       <ThemeProvider theme={theme}>
 
         {/* CONNECT WALLET BUTTON */}
-        <Box sx={{marginBottom:'10px', marginTop:'4vh'}} display="flex" alignItems="center" justifyContent="center">
+        <Box 
+          sx={{
+            marginBottom:'10px',
+            marginTop:'4vh'
+          }}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
           <ConnectWallet
             dropdownPosition={{
               side: "top",
@@ -168,7 +166,7 @@ setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
           />
         </Box>
         
-        <Grid   container
+        <Grid container
           spacing={0}
           direction="column"
           alignItems="center"
@@ -186,16 +184,24 @@ setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
               opacity: 0.9,
             }}
           >
-            <Typography color="#af0079" component="h1" sx={{
-              fontSize: 20,
-              fontWeight: 700,
-              padding: 2
-            }}>
+            <Typography
+              color="#af0079"
+              component="h1"
+              sx={{
+                fontSize: 20,
+                fontWeight: 700,
+                padding: 2
+              }}
+            >
                 Create Dollar Cost Average:
             </Typography>
 
-            {/* AMOUNT BOX FIELD */}  
-            <Box display="flex" alignItems="center" justifyContent="center">
+            {/* TOTAL AMOUNT BOX FIELD */}  
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            >
               <TextField
                 onChange={ (e) => setAmount(e.target.value) }
                 id="filled-basic"
@@ -207,67 +213,98 @@ setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
             </Box>
 
             {/* TOKEN 1 BOX FIELD */}
-            <Box display="flex" alignItems="center" justifyContent="center">
+            <Box 
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            >
               <TextField
                 onChange={ (e) => setToken1(e.target.value) }
                 id="filled-basic"
-                label="Token1"
+                label="Token you own"
                 variant="filled"
               >
               </TextField>
             </Box>
 
-            {/* TOKEN 2 BOX FIELD */}
             {/*
-            <Box display="flex" alignItems="center" justifyContent="center">
-              <TextField
-                onChange={ (e) => setToken2(e.target.value) }
-                id="filled-basic"
-                label="Token2"
-                variant="filled"
-              >
-              </TextField>
-            </Box>
-          */}
-            {!spendingApproved?
-            (
-              <>
-                <Box sx={{marginTop:'20px',marginBottom:"20px"}} display="flex" alignItems="center" justifyContent="center">
-                  <Button onClick={approveSpending} variant="contained" color="success">
-                    Approve Spending Amount
-                  </Button>
-                </Box>
-              </>
-            ):null
-}
+               -WE NEED USERS SPENDING APPROVAL
+               -SHOW APPROVAL BUTTON UNTIL USER GIVES APPROVAL
+            */}
+            {
+              !spendingApproved
+              ?
+              (
+                <>
+                  <Box 
+                    sx={{
+                      marginTop:'20px',
+                      marginBottom:"20px"
+                    }} 
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <Button
+                      onClick={approveSpending}
+                      variant="contained"
+                      color="success"
+                    >
+                      Approve Spending Amount
+                    </Button>
+                  </Box>
+                </>
+              )
+              :
+              null
+            }
 
             {/* TIME INTERVAL FORMCONTROL FIELD */}
             {
-              spendingApproved?(
+              spendingApproved
+              ?
+              (
                 <>
                   {/* INTERVAL AMOUNT BOX FIELD */}  
-                  <Box display="flex" alignItems="center" justifyContent="center">
+                  <Box 
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
                     <TextField
                       onChange={ (e) => setIntervalAmount(e.target.value) }
                       id="filled-basic"
-                      label="Interval amount"
+                      label="Interval purchase amount"
                       variant="filled"
                     >
                     </TextField>
                   </Box>
                   {/* TOKEN 2 BOX FIELD */}
-                <Box display="flex" alignItems="center" justifyContent="center">
-                  <TextField
-                    onChange={ (e) => setToken2(e.target.value) }
-                    id="filled-basic"
-                    label="Token2"
-                    variant="filled"
+                  <Box 
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
                   >
-                  </TextField>
-                </Box>
-                <Box display="flex" alignItems="center" justifyContent="center">
-                </Box>
-                  <Box display="flex" alignItems="center" justifyContent="center" marginLeft="10%" marginRight="10.25%">
+                    <TextField
+                      onChange={ (e) => setToken2(e.target.value) }
+                      id="filled-basic"
+                      label="Token you want"
+                      variant="filled"
+                    >
+                    </TextField>
+                  </Box>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center">
+                  </Box>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    marginLeft="10%"
+                    marginRight="10.25%"
+                  >
                     <FormControl
                       fullWidth
                       variant="filled"
@@ -291,21 +328,41 @@ setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
                     </FormControl>
                   </Box> 
                 </>
-              ):null
-}
+              )
+              :
+              null
+            }
+
             {/* "SUBMIT AGREEMENT" BUTTON LOGIC
                   IF USER SUBMITTED ALL INFO
                     SHOW SUBMIT AGREEMENT BUTTON
             */}
-            { contractParamsSet & spendingApproved
+            { 
+              contractParamsSet & spendingApproved
               ?
-              <Box sx={{marginTop:'20px',marginBottom:"20px"}} display="flex" alignItems="center" justifyContent="center">
-                <Button onClick={submitAgreement} variant="contained" color="warning">
+              <Box 
+                sx={{
+                  marginTop:'20px',
+                  marginBottom:"20px"
+                }}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Button
+                  onClick={submitAgreement}
+                  variant="contained"
+                  color="warning"
+                >
                   Submit Agreement
                 </Button>
               </Box>
               :
-              <Box sx={{marginTop:'20px',marginBottom:"20px"}}>
+              <Box
+                sx={{
+                  marginTop:'20px',
+                  marginBottom:"20px"
+                }}>
               </Box>
             }    
           </Card> 
