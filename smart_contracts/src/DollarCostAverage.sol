@@ -51,7 +51,7 @@ contract DollarCostAverage is
     // constants
     uint256 private constant FEE = 100; // over 10000
     uint256 private constant PRECISION = 10000;
-    uint256 private constant CONTRACT_FEE_SHARE = 5000; // over 10000
+    uint256 private constant CLIENT_FEE_SHARE = 5000; // over 10000
     uint256 private SLIPPAGE_PERCENTAGE = 100; // over 10000
 
     /* solhint-enable */
@@ -68,38 +68,6 @@ contract DollarCostAverage is
 
     /// @dev Uses the onlyOwner modifier. This way reduces smart contract size.
     function __onlyOwner() private view onlyOwner {}
-
-    /** @dev Checks if this contract has enough allowance to perform the transfer of funds for the recurring buy automation.
-     *  It reverts if allowance is not enough.
-     *  @param token: address of the ERC20 token to be spent.
-     *  @param owner_: owner address of the ERC20 token amount.
-     *  @param amount: amount of the token to spend.
-     */
-    function __haveEnoughAllowance(
-        address token,
-        address owner_,
-        uint256 amount
-    ) private view {
-        if (IERC20(token).allowance(owner_, address(this)) < amount) {
-            revert DollarCostAverage__TokenNotEnoughAllowance();
-        }
-    }
-
-    /** @dev Validates the given range of recurring buy IDs. It reverts if range is not valid.
-     *  @param startRecBuyId: starting recurring buy ID.
-     *  @param endRecBuyId: ending recurring buy ID.
-     */
-    function __validateIndexRange(
-        uint256 startRecBuyId,
-        uint256 endRecBuyId
-    ) private view {
-        if (
-            !(startRecBuyId < endRecBuyId) &&
-            !(endRecBuyId < s_nextRecurringBuyId)
-        ) {
-            revert DollarCostAverage__InvalidIndexRange();
-        }
-    }
 
     /// -----------------------------------------------------------------------
     /// Constructor
@@ -231,19 +199,19 @@ contract DollarCostAverage is
             revert DollarCostAverage__InvalidRecurringBuy();
         }
 
-        __haveEnoughAllowance(buy.tokenToSpend, buy.sender, buy.amountToSpend);
-
         buy.paymentDue += buy.timeIntervalInSeconds;
         uint256 fee = (buy.amountToSpend * FEE) / PRECISION;
         uint256 buyAmount = buy.amountToSpend - fee;
-        uint256 contractFee = (fee * CONTRACT_FEE_SHARE) / PRECISION;
+
+        uint256 clientFee = (fee * CLIENT_FEE_SHARE) / PRECISION;
+        uint256 contractFee = fee - clientFee;
 
         if (buy.paymentInterface != address(0)) {
             __transferERC20(
                 buy.tokenToSpend,
                 buy.sender,
                 buy.paymentInterface,
-                fee - contractFee
+                clientFee
             );
         }
 
@@ -299,10 +267,6 @@ contract DollarCostAverage is
         __whenNotPaused();
         __onlyOwner();
 
-        if (automationLayerAddress == address(0)) {
-            revert DollarCostAverage__InvalidAutomationLayerAddress();
-        }
-
         s_automationLayer = IAutomationLayer(automationLayerAddress);
 
         emit AutomationLayerSet(msg.sender, automationLayerAddress);
@@ -317,10 +281,6 @@ contract DollarCostAverage is
         __nonReentrant();
         __whenNotPaused();
         __onlyOwner();
-
-        if (defaultRouter == address(0)) {
-            revert DollarCostAverage__InvalidDefaultRouterAddress();
-        }
 
         s_defaultRouter = defaultRouter;
 
@@ -347,6 +307,7 @@ contract DollarCostAverage is
      */
     function pause() external override(IDollarCostAverage) {
         __nonReentrant();
+        __whenNotPaused();
         __onlyOwner();
 
         _pause();
@@ -357,6 +318,7 @@ contract DollarCostAverage is
      */
     function unpause() external override(IDollarCostAverage) {
         __nonReentrant();
+        __whenNotPaused();
         __onlyOwner();
 
         _unpause();
@@ -448,7 +410,8 @@ contract DollarCostAverage is
     function checkSimpleAutomation(
         uint256 recurringBuyId
     ) external view override(IAutomatedContract) returns (bool) {
-        return isRecurringBuyValid(recurringBuyId);
+        RecurringBuy memory buy = s_recurringBuys[recurringBuyId];
+        return buy.paymentDue < block.timestamp && buy.status == Status.SET;
     }
 
     /// @inheritdoc IDollarCostAverage
@@ -498,89 +461,21 @@ contract DollarCostAverage is
         override(IDollarCostAverage)
         returns (RecurringBuy[] memory)
     {
-        __validateIndexRange(startRecBuyId, endRecBuyId);
-
-        uint256 forLoopEndRecBuyId = endRecBuyId + 1;
+        if (
+            !(startRecBuyId < endRecBuyId) &&
+            !(endRecBuyId < s_nextRecurringBuyId)
+        ) {
+            revert DollarCostAverage__InvalidIndexRange();
+        }
 
         RecurringBuy[] memory recurringBuys = new RecurringBuy[](
-            forLoopEndRecBuyId - startRecBuyId
+            endRecBuyId - startRecBuyId
         );
 
-        for (uint256 i = startRecBuyId; i < forLoopEndRecBuyId; ++i) {
+        for (uint256 i = startRecBuyId; i < endRecBuyId; ++i) {
             recurringBuys[i - startRecBuyId] = s_recurringBuys[i];
         }
 
         return recurringBuys;
-    }
-
-    /// @inheritdoc IDollarCostAverage
-    function getValidRangeOfRecurringBuys(
-        uint256 startRecBuyId,
-        uint256 endRecBuyId
-    )
-        external
-        view
-        override(IDollarCostAverage)
-        returns (RecurringBuy[] memory)
-    {
-        __validateIndexRange(startRecBuyId, endRecBuyId);
-
-        uint256 forLoopEndRecBuyId = endRecBuyId + 1;
-
-        RecurringBuy[] memory recurringBuys = new RecurringBuy[](
-            forLoopEndRecBuyId - startRecBuyId
-        );
-
-        uint256 recBuyCount;
-        for (uint256 i = startRecBuyId; i < forLoopEndRecBuyId; ++i) {
-            recurringBuys[i - startRecBuyId] = s_recurringBuys[i];
-            if (__validateRecurringBuy(recurringBuys[i - startRecBuyId])) {
-                unchecked {
-                    ++recBuyCount;
-                }
-            }
-        }
-
-        RecurringBuy[] memory validRecurringBuys = new RecurringBuy[](
-            recBuyCount
-        );
-        uint256 index = 0;
-        uint256 count = recurringBuys.length;
-        for (uint256 i = 0; i < count; ++i) {
-            if (__validateRecurringBuy(recurringBuys[i])) {
-                validRecurringBuys[index++] = recurringBuys[i];
-            }
-        }
-
-        return validRecurringBuys;
-    }
-
-    /// @inheritdoc IDollarCostAverage
-    function isRecurringBuyValid(
-        uint256 recurringBuyId
-    ) public view override(IDollarCostAverage) returns (bool) {
-        RecurringBuy memory buy = s_recurringBuys[recurringBuyId];
-        return __validateRecurringBuy(buy);
-    }
-
-    /// -----------------------------------------------------------------------
-    /// Internal/private view/pure functions
-    /// -----------------------------------------------------------------------
-
-    /** @dev Checks if given recurring buy ID is valid (with status == Status.SET).
-     *  @param recBuy: recurring buy struct.
-     */
-    function __validateRecurringBuy(
-        RecurringBuy memory recBuy
-    ) private view returns (bool) {
-        return
-            recBuy.status == Status.SET && // 1. Has it been cancelled?
-            !(recBuy.paymentDue > block.timestamp) && // 2. Has the time came to make the payment?
-            !(IERC20(recBuy.tokenToSpend).balanceOf(recBuy.sender) <
-                recBuy.amountToSpend) && // 3. Has the owner enough balance?
-            !(IERC20(recBuy.tokenToSpend).allowance(
-                recBuy.sender,
-                address(this)
-            ) < recBuy.amountToSpend); // 4. Has this smart contract enough allowance?
     }
 }

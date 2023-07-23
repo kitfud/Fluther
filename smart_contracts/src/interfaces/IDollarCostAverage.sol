@@ -53,11 +53,8 @@ interface IDollarCostAverage {
     /// @dev error for when given automation layer address is address(0).
     error DollarCostAverage__InvalidAutomationLayerAddress();
 
-    /// @dev error for when the token approval fails.
+    /// @dev error for when
     error DollarCostAverage__TokenApprovalFailed();
-
-    /// @dev error for when there is not enough allowance for the recurring buy.
-    error DollarCostAverage__TokenNotEnoughAllowance();
 
     /// -----------------------------------------------------------------------
     /// Type declarations (structs and enums)
@@ -233,25 +230,25 @@ interface IDollarCostAverage {
      */
     function getNextRecurringBuyId() external view returns (uint256);
 
-    /** @notice reads automationLayer storage variable.
-     *  @return IAutomationLayer of the automation layer smart contract.
+    /** @notice reads automationLayer storage variable
+     *  @return IAutomationLayer of the automation layer smart contract
      */
     function getAutomationLayer() external view returns (IAutomationLayer);
 
-    /** @notice reads the acceptingNewRecurringBuys storage variable.
-     *  @return boolean value that indicates whether the contract is accepting new recurring buys (true) or not (false).
+    /** @notice reads the acceptingNewRecurringBuys storage variable
+     *  @return boolean value that indicates whether the contract is accepting new recurring buys (true) or not (false)
      */
     function getAcceptingNewRecurringBuys() external view returns (bool);
 
-    /** @notice reads WMATIC constant variable.
-     *  @return address for the WMATIC ERC20 smart contract.
+    /** @notice reads WMATIC constant variable
+     *  @return address for the WMATIC ERC20 smart contract
      */
     function getWrapNative() external view returns (address);
 
-    /** @notice gets an array of recurring buys from a starting to an ending recurring buy ID.
-     *  @param startRecBuyId: start recurring buy ID.
-     *  @param endRecBuyId: end recurring buy ID.
-     *  @return array of recurring buy structs.
+    /** @notice gets an array of recurring buys from a starting to an ending recurring buy ID
+     *  @param startRecBuyId: start recurring buy ID
+     *  @param endRecBuyId: end recurring buy ID
+     *  @return array of recurring buy structs
      */
     function getRangeOfRecurringBuys(
         uint256 startRecBuyId,
@@ -262,22 +259,4 @@ interface IDollarCostAverage {
      *  @return address for the default DEX router.
      */
     function getDefaultRouter() external view returns (address);
-
-    /** @notice gets valid recurring buys based on the given range of recurring buy IDs.
-     *  @param startRecBuyId: start recurring buy ID.
-     *  @param endRecBuyId: end recurring buy ID.
-     *  @return array of valid recurring buy structs.
-     */
-    function getValidRangeOfRecurringBuys(
-        uint256 startRecBuyId,
-        uint256 endRecBuyId
-    ) external view returns (RecurringBuy[] memory);
-
-    /** @notice gets if given recurring buy ID is valid.
-     *  @param recurringBuyId: ID of the recurring buy.
-     *  @return bool that specifies if the recurring buy is valid (true) or not (false).
-     */
-    function isRecurringBuyValid(
-        uint256 recurringBuyId
-    ) external view returns (bool);
 }

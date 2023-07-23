@@ -60,7 +60,7 @@ function App() {
   const [amount, setAmount] = useState("")
   const [token1,setToken1] = useState("")
   const [token2,setToken2] = useState("")
-  const [interval, setI] = useState("")
+  const [interval, setInterval] = useState("")
 
   const [contractParamsSet, setContractParams] = useState(false)
   const [userAddress,setUserAddress] = useState(null)
@@ -149,17 +149,6 @@ function App() {
                 variant="filled"
               >
               </TextField>
-            </Box>
-
-            {/* AMOUNT BOX FIELD */}  
-            <Box display="flex" alignItems="center" justifyContent="center">
-              <TextField
-                onChange={ (e) => setAmount(e.target.value) }
-                id="filled-basic"
-                label="Amount"
-                variant="filled"
-              >
-              </TextField>
             </Box> 
 
             {/* AMOUNT BOX FIELD */}  
@@ -181,7 +170,7 @@ function App() {
               marginLeft="10%"
               marginRight="10.25%"
             >
-              <FormControl fullWidth variant="filled">
+              <FormControl fullWidth variant="filled" >
                 <InputLabel>
                   Time Interval
                 </InputLabel>
@@ -189,14 +178,19 @@ function App() {
                   id="filled-basic"
                   label="Interval"
                   variant="filled"
-                  onChange={ (e) => setI(e.target.value) }
-                  value={interval}
+                  onChange={ (e) => setInterval(e.target.value) }
                 >
-                  {/* WILL FIGURE OUT A BETTER WAY TO DO THIS PART LATER */}
-                  <MenuItem value={300}>5 Minutes</MenuItem>
+                  {/*
+                  WILL FIGURE OUT A BETTER WAY TO DO THIS PART LATER
+                  DAILY = 86400 SECONDS/DAY = (60 * 60 * 24)
+                  WEEKLY = 604800 SECONDS/WEEK = (60 * 60 * 24 * 7) 
+                  MONTHLY = 2419200 SECONDS/MONTH = (60 * 60 * 24 * 7 * 4) 
+                   */}
+
                   <MenuItem value={86400}>Daily</MenuItem>
                   <MenuItem value={604800}>Weekly</MenuItem>
                   <MenuItem value={2419200}>Monthly</MenuItem>
+
                 </Select>
               </FormControl>
             </Box> 
