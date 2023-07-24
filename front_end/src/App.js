@@ -218,13 +218,25 @@ function App() {
               alignItems="center"
               justifyContent="center"
             >
-              <TextField
-                onChange={ (e) => setToken1(e.target.value) }
-                id="filled-basic"
-                label="Token you own"
+        
+              <FormControl
+                fullWidth
                 variant="filled"
               >
-              </TextField>
+                <InputLabel>
+                  Tokens you own
+                </InputLabel>
+                <Select
+                  id="filled-basic"
+                  label="Token1"
+                  variant="filled"
+                  onChange={ (e) => setToken1(e.target.value) }
+                  value={token1}
+                >
+                  {/* WILL FIGURE OUT A BETTER WAY TO DO THIS PART LATER */}
+                  <MenuItem value= {ERC20Address.wEthSepolia} >WETH Sepolia</MenuItem>
+                </Select>
+              </FormControl>
             </Box>
 
             {/*
@@ -285,13 +297,25 @@ function App() {
                     alignItems="center"
                     justifyContent="center"
                   >
-                    <TextField
-                      onChange={ (e) => setToken2(e.target.value) }
-                      id="filled-basic"
-                      label="Token you want"
+                    <FormControl
+                      fullWidth
                       variant="filled"
                     >
-                    </TextField>
+                      <InputLabel>
+                        Tokens you want
+                      </InputLabel>
+                      <Select
+                        id="filled-basic"
+                        label="Token1"
+                        variant="filled"
+                        onChange={ (e) => setToken2(e.target.value) }
+                        value={token2}
+                      >
+                        {/* WILL FIGURE OUT A BETTER WAY TO DO THIS PART LATER */}
+                        <MenuItem value= {ERC20Address.wEthSepolia} >WETH Sepolia</MenuItem>
+                        <MenuItem value= {ERC20Address.UNI} >UNI</MenuItem>
+                      </Select>
+                    </FormControl>
                   </Box>
                   <Box
                     display="flex"
