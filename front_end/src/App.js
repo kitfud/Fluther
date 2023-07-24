@@ -287,9 +287,10 @@ function App() {
                   variant="filled"
                   onChange={ (e) => setToken1(e.target.value) }
                   value={token1}
+                  disabled = {disableText}
                 >
                   {/* WILL FIGURE OUT A BETTER WAY TO DO THIS PART LATER */}
-                  <MenuItem value= {ERC20Address.wEthSepolia} >WETH Sepolia</MenuItem>
+                  <MenuItem   value= {ERC20Address.wEthSepolia} >WETH Sepolia</MenuItem>
                 </Select>
               </FormControl>
             </Box>
@@ -372,7 +373,7 @@ function App() {
                         value={token2}
                       >
                         {/* WILL FIGURE OUT A BETTER WAY TO DO THIS PART LATER */}
-                        <MenuItem value= {ERC20Address.wEthSepolia} >WETH Sepolia</MenuItem>
+            
                         <MenuItem value= {ERC20Address.UNI} >UNI</MenuItem>
                       </Select>
                     </FormControl>
