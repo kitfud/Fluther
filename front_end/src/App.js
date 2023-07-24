@@ -89,7 +89,7 @@ function App() {
   //const quickSwapRouterAddress = '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff'
 
   //address below is for testing on Sepolia testnet
-  const quickSwapRouterAddress = ethers.utils.getAddress('0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008')
+  const quickSwapRouterAddress = '0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008'
   const [dataload,setDataLoad] = useState(false)
   useEffect(() => {
     if(!dataload){
@@ -98,7 +98,8 @@ function App() {
   },[])
 
   useEffect(() => {
-  if(wethtoken!==null && unitoken!==null){
+    console.log("token",wethtoken)
+  if(wethtoken!==null && address!==null && address !== undefined){
     try{
     checkTokenBalance()
     }
@@ -107,35 +108,24 @@ function App() {
     }
   }
   
-  },[wethtoken,unitoken])
+  },[wethtoken,address])
+
+
 
   useEffect(() => {
     if(provider !== null){
       //setting contract to approve spending amount, wEth in this case
       try{
       setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
+      setWEth(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
+      setUNI(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
       }
       catch(err){
-console.log(err)
-      }
-      try{
-      console.log(ERC20Address.wEthSepolia)
-      let wethcontr = new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider)
-      setWEth(wethcontr)
-      }
-      catch(err){
-        console.log(err)
-      }
-      try{
-      console.log(ERC20Address.UNI)
-      let unicontr = new ethers.Contract(ERC20Address.UNI,ABI,provider)
-      setUNI(unicontr)
-      }
-      catch(err){
-        console.log(err)
+      console.log(err)
       }
     }
   },[provider])
+
 
   useEffect(() => {
     if(amount !== "" && token1 !== "" & token2 !=="" & interval !== "" & intervalAmount !== "") {
@@ -163,12 +153,13 @@ console.log(err)
 
   const checkTokenBalance = async ()=>{
 
-    if(wethtoken){
+    if(wethtoken!==null && address !==null && address!== undefined){
+    console.log("address",address)
     var user = ethers.utils.getAddress(address)
     var wethbal= (await wethtoken.balanceOf(user)/10**18).toString();
     setWEthBalance(wethbal)
     }
-    if(unitoken){
+    if(unitoken !==null && address !==null && address!== undefined ){
     var unibal= (await unitoken.balanceOf(user)/10**18).toString();
     setUniBalance(unibal)
     }
@@ -461,7 +452,7 @@ console.log(err)
           </Card> 
           
           {
-          wethbalance!==null && unibalance !== null?
+          wethbalance!==null && address !== null?
           <Box sx={{backgroundColor:'white',marginTop:"20px"}}>
           <Typography>wETH:${wethbalance}</Typography>
           <Typography>UNI:${unibalance}</Typography>
