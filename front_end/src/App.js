@@ -97,7 +97,7 @@ function App() {
       //setting contract to approve spending amount, wEth in this case
       setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
       setWEth(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
-      setUNI(new ethers.Contract('0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',ABI,provider))
+      setUNI(new ethers.Contract(ERC20Address.UNI,ABI,provider))
     }
   },[provider])
 
