@@ -203,6 +203,9 @@ function App() {
               justifyContent="center"
             >
               <TextField
+                sx={{
+                  width: "80%"
+                }}
                 onChange={ (e) => setAmount(e.target.value) }
                 id="filled-basic"
                 label="Total amount"
@@ -220,8 +223,11 @@ function App() {
             >
         
               <FormControl
-                fullWidth
                 variant="filled"
+                sx={{
+                  width: "80%"
+                }}
+                
               >
                 <InputLabel>
                   Tokens you own
@@ -288,6 +294,9 @@ function App() {
                       id="filled-basic"
                       label="Interval purchase amount"
                       variant="filled"
+                      sx={{
+                        width: "80%"
+                      }}
                     >
                     </TextField>
                   </Box>
@@ -298,8 +307,10 @@ function App() {
                     justifyContent="center"
                   >
                     <FormControl
-                      fullWidth
                       variant="filled"
+                      sx={{
+                        width: "80%"
+                      }}
                     >
                       <InputLabel>
                         Tokens you want
@@ -326,12 +337,12 @@ function App() {
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
-                    marginLeft="10%"
-                    marginRight="10.25%"
                   >
                     <FormControl
-                      fullWidth
                       variant="filled"
+                      sx={{
+                        width: "80%"
+                      }}
                     >
                       <InputLabel>
                         Time Interval
