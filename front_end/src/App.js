@@ -77,6 +77,9 @@ function App() {
   const [wethtoken,setWEth] = useState(null)
   const [unitoken,setUNI] = useState(null)
 
+  const [wethbalance,setWEthBalance] = useState(null)
+  const [unibalance,setUniBalance] = useState(null)
+
   const address = useAddress();
 
   //address below is deployment to Polygon mainnet
@@ -91,6 +94,13 @@ function App() {
   useEffect(() => {
     updateEthers()
   },[])
+
+  useEffect(() => {
+  if(wethtoken!==null){
+    checkTokenBalance()
+  }
+  
+  },[wethtoken,unitoken])
 
   useEffect(() => {
     if(provider !== null){
@@ -121,6 +131,13 @@ function App() {
     //lines below prepped for direct contract interaction [en future]....
     // let tempContract = await new ethers.Contract(address,abi, tempProvider);
     // setDollarCostContract(tempContract);
+  }
+
+  const checkTokenBalance = async ()=>{
+    let wethbalance= (await wethtoken.balanceOf(address)/10**18).toString();
+    setWEthBalance(wethbalance)
+    let unibalance= (await unitoken.balanceOf(address)/10**18).toString();
+    setUniBalance(unibalance)
   }
 
   const approveSpending = async()=>{
@@ -397,8 +414,19 @@ function App() {
               </Box>
             }    
           </Card> 
+          
+          {
+          wethbalance && unibalance?
+          <Box sx={{backgroundColor:'white',marginTop:"20px"}}>
+          <Typography>wETH:${wethbalance}</Typography>
+          <Typography>UNI:${unibalance}</Typography>
+          </Box>:null
+          }
         </Grid>
-      
+        
+          
+       
+        
       </ThemeProvider>
     </>
   );
