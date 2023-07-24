@@ -73,6 +73,13 @@ function App() {
   //const [dollarCostContract,setDollarCostContract] = useState(null)
   const [disableText, setDisabledTextFeild] = useState(false)
 
+
+  const [wethtoken,setWEth] = useState(null)
+  const [unitoken,setUNI] = useState(null)
+
+  const [wethbalance,setWEthBalance] = useState(null)
+  const [unibalance,setUniBalance] = useState(null)
+
   const address = useAddress();
 
   //address below is deployment to Polygon mainnet
@@ -83,17 +90,42 @@ function App() {
 
   //address below is for testing on Sepolia testnet
   const quickSwapRouterAddress = '0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008'
+  const [dataload,setDataLoad] = useState(false)
+  useEffect(() => {
+    if(!dataload){
+    updateEthers()
+    }
+  },[])
 
   useEffect(() => {
-    updateEthers()
-  },[])
+    console.log("token",wethtoken)
+  if(wethtoken!==null && address!==null && address !== undefined){
+    try{
+    checkTokenBalance()
+    }
+    catch(err){
+      console.log(err)
+    }
+  }
+  
+  },[wethtoken,address])
+
+
 
   useEffect(() => {
     if(provider !== null){
       //setting contract to approve spending amount, wEth in this case
+      try{
       setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
+      setWEth(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
+      setUNI(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
+      }
+      catch(err){
+      console.log(err)
+      }
     }
   },[provider])
+
 
   useEffect(() => {
     if(amount !== "" && token1 !== "" & token2 !=="" & interval !== "" & intervalAmount !== "") {
@@ -111,13 +143,30 @@ function App() {
 
     let tempSigner = await tempProvider.getSigner();
     setSigner(tempSigner);
+    setDataLoad(true)
 
+    //checkTokenBalance()
     //lines below prepped for direct contract interaction [en future]....
     // let tempContract = await new ethers.Contract(address,abi, tempProvider);
     // setDollarCostContract(tempContract);
   }
 
+  const checkTokenBalance = async ()=>{
+
+    if(wethtoken!==null && address !==null && address!== undefined){
+    console.log("address",address)
+    var user = ethers.utils.getAddress(address)
+    var wethbal= (await wethtoken.balanceOf(user)/10**18).toString();
+    setWEthBalance(wethbal)
+    }
+    if(unitoken !==null && address !==null && address!== undefined ){
+    var unibal= (await unitoken.balanceOf(user)/10**18).toString();
+    setUniBalance(unibal)
+    }
+  }
+
   const approveSpending = async()=>{
+    console.log("amount",amount)
     console.log(erc20contract)
     try{
       await erc20contract.connect(signer).approve(quickSwapRouterAddress,parseInt(amount))
@@ -401,8 +450,19 @@ function App() {
               </Box>
             }    
           </Card> 
+          
+          {
+          wethbalance!==null && address !== null?
+          <Box sx={{backgroundColor:'white',marginTop:"20px"}}>
+          <Typography>wETH:${wethbalance}</Typography>
+          <Typography>UNI:${unibalance}</Typography>
+          </Box>:null
+          }
         </Grid>
-      
+        
+          
+       
+        
       </ThemeProvider>
     </>
   );
