@@ -89,15 +89,22 @@ function App() {
   //const quickSwapRouterAddress = '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff'
 
   //address below is for testing on Sepolia testnet
-  const quickSwapRouterAddress = '0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008'
-
+  const quickSwapRouterAddress = ethers.utils.getAddress('0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008')
+  const [dataload,setDataLoad] = useState(false)
   useEffect(() => {
+    if(!dataload){
     updateEthers()
+    }
   },[])
 
   useEffect(() => {
-  if(wethtoken!==null){
+  if(wethtoken!==null && unitoken!==null){
+    try{
     checkTokenBalance()
+    }
+    catch(err){
+      console.log(err)
+    }
   }
   
   },[wethtoken,unitoken])
@@ -105,9 +112,28 @@ function App() {
   useEffect(() => {
     if(provider !== null){
       //setting contract to approve spending amount, wEth in this case
+      try{
       setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
-      setWEth(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
-      setUNI(new ethers.Contract(ERC20Address.UNI,ABI,provider))
+      }
+      catch(err){
+console.log(err)
+      }
+      try{
+      console.log(ERC20Address.wEthSepolia)
+      let wethcontr = new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider)
+      setWEth(wethcontr)
+      }
+      catch(err){
+        console.log(err)
+      }
+      try{
+      console.log(ERC20Address.UNI)
+      let unicontr = new ethers.Contract(ERC20Address.UNI,ABI,provider)
+      setUNI(unicontr)
+      }
+      catch(err){
+        console.log(err)
+      }
     }
   },[provider])
 
@@ -127,17 +153,25 @@ function App() {
 
     let tempSigner = await tempProvider.getSigner();
     setSigner(tempSigner);
+    setDataLoad(true)
 
+    //checkTokenBalance()
     //lines below prepped for direct contract interaction [en future]....
     // let tempContract = await new ethers.Contract(address,abi, tempProvider);
     // setDollarCostContract(tempContract);
   }
 
   const checkTokenBalance = async ()=>{
-    let wethbalance= (await wethtoken.balanceOf(address)/10**18).toString();
-    setWEthBalance(wethbalance)
-    let unibalance= (await unitoken.balanceOf(address)/10**18).toString();
-    setUniBalance(unibalance)
+
+    if(wethtoken){
+    var user = ethers.utils.getAddress(address)
+    var wethbal= (await wethtoken.balanceOf(user)/10**18).toString();
+    setWEthBalance(wethbal)
+    }
+    if(unitoken){
+    var unibal= (await unitoken.balanceOf(user)/10**18).toString();
+    setUniBalance(unibal)
+    }
   }
 
   const approveSpending = async()=>{
@@ -416,7 +450,7 @@ function App() {
           </Card> 
           
           {
-          wethbalance && unibalance?
+          wethbalance!==null && unibalance !== null?
           <Box sx={{backgroundColor:'white',marginTop:"20px"}}>
           <Typography>wETH:${wethbalance}</Typography>
           <Typography>UNI:${unibalance}</Typography>
