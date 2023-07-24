@@ -73,6 +73,10 @@ function App() {
   //const [dollarCostContract,setDollarCostContract] = useState(null)
   const [disableText, setDisabledTextFeild] = useState(false)
 
+
+  const [wethtoken,setWEth] = useState(null)
+  const [unitoken,setUNI] = useState(null)
+
   const address = useAddress();
 
   //address below is deployment to Polygon mainnet
@@ -92,6 +96,8 @@ function App() {
     if(provider !== null){
       //setting contract to approve spending amount, wEth in this case
       setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
+      setWEth(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
+      setUNI(new ethers.Contract('0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',ABI,provider))
     }
   },[provider])
 
