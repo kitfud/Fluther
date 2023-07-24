@@ -63,6 +63,7 @@ function App() {
   const [token1,setToken1] = useState("")
   const [token2,setToken2] = useState("")
   const [interval, setI] = useState("")
+  const [intervalAmount, setIntervalAmount] = useState("")
 
   const [erc20contract, setErc20Contract]= useState(null)
 
@@ -101,15 +102,19 @@ setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
 
 
 
+// useEffect(()=>{
+// console.log(amount)
+// },[amount])
+
 
   useEffect( () => {
-    if(amount!== "" && token1!== "" & token2!=="" & interval !=="") {
+    if(amount!== "" && token1!== "" & token2!=="" & interval !=="" & intervalAmount !== "") {
       setContractParams(true)
     }
     else {
       setContractParams(false)
     }
-  },[amount,token1,token2,interval])
+  },[amount,token1,token2,interval, intervalAmount])
 
 
   const updateEthers = async ()=>{
@@ -127,6 +132,7 @@ setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
   }
 
   const approveSpending = async()=>{
+    console.log("amount",amount)
     console.log(erc20contract)
     try{
     await erc20contract.connect(signer).approve(quickSwapRouterAddress,parseInt(amount))
@@ -145,7 +151,8 @@ setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
       "amount": amount,
       "token1": token1,
       "token2": token2,
-      "interval": interval
+      "interval": interval,
+      "intervalAmount": intervalAmount,
     }
     console.log(JSON.stringify(data))
   }
@@ -192,6 +199,18 @@ setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
                 Create Dollar Cost Average:
             </Typography>
 
+            {/* AMOUNT BOX FIELD */}  
+            <Box display="flex" alignItems="center" justifyContent="center">
+              <TextField
+                onChange={ (e) => setAmount(e.target.value) }
+                id="filled-basic"
+                label="Total amount"
+                variant="filled"
+                disabled = {disableText}
+              >
+              </TextField>
+            </Box>
+
             {/* TOKEN 1 BOX FIELD */}
             <Box display="flex" alignItems="center" justifyContent="center">
               <TextField
@@ -204,6 +223,7 @@ setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
             </Box>
 
             {/* TOKEN 2 BOX FIELD */}
+            {/*
             <Box display="flex" alignItems="center" justifyContent="center">
               <TextField
                 onChange={ (e) => setToken2(e.target.value) }
@@ -213,54 +233,69 @@ setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
               >
               </TextField>
             </Box>
-
-            {/* AMOUNT BOX FIELD */}  
-            <Box display="flex" alignItems="center" justifyContent="center">
-              <TextField
-                onChange={ (e) => setAmount(e.target.value) }
-                id="filled-basic"
-                label="Amount"
-                variant="filled"
-                disabled = {disableText}
-              >
-              </TextField>
-            </Box>
-
+          */}
             {!spendingApproved?
-            <Box sx={{marginTop:'20px',marginBottom:"20px"}} display="flex" alignItems="center" justifyContent="center">
-                <Button onClick={approveSpending} variant="contained" color="success">
-                  Approve Spending Amount
-                </Button>
-              </Box>:null
-            }
+            (
+              <>
+                <Box sx={{marginTop:'20px',marginBottom:"20px"}} display="flex" alignItems="center" justifyContent="center">
+                  <Button onClick={approveSpending} variant="contained" color="success">
+                    Approve Spending Amount
+                  </Button>
+                </Box>
+              </>
+            ):null
+}
 
-            {/* TIME INTERVAL BOX FIELD */}
-
+            {/* TIME INTERVAL FORMCONTROL FIELD */}
             {
               spendingApproved?(
-            <Box display="flex" alignItems="center" justifyContent="center" marginLeft="10%" marginRight="10.25%">
-              <FormControl
-                fullWidth
-                variant="filled"
-              >
-                <InputLabel>
-                  Time Interval
-                </InputLabel>
-                <Select
-                  id="filled-basic"
-                  label="Interval"
-                  variant="filled"
-                  onChange={ (e) => setI(e.target.value) }
-                  value={interval}
-                >
-                  {/* WILL FIGURE OUT A BETTER WAY TO DO THIS PART LATER */}
-                  <MenuItem value={300}>5 Minutes</MenuItem>
-                  <MenuItem value={86400}>Daily</MenuItem>
-                  <MenuItem value={604800}>Weekly</MenuItem>
-                  <MenuItem value={2419200}>Monthly</MenuItem>
-                </Select>
-              </FormControl>
-            </Box> 
+                <>
+                  {/* INTERVAL AMOUNT BOX FIELD */}  
+                  <Box display="flex" alignItems="center" justifyContent="center">
+                    <TextField
+                      onChange={ (e) => setIntervalAmount(e.target.value) }
+                      id="filled-basic"
+                      label="Interval amount"
+                      variant="filled"
+                    >
+                    </TextField>
+                  </Box>
+                  {/* TOKEN 2 BOX FIELD */}
+                <Box display="flex" alignItems="center" justifyContent="center">
+                  <TextField
+                    onChange={ (e) => setToken2(e.target.value) }
+                    id="filled-basic"
+                    label="Token2"
+                    variant="filled"
+                  >
+                  </TextField>
+                </Box>
+                <Box display="flex" alignItems="center" justifyContent="center">
+                </Box>
+                  <Box display="flex" alignItems="center" justifyContent="center" marginLeft="10%" marginRight="10.25%">
+                    <FormControl
+                      fullWidth
+                      variant="filled"
+                    >
+                      <InputLabel>
+                        Time Interval
+                      </InputLabel>
+                      <Select
+                        id="filled-basic"
+                        label="Interval"
+                        variant="filled"
+                        onChange={ (e) => setI(e.target.value) }
+                        value={interval}
+                      >
+                        {/* WILL FIGURE OUT A BETTER WAY TO DO THIS PART LATER */}
+                        <MenuItem value={300}>5 Minutes</MenuItem>
+                        <MenuItem value={86400}>Daily</MenuItem>
+                        <MenuItem value={604800}>Weekly</MenuItem>
+                        <MenuItem value={2419200}>Monthly</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Box> 
+                </>
               ):null
 }
             {/* "SUBMIT AGREEMENT" BUTTON LOGIC
