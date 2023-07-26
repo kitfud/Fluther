@@ -3,12 +3,15 @@ import './App.css';
 import { ConnectWallet } from "@thirdweb-dev/react";
 import { useAddress } from "@thirdweb-dev/react";
 import { ThemeProvider, createTheme } from '@mui/material';
-import { Grid, Box, TextField, Typography, Card, Button, InputLabel, MenuItem, FormControl, Select } from "@mui/material";
+import {Snackbar,CircularProgress, Grid, Box, TextField, Typography, Card, Button, InputLabel, MenuItem, FormControl, Select } from "@mui/material";
 
 import ABI from './chain-info/erc20ABI.json'
 import ERC20Address from './chain-info/erc20Address.json'
 import DollarCostAverage from './chain-info/smart_contracts.json'
 import {ethers} from 'ethers'
+
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 
 const theme = createTheme({
   palette: {
@@ -80,6 +83,10 @@ function App() {
 
   const [wethbalance,setWEthBalance] = useState(null)
   const [unibalance,setUniBalance] = useState(null)
+  const [processing, setProcessing] = useState(false)
+  const [txHash, setTxHash] = useState(null)
+
+  const [openSnackbar,setOpenSnackBar] = useState(false)
 
   const address = useAddress();
 
@@ -196,9 +203,74 @@ function App() {
     }
     console.log(JSON.stringify(data))
 
+  try{
+  setProcessing(true)
   let tx = await dollarCostAverageContract.connect(signer).createRecurringBuy(amount,token1,token2,interval,'0x0000000000000000000000000000000000000000',quickSwapRouterAddress)
   console.log(JSON.stringify(tx))
+
+  let hash = tx.hash
+  setTxHash(hash.toString())
+  isTransactionMined(hash.toString())
+  }
+  catch(err){
+    setProcessing(false)
+    console.log(err)
+  }
 }
+
+const isTransactionMined = async (transactionHash) => {
+  let transactionBlockFound = false
+
+  while (transactionBlockFound === false) {
+      let tx = await provider.getTransactionReceipt(transactionHash)
+      console.log("transaction status check....")
+      try {
+          await tx.blockNumber
+      }
+      catch (error) {
+          tx = await provider.getTransactionReceipt(transactionHash)
+      }
+      finally {
+          console.log("proceeding")
+      }
+
+
+      if (tx && tx.blockNumber) {
+         
+          setProcessing(false)
+          console.log("block number assigned.")
+          transactionBlockFound = true
+          let stringBlock = tx.blockNumber.toString()
+          console.log("COMPLETED BLOCK: " + stringBlock)
+          setOpenSnackBar(true)
+
+      }
+  }
+}
+
+const handleClose = (event, reason) => {
+  if (reason === 'clickaway') {
+    return;
+  }
+
+  setOpenSnackBar(false);
+};
+
+const action = (
+  <React.Fragment>
+    <Button color="secondary" size="small" onClick={handleClose}>
+      UNDO
+    </Button>
+    <IconButton
+      size="small"
+      aria-label="close"
+      color="inherit"
+      onClick={handleClose}
+    >
+      <CloseIcon fontSize="small" />
+    </IconButton>
+  </React.Fragment>
+);
 
   return (
     <>
@@ -434,6 +506,8 @@ function App() {
             { 
               contractParamsSet & spendingApproved
               ?
+              
+                !processing?
               <Box 
                 sx={{
                   marginTop:'20px',
@@ -443,6 +517,7 @@ function App() {
                 alignItems="center"
                 justifyContent="center"
               >
+              
                 <Button
                   onClick={submitAgreement}
                   variant="contained"
@@ -450,7 +525,17 @@ function App() {
                 >
                   Submit Agreement
                 </Button>
+              </Box>: <Box 
+                sx={{
+                  marginTop:'20px',
+                  marginBottom:"20px"
+                }}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              ><CircularProgress/> 
               </Box>
+              
               :
               <Box
                 sx={{
@@ -468,6 +553,20 @@ function App() {
           <Typography>UNI:${unibalance}</Typography>
           </Box>:null
           }
+      
+      <Snackbar
+        anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        message=""
+        action={action}
+        sx={{backgroundColor:"white"}}
+      >
+        <a target="_blank" href={`https://sepolia.etherscan.io/tx/${txHash}`}>
+          <Typography color="black">Success! Click for Transaction:${txHash} on Etherscan</Typography>
+        </a>
+        </Snackbar>
         </Grid>
         
           
