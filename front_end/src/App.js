@@ -12,6 +12,7 @@ import {ethers} from 'ethers'
 
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import UserRecurringBuys from './components/UserRecurringBuys';
 
 const theme = createTheme({
   palette: {
@@ -567,11 +568,11 @@ const action = (
           <Typography color="black">Success! Click for Transaction:${txHash} on Etherscan</Typography>
         </a>
         </Snackbar>
-        </Grid>
-        
-          
+
+        <UserRecurringBuys/>
        
-        
+       
+        </Grid>      
       </ThemeProvider>
     </>
   );
