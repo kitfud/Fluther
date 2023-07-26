@@ -35,9 +35,6 @@ interface IDollarCostAverage {
     /// @dev error for when the recurring buy is not valid or not enough time has past
     error DollarCostAverage__InvalidRecurringBuy();
 
-    /// @dev error for when ERC20 token transfer fails
-    error DollarCostAverage__TokenTransferFailed();
-
     /// @dev error for when an invalid range of recurring buy IDs is given
     error DollarCostAverage__InvalidIndexRange();
 
@@ -52,9 +49,6 @@ interface IDollarCostAverage {
 
     /// @dev error for when given automation layer address is address(0).
     error DollarCostAverage__InvalidAutomationLayerAddress();
-
-    /// @dev error for when the token approval fails.
-    error DollarCostAverage__TokenApprovalFailed();
 
     /// @dev error for when there is not enough allowance for the recurring buy.
     error DollarCostAverage__TokenNotEnoughAllowance();
@@ -208,12 +202,6 @@ interface IDollarCostAverage {
     function setAcceptingNewRecurringBuys(
         bool acceptingNewRecurringBuys
     ) external;
-
-    /** @notice pauses the smart contract so that any function won't work. */
-    function pause() external;
-
-    /** @notice unpauses the smart contract so that every function will work. */
-    function unpause() external;
 
     /** @notice gets the timestamp of the current block.
      *  @return uint256 value for the block timestamp.
