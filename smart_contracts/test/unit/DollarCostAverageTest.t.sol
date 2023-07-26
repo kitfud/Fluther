@@ -5,6 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {Deploy} from "../../script/Deploy.s.sol";
 import {HelperConfig} from "../../script/HelperConfig.s.sol";
 import {AutomationLayer} from "../../src/AutomationLayer.sol";
+import {Security} from "../../src/Security.sol";
 import {DollarCostAverage, IDollarCostAverage} from "../../src/DollarCostAverage.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/ERC20Mock.sol";
 
@@ -80,7 +81,7 @@ contract DollarCostAverageTest is Test {
         token2 = deployer.token2();
         defaultRouter = deployer.defaultRouter();
 
-        (address wNative, , , , , , , , , uint256 deployerPk) = config
+        (address wNative, , , , , , , , uint256 deployerPk) = config
             .activeNetworkConfig();
         wrapNative = wNative;
         signer = vm.addr(deployerPk);
@@ -104,8 +105,7 @@ contract DollarCostAverageTest is Test {
         bool acceptingBuys = dca.getAcceptingNewRecurringBuys();
         address wNative = dca.getWrapNative();
 
-        (, address defaultRouter_, , , , , , , , ) = config
-            .activeNetworkConfig();
+        (, address defaultRouter_, , , , , , , ) = config.activeNetworkConfig();
 
         assertEq(router, defaultRouter_);
         assertEq(automationLayer, address(automation));
@@ -128,8 +128,7 @@ contract DollarCostAverageTest is Test {
     }
 
     function testConstructorRevertsIfAutomationLayerAddressIs0() public {
-        (, address defaultRouter_, , , , , , , , ) = config
-            .activeNetworkConfig();
+        (, address defaultRouter_, , , , , , , ) = config.activeNetworkConfig();
         address automationLayer = address(0);
 
         vm.startBroadcast(user);
@@ -710,11 +709,11 @@ contract DollarCostAverageTest is Test {
         dca.setAutomationLayer(newAutomationLayerAddress);
     }
 
-    function testSetAutomationLayerRevertsIfCallerNotOwner() public {
+    function testSetAutomationLayerRevertsIfCallerNotAllowed() public {
         address newAutomationLayerAddress = makeAddr("newAutomationLayer");
 
         vm.prank(user);
-        vm.expectRevert("Ownable: caller is not the owner");
+        vm.expectRevert(Security.Security__NotAllowed.selector);
         dca.setAutomationLayer(newAutomationLayerAddress);
     }
 
@@ -768,11 +767,11 @@ contract DollarCostAverageTest is Test {
         dca.setDefaultRouter(newDefaultRouter);
     }
 
-    function testSetDefaultRouterRevertsIfCallerNotOwner() public {
+    function testSetDefaultRouterRevertsIfCallerNotAllowed() public {
         address newDefaultRouter = makeAddr("newDefaultRouter");
 
         vm.prank(user);
-        vm.expectRevert("Ownable: caller is not the owner");
+        vm.expectRevert(Security.Security__NotAllowed.selector);
         dca.setDefaultRouter(newDefaultRouter);
     }
 
@@ -816,11 +815,13 @@ contract DollarCostAverageTest is Test {
         dca.setAcceptingNewRecurringBuys(newAcceptingNewRecurringBuys);
     }
 
-    function testSetAcceptingNewRecurringBuysRevertsIfCallerNotOwner() public {
+    function testSetAcceptingNewRecurringBuysRevertsIfCallerNotAllowed()
+        public
+    {
         bool newAcceptingNewRecurringBuys = false;
 
         vm.prank(user);
-        vm.expectRevert("Ownable: caller is not the owner");
+        vm.expectRevert(Security.Security__NotAllowed.selector);
         dca.setAcceptingNewRecurringBuys(newAcceptingNewRecurringBuys);
     }
 
@@ -832,56 +833,6 @@ contract DollarCostAverageTest is Test {
         vm.expectRevert("Pausable: paused");
         dca.setAcceptingNewRecurringBuys(newAcceptingNewRecurringBuys);
         vm.stopPrank();
-    }
-
-    /// -----------------------------------------------------------------------
-    /// Test for: pause
-    /// -----------------------------------------------------------------------
-
-    function testPause() public {
-        bool pausedBefore = dca.paused();
-
-        vm.prank(signer);
-        dca.pause();
-
-        bool pausedAfter = dca.paused();
-
-        assertEq(pausedBefore, false);
-        assertEq(pausedAfter, true);
-    }
-
-    function testPauseRevertsIfCallerNotOwner() public {
-        vm.prank(user);
-        vm.expectRevert("Ownable: caller is not the owner");
-        dca.pause();
-    }
-
-    /// -----------------------------------------------------------------------
-    /// Test for: unpause
-    /// -----------------------------------------------------------------------
-
-    function testUnpause() public {
-        vm.prank(signer);
-        dca.pause();
-
-        bool pausedBefore = dca.paused();
-
-        vm.prank(signer);
-        dca.unpause();
-
-        bool pausedAfter = dca.paused();
-
-        assertEq(pausedBefore, true);
-        assertEq(pausedAfter, false);
-    }
-
-    function testUnpauseRevertsIfCallerNotOwner() public {
-        vm.prank(signer);
-        dca.pause();
-
-        vm.prank(user);
-        vm.expectRevert("Ownable: caller is not the owner");
-        dca.unpause();
     }
 
     /// -----------------------------------------------------------------------
@@ -924,6 +875,7 @@ contract DollarCostAverageTest is Test {
     function testCheckSimpleAutomationSuccess()
         public
         createRecurringBuy(token1, token2, address(0))
+        transferFundsApproves
     {
         uint256 recurringBuyId = dca.getNextRecurringBuyId() - 1;
         bool canAutomate = dca.checkSimpleAutomation(recurringBuyId);
@@ -932,6 +884,20 @@ contract DollarCostAverageTest is Test {
     }
 
     function testCheckSimpleAutomationFalsePath1()
+        public
+        createRecurringBuy(token1, token2, address(0))
+    {
+        uint256 recurringBuyId = dca.getNextRecurringBuyId() - 1;
+
+        vm.prank(user);
+        dca.cancelRecurringPayment(recurringBuyId);
+
+        bool canAutomate = dca.checkSimpleAutomation(recurringBuyId);
+
+        assertEq(canAutomate, false);
+    }
+
+    function testCheckSimpleAutomationFalsePath2()
         public
         createRecurringBuy(token1, token2, address(0))
         transferFundsApproves
@@ -946,14 +912,62 @@ contract DollarCostAverageTest is Test {
         assertEq(canAutomate, false);
     }
 
-    function testCheckSimpleAutomationFalsePath2()
+    modifier createRecurringBuyForUser(
+        address user_,
+        address tokenToSpend,
+        address tokenToBuy,
+        address paymentInterface
+    ) {
+        uint256 amountToSpend = 1 ether;
+        uint256 timeIntervalInSeconds = 2 minutes;
+        address dexRouter = defaultRouter;
+
+        vm.prank(user_);
+        dca.createRecurringBuy(
+            amountToSpend,
+            tokenToSpend,
+            tokenToBuy,
+            timeIntervalInSeconds,
+            paymentInterface,
+            dexRouter
+        );
+        _;
+    }
+
+    function testCheckSimpleAutomationFalsePath3()
         public
-        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuyForUser(
+            makeAddr("anotherUser"),
+            token1,
+            token2,
+            address(0)
+        )
     {
+        address anotherUser = makeAddr("anotherUser");
+        vm.prank(anotherUser);
+        ERC20Mock(token1).approve(address(dca), type(uint256).max);
+
         uint256 recurringBuyId = dca.getNextRecurringBuyId() - 1;
 
-        vm.prank(user);
-        dca.cancelRecurringPayment(recurringBuyId);
+        bool canAutomate = dca.checkSimpleAutomation(recurringBuyId);
+
+        assertEq(canAutomate, false);
+    }
+
+    function testCheckSimpleAutomationFalsePath4()
+        public
+        createRecurringBuyForUser(
+            makeAddr("anotherUser"),
+            token1,
+            token2,
+            address(0)
+        )
+    {
+        address anotherUser = makeAddr("anotherUser");
+        vm.prank(anotherUser);
+        ERC20Mock(token1).mint(anotherUser, 1 ether);
+
+        uint256 recurringBuyId = dca.getNextRecurringBuyId() - 1;
 
         bool canAutomate = dca.checkSimpleAutomation(recurringBuyId);
 
@@ -1038,6 +1052,25 @@ contract DollarCostAverageTest is Test {
         assertEq(buys.length, 3);
     }
 
+    function testGetRangeOfRecurringBuysRevertsIfInvalidRange()
+        public
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+    {
+        vm.expectRevert(
+            IDollarCostAverage.DollarCostAverage__InvalidIndexRange.selector
+        );
+        dca.getRangeOfRecurringBuys(3, 1);
+
+        vm.expectRevert(
+            IDollarCostAverage.DollarCostAverage__InvalidIndexRange.selector
+        );
+        dca.getRangeOfRecurringBuys(1, 5);
+    }
+
     /// -----------------------------------------------------------------------
     /// Test for: getValidRangeOfRecurringBuys
     /// -----------------------------------------------------------------------
@@ -1052,6 +1085,7 @@ contract DollarCostAverageTest is Test {
         createRecurringBuy(token1, token2, address(0))
         createRecurringBuy(token1, token2, address(0))
         createRecurringBuy(token1, token2, address(0))
+        transferFundsApproves
     {
         vm.prank(user);
         dca.cancelRecurringPayment(2);
@@ -1062,7 +1096,141 @@ contract DollarCostAverageTest is Test {
         assertEq(buys.length, 4);
     }
 
+    function testGetValidRangeOfRecurringBuysRevertsIfInvalidRange()
+        public
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        transferFundsApproves
+    {
+        vm.prank(user);
+        dca.cancelRecurringPayment(2);
+
+        vm.expectRevert(
+            IDollarCostAverage.DollarCostAverage__InvalidIndexRange.selector
+        );
+        dca.getValidRangeOfRecurringBuys(3, 1);
+
+        vm.expectRevert(
+            IDollarCostAverage.DollarCostAverage__InvalidIndexRange.selector
+        );
+        dca.getValidRangeOfRecurringBuys(1, 7);
+    }
+
     /// -----------------------------------------------------------------------
     /// Test for: isRecurringBuyValid
     /// -----------------------------------------------------------------------
+
+    function testIsRecurringBuyValidSuccess()
+        public
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        transferFundsApproves
+    {
+        uint256 recurringBuyId = 1;
+        bool isValid = dca.isRecurringBuyValid(recurringBuyId);
+
+        assertEq(isValid, true);
+    }
+
+    function testIsRecurringBuyValidFailPath1()
+        public
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        transferFundsApproves
+    {
+        uint256 recurringBuyId = 1;
+
+        vm.prank(user);
+        dca.cancelRecurringPayment(recurringBuyId);
+
+        bool isValid = dca.isRecurringBuyValid(recurringBuyId);
+
+        assertEq(isValid, false);
+    }
+
+    function testIsRecurringBuyValidFailPath2()
+        public
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        transferFundsApproves
+    {
+        uint256 recurringBuyId = 1;
+
+        vm.prank(user);
+        dca.transferFunds(recurringBuyId);
+
+        bool isValid = dca.isRecurringBuyValid(recurringBuyId);
+
+        assertEq(isValid, false);
+    }
+
+    function testIsRecurringBuyValidFailPath3()
+        public
+        createRecurringBuyForUser(
+            makeAddr("anotherUser"),
+            token1,
+            token2,
+            address(0)
+        )
+        createRecurringBuyForUser(
+            makeAddr("anotherUser"),
+            token1,
+            token2,
+            address(0)
+        )
+    {
+        uint256 recurringBuyId = 1;
+
+        vm.prank(makeAddr("anotherUser"));
+        ERC20Mock(token1).approve(address(dca), type(uint256).max);
+
+        bool isValid = dca.isRecurringBuyValid(recurringBuyId);
+
+        assertEq(isValid, false);
+    }
+
+    function testIsRecurringBuyValidFailPath4()
+        public
+        createRecurringBuyForUser(
+            makeAddr("anotherUser"),
+            token1,
+            token2,
+            address(0)
+        )
+        createRecurringBuyForUser(
+            makeAddr("anotherUser"),
+            token1,
+            token2,
+            address(0)
+        )
+    {
+        uint256 recurringBuyId = 1;
+
+        vm.prank(makeAddr("anotherUser"));
+        ERC20Mock(token1).mint(user, 1 ether);
+
+        bool isValid = dca.isRecurringBuyValid(recurringBuyId);
+
+        assertEq(isValid, false);
+    }
 }

@@ -17,21 +17,13 @@ import {IAutomatedContract} from "./interfaces/IAutomatedContract.sol";
 import {IUniswapV2Router02} from "./interfaces/IUniswapV2Router02.sol";
 import {IAutomationLayer} from "./interfaces/IAutomationLayer.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {Pausable} from "@openzeppelin/contracts/security/Pausable.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import {Security} from "./Security.sol";
 
 /// -----------------------------------------------------------------------
 /// Contract
 /// -----------------------------------------------------------------------
 
-contract DollarCostAverage is
-    IDollarCostAverage,
-    IAutomatedContract,
-    Ownable,
-    Pausable,
-    ReentrancyGuard
-{
+contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
     /// -----------------------------------------------------------------------
     /// Storage variables
     /// -----------------------------------------------------------------------
@@ -45,7 +37,7 @@ contract DollarCostAverage is
     address private immutable wrapNative;
 
     // mappings and arrays
-    mapping(uint256 recurringBuyId => RecurringBuy data)
+    mapping(uint256 /* recurringBuyId */ => RecurringBuy /* data */)
         private s_recurringBuys;
 
     // constants
@@ -59,15 +51,6 @@ contract DollarCostAverage is
     /// -----------------------------------------------------------------------
     /// Modifiers (or functions as modifiers)
     /// -----------------------------------------------------------------------
-
-    /// @dev Uses the nonReentrant modifier. This way reduces smart contract size.
-    function __nonReentrant() private nonReentrant {}
-
-    /// @dev Uses the whenNotPaused modifier. This way reduces smart contract size.
-    function __whenNotPaused() private view whenNotPaused {}
-
-    /// @dev Uses the onlyOwner modifier. This way reduces smart contract size.
-    function __onlyOwner() private view onlyOwner {}
 
     /** @dev Checks if this contract has enough allowance to perform the transfer of funds for the recurring buy automation.
      *  It reverts if allowance is not enough.
@@ -94,7 +77,7 @@ contract DollarCostAverage is
         uint256 endRecBuyId
     ) private view {
         if (
-            !(startRecBuyId < endRecBuyId) &&
+            !(startRecBuyId < endRecBuyId) ||
             !(endRecBuyId < s_nextRecurringBuyId)
         ) {
             revert DollarCostAverage__InvalidIndexRange();
@@ -114,7 +97,7 @@ contract DollarCostAverage is
         address defaultRouter,
         address automationLayerAddress,
         address _wrapNative
-    ) {
+    ) Security(msg.sender) {
         if (defaultRouter == address(0)) {
             revert DollarCostAverage__InvalidDefaultRouterAddress();
         }
@@ -243,11 +226,18 @@ contract DollarCostAverage is
                 buy.tokenToSpend,
                 buy.sender,
                 buy.paymentInterface,
-                fee - contractFee
+                fee - contractFee,
+                true
             );
         }
 
-        __transferERC20(buy.tokenToSpend, buy.sender, owner(), contractFee);
+        __transferERC20(
+            buy.tokenToSpend,
+            buy.sender,
+            owner(),
+            contractFee,
+            true
+        );
         __approveERC20(buy.tokenToSpend, buy.dexRouter, buyAmount);
 
         address[] memory path;
@@ -267,7 +257,13 @@ contract DollarCostAverage is
         uint256 amountOutMin = (amountsOut[amountsOut.length - 1] *
             SLIPPAGE_PERCENTAGE) / PRECISION;
 
-        __transferERC20(buy.tokenToSpend, buy.sender, address(this), buyAmount);
+        __transferERC20(
+            buy.tokenToSpend,
+            buy.sender,
+            address(this),
+            buyAmount,
+            true
+        );
 
         uint256[] memory amounts = dexRouter.swapExactTokensForTokens(
             buyAmount,
@@ -297,7 +293,7 @@ contract DollarCostAverage is
     ) external override(IDollarCostAverage) {
         __nonReentrant();
         __whenNotPaused();
-        __onlyOwner();
+        __onlyAllowed();
 
         if (automationLayerAddress == address(0)) {
             revert DollarCostAverage__InvalidAutomationLayerAddress();
@@ -316,7 +312,7 @@ contract DollarCostAverage is
     ) external override(IDollarCostAverage) {
         __nonReentrant();
         __whenNotPaused();
-        __onlyOwner();
+        __onlyAllowed();
 
         if (defaultRouter == address(0)) {
             revert DollarCostAverage__InvalidDefaultRouterAddress();
@@ -335,79 +331,11 @@ contract DollarCostAverage is
     ) external override(IDollarCostAverage) {
         __nonReentrant();
         __whenNotPaused();
-        __onlyOwner();
+        __onlyAllowed();
 
         s_acceptingNewRecurringBuys = acceptingNewRecurringBuys;
 
         emit AcceptingRecurringBuysSet(msg.sender, acceptingNewRecurringBuys);
-    }
-
-    /** @dev added onlyOwner third party modifier. Calls third party pause internal function
-     *  @inheritdoc IDollarCostAverage
-     */
-    function pause() external override(IDollarCostAverage) {
-        __nonReentrant();
-        __onlyOwner();
-
-        _pause();
-    }
-
-    /** @dev added onlyOwner third party modifier. Calls third party unpause internal function
-     *  @inheritdoc IDollarCostAverage
-     */
-    function unpause() external override(IDollarCostAverage) {
-        __nonReentrant();
-        __onlyOwner();
-
-        _unpause();
-    }
-
-    /// -----------------------------------------------------------------------
-    /// Internal and private state-change functions
-    /// -----------------------------------------------------------------------
-
-    /** @dev Performs transfer of ERC20 tokens using transferFrom function. The way this function does the
-     *  transfers is safer because it works when the ERC20 transferFrom returns or does not return any value.
-     *  @dev It reverts if the transfer was not successful (i.e. reverted) or if returned value is false.
-     *  @param token: ERC20 token smart contract address to transfer.
-     *  @param from: address from which tokens will be transferred.
-     *  @param to: address to which tokens will be transferred.
-     *  @param value: amount of ERC20 tokens to transfer.
-     */
-    function __transferERC20(
-        address token,
-        address from,
-        address to,
-        uint256 value
-    ) private {
-        (bool success, bytes memory data) = token.call(
-            abi.encodeWithSelector(
-                IERC20(token).transferFrom.selector,
-                from,
-                to,
-                value
-            )
-        );
-
-        if (!success || (data.length != 0 && !abi.decode(data, (bool)))) {
-            revert DollarCostAverage__TokenTransferFailed();
-        }
-    }
-
-    /** @dev Approves the specific amount as allowance to the given address of the given token
-     *  @dev It reverts if the approve is not sucessfull (i.e. reverted) or if returned value is false.
-     *  @param token: ERC20 token smart contract address to approve.
-     *  @param to: address to which tokens will be approved.
-     *  @param amount: amount to be approved.
-     */
-    function __approveERC20(address token, address to, uint256 amount) private {
-        (bool success, bytes memory data) = token.call(
-            abi.encodeWithSelector(IERC20(token).approve.selector, to, amount)
-        );
-
-        if (!success || (data.length != 0 && !abi.decode(data, (bool)))) {
-            revert DollarCostAverage__TokenApprovalFailed();
-        }
     }
 
     /// -----------------------------------------------------------------------

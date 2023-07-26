@@ -42,6 +42,9 @@ interface IAutomationLayer {
     /// @dev error for when the simple automation process fails.
     error AutomationLayer__SimpleAutomationFailed();
 
+    /// @dev error for when given address is address(0).
+    error AutomationLayer__InvalidAddress();
+
     /// -----------------------------------------------------------------------
     /// Type declarations (structs and enums)
     /// -----------------------------------------------------------------------
@@ -101,7 +104,7 @@ interface IAutomationLayer {
      *  @param user: user address.
      *  @param automatedContract: smart contract address that had a operation automated.
      */
-    event TransactionSuccess(
+    event SimpleAutomationDone(
         uint256 indexed accountNumber,
         address indexed user,
         address indexed automatedContract
@@ -202,12 +205,6 @@ interface IAutomationLayer {
      *  @param amount: amount to withdraw.
      */
     function withdraw(uint256 amount) external;
-
-    /** @notice pauses the smart contract so that any function won't work. */
-    function pause() external;
-
-    /** @notice unpauses the smart contract so that every function will work. */
-    function unpause() external;
 
     /** @notice sets new address for the DUH token.
      *  @param duh: new address of DUH.

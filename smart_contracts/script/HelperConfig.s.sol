@@ -5,13 +5,14 @@ import {Script} from "forge-std/Script.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/ERC20Mock.sol";
 import {UniswapMock} from "../test/mocks/UniswapMock.sol";
 
+// import {DevOpsTools} from "@devops/DevOpsTools.sol";
+
 contract HelperConfig is Script {
     struct NetworkConfig {
         address wrapNative;
         address defaultRouter;
         address duhToken;
         uint256 minimumDuh;
-        address sequencerAddress;
         uint256 automationFee;
         address oracleAddress;
         address token1;
@@ -22,7 +23,6 @@ contract HelperConfig is Script {
     NetworkConfig public activeNetworkConfig;
 
     uint256 public constant MINIMUM_DUH = 1 ether;
-    address public constant SEQUENCER_ADDRESS = address(0);
     uint256 public constant AUTOMATION_FEE = 100; // over 10000
     address public constant ORACLE = address(0);
     uint256 public constant DEFAULT_ANVIL_KEY =
@@ -41,9 +41,12 @@ contract HelperConfig is Script {
             NetworkConfig({
                 wrapNative: 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9,
                 defaultRouter: 0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008,
+                // duhToken: DevOpsTools.get_most_recent_deployment(
+                //     "Duh",
+                //     block.chainid
+                // ),
                 duhToken: address(0),
                 minimumDuh: MINIMUM_DUH,
-                sequencerAddress: SEQUENCER_ADDRESS,
                 automationFee: AUTOMATION_FEE,
                 oracleAddress: ORACLE,
                 token1: address(0),
@@ -57,13 +60,16 @@ contract HelperConfig is Script {
             NetworkConfig({
                 wrapNative: 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9,
                 defaultRouter: 0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008,
+                // duhToken: DevOpsTools.get_most_recent_deployment(
+                //     "Duh",
+                //     block.chainid
+                // ),
                 duhToken: address(0),
                 minimumDuh: MINIMUM_DUH,
-                sequencerAddress: SEQUENCER_ADDRESS,
                 automationFee: AUTOMATION_FEE,
                 oracleAddress: ORACLE,
-                token1: address(0),
-                token2: address(0),
+                token1: 0x779877A7B0D9E8603169DdbD7836e478b4624789, // LINK
+                token2: 0x7169D38820dfd117C3FA1f22a697dBA58d90BA06, // USDT
                 deployerKey: vm.envUint("PRIVATE_KEY")
             });
     }
@@ -88,7 +94,6 @@ contract HelperConfig is Script {
                 defaultRouter: address(dexRouter),
                 duhToken: address(duh),
                 minimumDuh: MINIMUM_DUH,
-                sequencerAddress: SEQUENCER_ADDRESS,
                 automationFee: AUTOMATION_FEE,
                 oracleAddress: ORACLE,
                 token1: address(token1),
