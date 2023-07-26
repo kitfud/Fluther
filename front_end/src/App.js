@@ -549,9 +549,49 @@ const action = (
           
           {
           wethbalance!==null && address !== null?
-          <Box sx={{backgroundColor:'white',marginTop:"20px"}}>
-          <Typography>wETH:${wethbalance}</Typography>
-          <Typography>UNI:${unibalance}</Typography>
+          <Box
+            sx={{
+              backgroundColor:'#15ece1',
+              marginTop:"20px",
+              display:"flex",
+              justifyContent:"center",
+              border: "8px solid #15ece1",
+              borderRadius: 2,
+              width:"20%",
+            }}
+          >
+            <Box
+              sx={{
+                //COINS section
+                minWidth:"40%",
+                display:"flex",
+                flexDirection:"column",
+                justifyContent:"center",
+
+            
+              }}
+            >
+              
+              <Typography sx={{backgroundColor:"#af0079", display:"flex", justifyContent:"center"}}>COINS</Typography>
+              <Typography sx={{backgroundColor:"darkgrey", borderTop: "3px solid #999999", display: "flex", justifyContent:"center",}}>wETH</Typography>
+              <Typography sx={{backgroundColor:"darkgrey", borderTop: "3px solid #999999", display: "flex", justifyContent:"center",}}>UNI</Typography>
+            </Box>
+
+            <Box 
+              sx={{
+                //WALLET AMOUNT section
+                minWidth:"60%",
+                display:"flex",
+                flexDirection:"column",
+                justifyContent:"center",
+              
+              }}
+            >
+              <Typography sx={{backgroundColor:"#af0079", display:"flex", justifyContent:"center", borderLeft:"5px solid #960369"}}>WALLET AMOUNT</Typography>
+              <Typography sx={{backgroundColor:"darkgrey", display:"flex", justifyContent:"center", borderTop: "3px solid #999999", borderLeft: "5px solid #999999"}}>{wethbalance}</Typography>
+              <Typography sx={{backgroundColor:"darkgrey", display:"flex", justifyContent:"center", borderTop: "3px solid #999999", borderLeft: "5px solid #999999"}}>{unibalance}</Typography>
+            </Box>
+          
           </Box>:null
           }
       
