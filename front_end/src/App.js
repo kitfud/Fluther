@@ -7,6 +7,7 @@ import { Grid, Box, TextField, Typography, Card, Button, InputLabel, MenuItem, F
 
 import ABI from './chain-info/erc20ABI.json'
 import ERC20Address from './chain-info/erc20Address.json'
+import DollarCostAverage from './chain-info/smart_contracts.json'
 import {ethers} from 'ethers'
 
 const theme = createTheme({
@@ -70,7 +71,7 @@ function App() {
   const [provider, setProvider] = useState(null)
   const [signer, setSigner] = useState(null)
   const [spendingApproved, setSpendingApproved] = useState(false)
-  //const [dollarCostContract,setDollarCostContract] = useState(null)
+  const [dollarCostAverageContract,setDollarCostAverageContract] = useState(null)
   const [disableText, setDisabledTextFeild] = useState(false)
 
 
@@ -98,7 +99,7 @@ function App() {
   },[])
 
   useEffect(() => {
-    console.log("token",wethtoken)
+    // console.log("token",wethtoken)
   if(wethtoken!==null && address!==null && address !== undefined){
     try{
     checkTokenBalance()
@@ -118,7 +119,7 @@ function App() {
       try{
       setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
       setWEth(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
-      setUNI(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
+      setUNI(new ethers.Contract(ERC20Address.UNI,ABI,provider))
       }
       catch(err){
       console.log(err)
@@ -145,16 +146,21 @@ function App() {
     setSigner(tempSigner);
     setDataLoad(true)
 
-    //checkTokenBalance()
+    console.log(DollarCostAverage.DollarCostAverage.address.sepolia)
+    console.log(DollarCostAverage.DollarCostAverage.abi)
+
+    let dollaAverageAddress = DollarCostAverage.DollarCostAverage.address.sepolia
+    let dollaAverageAbi = DollarCostAverage.DollarCostAverage.abi
+  
     //lines below prepped for direct contract interaction [en future]....
-    // let tempContract = await new ethers.Contract(address,abi, tempProvider);
-    // setDollarCostContract(tempContract);
+    let tempContract = await new ethers.Contract(dollaAverageAddress,dollaAverageAbi,tempProvider);
+    setDollarCostAverageContract(tempContract);
   }
 
   const checkTokenBalance = async ()=>{
 
     if(wethtoken!==null && address !==null && address!== undefined){
-    console.log("address",address)
+    // console.log("address",address)
     var user = ethers.utils.getAddress(address)
     var wethbal= (await wethtoken.balanceOf(user)/10**18).toString();
     setWEthBalance(wethbal)
@@ -166,8 +172,8 @@ function App() {
   }
 
   const approveSpending = async()=>{
-    console.log("amount",amount)
-    console.log(erc20contract)
+    // console.log("amount",amount)
+    // console.log(erc20contract)
     try{
       await erc20contract.connect(signer).approve(quickSwapRouterAddress,parseInt(amount))
       setSpendingApproved(true)
