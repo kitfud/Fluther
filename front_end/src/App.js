@@ -196,6 +196,7 @@ function App() {
     }
     console.log(JSON.stringify(data))
 
+  
   let tx = await dollarCostAverageContract.connect(signer).createRecurringBuy(amount,token1,token2,interval,'0x0000000000000000000000000000000000000000',quickSwapRouterAddress)
   console.log(JSON.stringify(tx))
 }
