@@ -1,15 +1,46 @@
-import React from 'react'
+import React, { isValidElement } from 'react'
 import { useEffect,useState } from 'react'
-import {Button,Card,Box,Paper,Table, TableBody,TableCell,TableContainer,TableHead,TableRow } from '@mui/material'
+import {Typography,Snackbar,CircularProgress,Button,Card,Box,Paper,Table, TableBody,TableCell,TableContainer,TableHead,TableRow } from '@mui/material'
 import { ethers } from 'ethers'
 import DollarCost from '../chain-info/smart_contracts.json'
 
-const UserRecurringBuys = ({contract,provider,address}) => {
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+
+const UserRecurringBuys = ({signer,contract,provider,address}) => {
 
     // console.log(DollarCost.DollarCostAverage.address.sepolia)
 // console.log("address",address)
     const [data, setData] = useState(null)
     const [tabledata,setTableData] = useState(null)
+    const [processing, setProcessing] = useState(false)
+
+  const [openSnackbar,setOpenSnackBar] = useState(false)
+  const [txHash, setTxHash] = useState(null)
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+  
+    setOpenSnackBar(false);
+  };
+
+  const action = (
+    <React.Fragment>
+      <Button color="secondary" size="small" onClick={handleClose}>
+        UNDO
+      </Button>
+      <IconButton
+        size="small"
+        aria-label="close"
+        color="inherit"
+        onClick={handleClose}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </React.Fragment>
+  );
 
     useEffect(()=>{
 
@@ -18,7 +49,7 @@ const UserRecurringBuys = ({contract,provider,address}) => {
     setData(data)
     }
 
-    if(provider){
+    if(provider!=null){
     try{
     loggingData()  
     }
@@ -31,7 +62,7 @@ const UserRecurringBuys = ({contract,provider,address}) => {
 
     useEffect(()=>{
     if(data){
-    // console.log(data)
+    console.log("data",data)
     filterData(data)
 }
     },[data])
@@ -44,8 +75,9 @@ const UserRecurringBuys = ({contract,provider,address}) => {
         //takes off records which don't relate to events,setup of contracts and admin
         let userData = []
         data.forEach((element)=>{
-            // console.log(typeof(element[0]))
-            if(typeof(element[0])!='string'){
+            //the cancel event array is length 2 and the admin stuff does not start witha  string when
+            //llooking at data
+            if(typeof(element[0])!='string'& element.length==3){
                 userData.push(element)
             }
         })
@@ -58,14 +90,15 @@ const UserRecurringBuys = ({contract,provider,address}) => {
         result.push(userData[i])
        }
        }
-console.log("result",result)
+// console.log("result",result)
        let tableResult = []
        result.forEach((element)=>{
         // console.log("buy",element.buy)
-        console.log("timeIntervalSeconds",element.buy.timeIntervalInSeconds.toNumber())
-        // console.log("tokenToBuy",element.buy.tokenToBuy)
+        // console.log("timeIntervalSeconds",element.buy.timeIntervalInSeconds.toNumber())
+        console.log("tokenToBuy",element.buy.tokenToBuy)
         // console.log("token to spend",element.buy.tokenToSpend)
         // console.log(element.recBuyId.toNumber())
+       
         let tdata = {
             "buyId":element.recBuyId.toNumber(),
             "tokenToSpend":element.buy.tokenToSpend,
@@ -73,23 +106,25 @@ console.log("result",result)
             "timeInterval":element.buy.timeIntervalInSeconds.toNumber()
         }
         tableResult.push(tdata)
+    
        })
- setTableData(tableResult)
+       console.log(tableResult)
+    setTableData(tableResult)
     }
 
 
     
     const logEventData = async (eventName, filters = [], provider, setterFunction = undefined) => {
 
-        console.log("eventName",eventName)
-        console.log("provider",provider)
-        console.log("filters",filters)
+        // console.log("eventName",eventName)
+        // console.log("provider",provider)
+        // console.log("filters",filters)
         // let filterABI = ["event RecurringBuyCreated ( uint256 recBuyId,address sender, tuple buy)"]
-        console.log(DollarCost.DollarCostAverage.abi)
+        // console.log(DollarCost.DollarCostAverage.abi)
         let filterABI = DollarCost.DollarCostAverage.abi
         let iface = new ethers.utils.Interface(filterABI)
 
-        console.log(iface)
+        // console.log(iface)
 
         let dollarCostAddress = DollarCost.DollarCostAverage.address.sepolia
         let filter = {
@@ -108,18 +143,59 @@ console.log("result",result)
         });
 
     }
-    
-    function createData(buyId, tokenToSpend, tokenToBuy, timeInterval) {
-        return {buyId, tokenToSpend, tokenToBuy,timeInterval};
+
+    const handleCancel = async (id)=>{
+        if(signer){
+        try{
+        setProcessing(true)
+        let tx = await contract.connect(signer).cancelRecurringPayment(id)
+        let hash = tx.hash
+        setTxHash(hash.toString())
+        isTransactionMined(hash.toString())
+
+        }
+        catch(err){
+        setProcessing(false)
+        console.log(err)
+        }
+        }
+    }
+
+    const isTransactionMined = async (transactionHash) => {
+        let transactionBlockFound = false
+      
+        while (transactionBlockFound === false) {
+            let tx = await provider.getTransactionReceipt(transactionHash)
+            console.log("transaction status check....")
+            try {
+                await tx.blockNumber
+            }
+            catch (error) {
+                tx = await provider.getTransactionReceipt(transactionHash)
+            }
+            finally {
+                console.log("proceeding")
+            }
+      
+      
+            if (tx && tx.blockNumber) {
+               
+                setProcessing(false)
+                console.log("block number assigned.")
+                transactionBlockFound = true
+                let stringBlock = tx.blockNumber.toString()
+                console.log("COMPLETED BLOCK: " + stringBlock)
+                setOpenSnackBar(true)
+      
+            }
+        }
       }
     
-    
-    const rows = [
-        createData('test0', 'testWETH', 'testUNI', 'test300'),
-      ];
-
+ 
   return (
     <>
+   {
+    !processing?
     <Card sx={{marginTop:'20px',padding:'40px'}}>
         <Box>
         <div>Current Dollar Cost Average Contracts</div>
@@ -146,15 +222,33 @@ console.log("result",result)
               <TableCell align="right">{row.tokenToBuy}</TableCell>
               <TableCell align="right">{row.tokenToSpend}</TableCell>
               <TableCell align="right">{row.timeInterval}</TableCell>
-              <TableCell><Button variant='contained' color="error">Cancel</Button></TableCell>
+              <TableCell><Button onClick={()=>handleCancel(row.buyId)} variant='contained' color="error">Cancel</Button></TableCell>
             </TableRow>)
           })):null}
         </TableBody>
       </Table>
     </TableContainer>
-   
-    </Card>
-    
+
+
+
+    </Card>:<Box display="flex"
+                alignItems="center"
+                justifyContent="center" 
+                sx={{marginTop:'20px'}}> <CircularProgress/></Box>
+}
+        <Snackbar
+        anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        message=""
+        action={action}
+        sx={{backgroundColor:"white"}}
+      >
+        <a target="_blank" href={`https://sepolia.etherscan.io/tx/${txHash}`}>
+          <Typography color="black">Success!Dollar Cost Agreement Canceled:${txHash} on Etherscan</Typography>
+        </a>
+        </Snackbar>
     </>
    
   )
