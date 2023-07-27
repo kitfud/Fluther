@@ -29,6 +29,12 @@ const UserRecurringBuys = ({contract,provider,address}) => {
     }
     },[provider])
 
+    useEffect(()=>{
+if(data){
+    console.log(data)
+}
+    },[data])
+
 
     
     const logEventData = async (eventName, filters = [], provider, setterFunction = undefined) => {
@@ -36,8 +42,25 @@ const UserRecurringBuys = ({contract,provider,address}) => {
         console.log("eventName",eventName)
         console.log("provider",provider)
         console.log("filters",filters)
-        let filterABI = ['event RecurringBuyCreated(uint256 nextRecurringBuyId,address msg.sender,tuple buy)']
+        let filterABI = ["event RecurringBuyCreated(uint256 indexed recBuyId,address indexed sender,tuple buy)"]
         let iface = new ethers.utils.Interface(filterABI)
+
+        let dollarCostAddress = DollarCost.DollarCostAverage.address.sepolia
+        let filter = {
+            address: dollarCostAddress,
+            fromBlock:0,     
+        }
+        let logPromise = provider.getLogs(filter)
+        logPromise.then(function(logs){
+            let events = logs.map((log)=>{
+                return iface.parseLog(log).args
+            })
+            setData(events)
+            
+        }).catch(function(err){
+            console.log(err);
+        });
+
     }
     
     function createData(buyId, tokenToSpend, tokenToBuy, timeInterval) {
