@@ -36,76 +36,8 @@ const UserRecurringBuys = ({contract,provider,address}) => {
         console.log("eventName",eventName)
         console.log("provider",provider)
         console.log("filters",filters)
-
-        const ABI = DollarCost.DollarCostAverage.abi.filter(frag => frag.name && frag.name === eventName)[0]
-        // console.log(ABI)
-        let ABIStr = `event ${ABI.name}(`
-        for (let ii = 0; ii < ABI.inputs.length; ii++) {
-            ABIStr += `${ABI.inputs[ii].type} ${ABI.inputs[ii].indexed ? "indexed" : ""} ${ABI.inputs[ii].name}`
-            if (ii < ABI.inputs.length - 1) {
-                ABIStr += ","
-            }
-        }
-        ABIStr += ")"
-
-        console.log(ABIStr)
-    //     let datac = contract.filters.RecurringBuyCreated(null,address)
-    //    console.log(datac)
-   
-        //lines below are old code
-        const iface = new ethers.utils.Interface([ABIStr])
-        console.log("iface",iface)
-        return iface
-
-        // const iface = new ethers.utils.Interface(DollarCost.DollarCostAverage.abi)
-        // console.log("iface",iface)
-    
-        // const topics = iface.encodeFilterTopics(ABI.name, filters)
-    
-        // const filter = {
-        //     address: ethers.utils.getAddress(DollarCost.DollarCostAverage.address.sepolia),
-        //     topics,
-        //     fromBlock: 0
-        // }
-    
-        // const logs = await provider.getLogs(filter)
-        // console.log("logs",logs)
-
-        // const decodedEventsArgs = logs.map(log => {
-        //     return iface.parseLog(log).args
-        // })
-        // const decodedEventsInputs = logs.map(log => {
-        //     return iface.parseLog(log).eventFragment.inputs
-        // })
-        // const blockNumbers = logs.map(log => {
-        //     return log.blockNumber
-        // })
-    
-        // let decodedEvents = []
-        // for (let ii = 0; ii < decodedEventsInputs.length; ii++) {
-        //     const result = decodedEventsInputs[ii].map((input, index) => {
-        //         if (input.name === "nextReccuringBuyId" || input.name === "msg.sender" || input.name === "buy") {
-        //             return { [input.name]: decodedEventsArgs[ii][index].toNumber() }
-        //         } else if (ethers.BigNumber.isBigNumber(decodedEventsArgs[ii][index])) {
-        //             return { [input.name]: parseFloat(ethers.utils.formatEther(decodedEventsArgs[ii][index])) }
-        //         } else {
-        //             return { [input.name]: decodedEventsArgs[ii][index] }
-        //         }
-        //     })
-    
-        //     let realRestul = {}
-        //     for (let jj = 0; jj < result.length; jj++) {
-        //         realRestul = { ...realRestul, ...result[jj] }
-        //     }
-        //     realRestul["timestamp"] = (await provider.getBlock(blockNumbers[ii])).timestamp
-        //     decodedEvents.push(realRestul)
-        // }
-    
-        // if (typeof setterFunction !== "undefined") {
-        //     setterFunction(decodedEvents)
-        // }
-    
-        // return decodedEvents
+        let filterABI = ['event RecurringBuyCreated(uint256 nextRecurringBuyId,address msg.sender,tuple buy)']
+        let iface = new ethers.utils.Interface(filterABI)
     }
     
     function createData(buyId, tokenToSpend, tokenToBuy, timeInterval) {
