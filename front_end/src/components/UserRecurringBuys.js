@@ -42,8 +42,12 @@ if(data){
         console.log("eventName",eventName)
         console.log("provider",provider)
         console.log("filters",filters)
-        let filterABI = ["event RecurringBuyCreated(uint256 indexed recBuyId,address indexed sender,tuple buy)"]
+        // let filterABI = ["event RecurringBuyCreated ( uint256 recBuyId,address sender, tuple buy)"]
+        console.log(DollarCost.DollarCostAverage.abi)
+        let filterABI = DollarCost.DollarCostAverage.abi
         let iface = new ethers.utils.Interface(filterABI)
+
+        console.log(iface)
 
         let dollarCostAddress = DollarCost.DollarCostAverage.address.sepolia
         let filter = {
