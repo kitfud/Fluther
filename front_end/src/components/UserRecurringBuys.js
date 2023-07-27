@@ -9,13 +9,12 @@ const UserRecurringBuys = ({contract,provider,address}) => {
     // console.log(DollarCost.DollarCostAverage.address.sepolia)
 // console.log("address",address)
     const [data, setData] = useState(null)
+    const [tabledata,setTableData] = useState(null)
 
     useEffect(()=>{
 
     const loggingData = async()=>{
-    console.log("provider",provider)
     const data = await logEventData("RecurringBuyCreated",[], provider)
-    console.log(data)
     setData(data)
     }
 
@@ -27,13 +26,56 @@ const UserRecurringBuys = ({contract,provider,address}) => {
         console.log(err)
     }
     }
-    },[provider])
+
+    },[provider,address])
 
     useEffect(()=>{
-if(data){
-    console.log(data)
+    if(data){
+    // console.log(data)
+    filterData(data)
 }
     },[data])
+
+
+    const filterData = (data)=>{
+        // console.log(data)
+        // console.log("data",data[16][0])
+
+        //takes off records which don't relate to events,setup of contracts and admin
+        let userData = []
+        data.forEach((element)=>{
+            // console.log(typeof(element[0]))
+            if(typeof(element[0])!='string'){
+                userData.push(element)
+            }
+        })
+
+        //filter to only records specific to user
+        // console.log("address",address)
+       let result =[] 
+       for(let i = 0; i<userData.length; i++){
+       if (userData[i][1]==address){
+        result.push(userData[i])
+       }
+       }
+console.log("result",result)
+       let tableResult = []
+       result.forEach((element)=>{
+        // console.log("buy",element.buy)
+        console.log("timeIntervalSeconds",element.buy.timeIntervalInSeconds.toNumber())
+        // console.log("tokenToBuy",element.buy.tokenToBuy)
+        // console.log("token to spend",element.buy.tokenToSpend)
+        // console.log(element.recBuyId.toNumber())
+        let tdata = {
+            "buyId":element.recBuyId.toNumber(),
+            "tokenToSpend":element.buy.tokenToSpend,
+            "tokenToBuy":element.buy.tokenToBuy,
+            "timeInterval":element.buy.timeIntervalInSeconds.toNumber()
+        }
+        tableResult.push(tdata)
+       })
+ setTableData(tableResult)
+    }
 
 
     
@@ -90,11 +132,11 @@ if(data){
             <TableCell align="right">Token To Spend</TableCell>
             <TableCell align="right">Token To Buy</TableCell>
             <TableCell align="right">Interval&nbsp; (sec)</TableCell>
-            
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
+          {tabledata?(tabledata.map((row) => {
+            return(
             <TableRow
               key={row.buyId}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -105,8 +147,8 @@ if(data){
               <TableCell align="right">{row.tokenToSpend}</TableCell>
               <TableCell align="right">{row.timeInterval}</TableCell>
               <TableCell><Button variant='contained' color="error">Cancel</Button></TableCell>
-            </TableRow>
-          ))}
+            </TableRow>)
+          })):null}
         </TableBody>
       </Table>
     </TableContainer>
