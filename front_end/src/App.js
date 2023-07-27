@@ -154,8 +154,8 @@ function App() {
     setSigner(tempSigner);
     setDataLoad(true)
 
-    console.log(DollarCostAverage.DollarCostAverage.address.sepolia)
-    console.log(DollarCostAverage.DollarCostAverage.abi)
+    // console.log(DollarCostAverage.DollarCostAverage.address.sepolia)
+    // console.log(DollarCostAverage.DollarCostAverage.abi)
 
     let dollaAverageAddress = DollarCostAverage.DollarCostAverage.address.sepolia
     let dollaAverageAbi = DollarCostAverage.DollarCostAverage.abi
@@ -569,7 +569,7 @@ const action = (
         </a>
         </Snackbar>
 
-        <UserRecurringBuys/>
+        <UserRecurringBuys contract={dollarCostAverageContract} provider={provider} address={address}/>
        
        
         </Grid>      
