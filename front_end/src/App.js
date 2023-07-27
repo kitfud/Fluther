@@ -207,7 +207,7 @@ function App() {
   try{
   setProcessing(true)
   let tx = await dollarCostAverageContract.connect(signer).createRecurringBuy(amount,token1,token2,interval,'0x0000000000000000000000000000000000000000',quickSwapRouterAddress)
-  console.log(JSON.stringify(tx))
+  // console.log(JSON.stringify(tx))
 
   let hash = tx.hash
   setTxHash(hash.toString())
@@ -609,8 +609,9 @@ const action = (
         </a>
         </Snackbar>
 
-        <UserRecurringBuys contract={dollarCostAverageContract} provider={provider} address={address}/>
        
+        <UserRecurringBuys signer={signer} contract={dollarCostAverageContract} provider={provider} address={address}/>
+        
        
         </Grid>      
       </ThemeProvider>
