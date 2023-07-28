@@ -69,7 +69,7 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
 
     useEffect(()=>{
     if(data){
-    console.log("data",data)
+    // console.log("data",data)
     filterData(data)
 }
     },[data])
@@ -115,7 +115,7 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
         result.push(userData[i])
        }
        }
-console.log("result",result)
+// console.log("result",result)
        let tableResult = []
        result.forEach((element)=>{
         // console.log("buy",element.buy)
@@ -136,7 +136,7 @@ console.log("result",result)
         tableResult.push(tdata)
     
        })
-       console.log("tableresult",tableResult)
+    //    console.log("tableresult",tableResult)
     setTableData(tableResult)
     }
 
@@ -221,10 +221,10 @@ console.log("result",result)
       }
     
  const removeCancelledContracts = (tableData) =>{
-    console.log('tableData',tableData)
-    console.log("cancelled",canceledIds)
+    // console.log('tableData',tableData)
+    // console.log("cancelled",canceledIds)
     let refinedData = tableData.filter(element=>!canceledIds.includes(element.buyId))
-    console.log("refined",refinedData)
+    // console.log("refined",refinedData)
     return refinedData
  }
 

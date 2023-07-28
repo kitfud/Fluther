@@ -102,7 +102,7 @@ function App() {
   const address = useAddress();
 
   //address below is deployment to Polygon mainnet
-  const dollarCostAddress = '0x519DdbffEA597980B19F254892dEc703613e8775'
+  //const dollarCostAddress = '0x519DdbffEA597980B19F254892dEc703613e8775'
 
   //address below is for Polygon mainnet
   //const quickSwapRouterAddress = '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff'
@@ -213,7 +213,7 @@ function App() {
       "interval": interval,
       "intervalAmount": intervalAmount,
     }
-    console.log(JSON.stringify(data))
+    // console.log(JSON.stringify(data))
 
   
 
