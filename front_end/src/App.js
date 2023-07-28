@@ -214,9 +214,14 @@ function App() {
     }
     console.log(JSON.stringify(data))
 
+  
+
+const input = intervalAmount;
+const amountInterval = ethers.utils.parseUnits(input)
+
   try{
   setProcessing(true)
-  let tx = await dollarCostAverageContract.connect(signer).createRecurringBuy(amount,token1,token2,interval,'0x0000000000000000000000000000000000000000',quickSwapRouterAddress)
+  let tx = await dollarCostAverageContract.connect(signer).createRecurringBuy(amountInterval,token1,token2,interval,'0x0000000000000000000000000000000000000000',quickSwapRouterAddress)
   // console.log(JSON.stringify(tx))
 
   let hash = tx.hash
@@ -574,7 +579,7 @@ const action = (
                 <TableHead sx={{backgroundColor:"lightyellow"}}>
                 <TableRow>
                   <TableCell align="left" >COINS</TableCell>
-                  <TableCell align="left" >WALET AMOUNT</TableCell>
+                  <TableCell align="left" >WALLET AMOUNT</TableCell>
                 </TableRow>
                 </TableHead>
                 <TableBody>

@@ -6,6 +6,7 @@ import DollarCost from '../chain-info/smart_contracts.json'
 
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import erc20Address from '../chain-info/erc20Address.json'
 
 const UserRecurringBuys = ({signer,contract,provider,address}) => {
 
@@ -18,7 +19,7 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
   const [openSnackbar,setOpenSnackBar] = useState(false)
   const [txHash, setTxHash] = useState(null)
   const [canceledIds,setCanceledIds] = useState(null)
-  const[reloadpage,setReloadPage]= useState(false)
+ 
 
 
   const handleClose = (event, reason) => {
@@ -30,10 +31,7 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
     
   };
 
-  const handleOpen = (event)=>{
-    window.location.reload(false);
 
-  }
 
   const action = (
     <React.Fragment>
@@ -117,25 +115,28 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
         result.push(userData[i])
        }
        }
-// console.log("result",result)
+console.log("result",result)
        let tableResult = []
        result.forEach((element)=>{
         // console.log("buy",element.buy)
         // console.log("timeIntervalSeconds",element.buy.timeIntervalInSeconds.toNumber())
-        console.log("tokenToBuy",element.buy.tokenToBuy)
+        // console.log("tokenToBuy",element.buy.tokenToBuy)
         // console.log("token to spend",element.buy.tokenToSpend)
         // console.log(element.recBuyId.toNumber())
+        
+        // console.log("amount",ethers.utils.formatEther(element.buy[1]))
        
         let tdata = {
             "buyId":element.recBuyId.toNumber(),
             "tokenToSpend":element.buy.tokenToSpend,
             "tokenToBuy":element.buy.tokenToBuy,
-            "timeInterval":element.buy.timeIntervalInSeconds.toNumber()
+            "timeInterval":element.buy.timeIntervalInSeconds.toNumber(),
+            "amount":ethers.utils.formatEther(element.buy[1])
         }
         tableResult.push(tdata)
     
        })
-       console.log(tableResult)
+       console.log("tableresult",tableResult)
     setTableData(tableResult)
     }
 
@@ -227,6 +228,43 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
     return refinedData
  }
 
+ const translateToken = (row)=>{
+    let translatedData = {}
+    if(row.tokenToBuy == erc20Address.UNI){
+        translatedData["tokenToBuy"] ="UNI"
+    }
+    else if (row.tokenToBuy == erc20Address.wEthSepolia){
+        translatedData["tokenToBuy"]="WETH"        
+    }
+
+    if(row.tokenToSpend == erc20Address.UNI){
+        translatedData["tokenToSpend"] ="UNI"
+    }
+    else if (row.tokenToSpend == erc20Address.wEthSepolia){
+        translatedData["tokenToSpend"]="WETH"        
+    }
+
+    return translatedData
+
+ }
+
+ const translateTime=(row)=>{
+    let returnData = {}
+    if(row.timeInterval==300){
+        returnData["timeInterval"] = "5 Minutes"
+    }
+    else if (row.timeInterval==86400){
+        returnData["timeInterval"] = "Daily"
+    } 
+    else if (row.timeInterval==604800){
+        returnData["timeInterval"] = "Weekly"
+    } 
+    else if (row.timeInterval==2419200){
+        returnData["timeInterval"] = "Monthly" 
+    }
+    return returnData
+ }
+
   return (
     <>
    {
@@ -242,11 +280,17 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
             <TableCell>buyId</TableCell>
             <TableCell align="right">Token To Spend</TableCell>
             <TableCell align="right">Token To Buy</TableCell>
-            <TableCell align="right">Interval&nbsp; (sec)</TableCell>
+            <TableCell align="right">Amount</TableCell>
+            <TableCell align="right">Interval&nbsp;</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {tabledata?(removeCancelledContracts(tabledata).map((row) => {
+            // let swap = {"tokenToBuy":"UNI","tokenToSpend":"WETH"}
+            // console.log("row",row)
+            let swap = translateToken(row)
+            let time = translateTime(row)
+            
             return(
             <TableRow
               key={row.buyId}
@@ -254,9 +298,10 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
             >
           
               <TableCell align="right">{row.buyId}</TableCell>
-              <TableCell align="right">{row.tokenToBuy}</TableCell>
-              <TableCell align="right">{row.tokenToSpend}</TableCell>
-              <TableCell align="right">{row.timeInterval}</TableCell>
+              <TableCell align="right">{swap.tokenToSpend}</TableCell>
+              <TableCell align="right">{swap.tokenToBuy}</TableCell>
+              <TableCell align="right">{row.amount}</TableCell>
+              <TableCell align="right">{time.timeInterval}</TableCell>
               <TableCell><Button onClick={()=>handleCancel(row.buyId)} variant='contained' color="error">Cancel</Button></TableCell>
             </TableRow>)
           })):null}
