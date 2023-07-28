@@ -17,14 +17,23 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
 
   const [openSnackbar,setOpenSnackBar] = useState(false)
   const [txHash, setTxHash] = useState(null)
+  const [canceledIds,setCanceledIds] = useState(null)
+  const[reloadpage,setReloadPage]= useState(false)
+
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
-  
+    window.location.reload(false);
     setOpenSnackBar(false);
+    
   };
+
+  const handleOpen = (event)=>{
+    window.location.reload(false);
+
+  }
 
   const action = (
     <React.Fragment>
@@ -68,20 +77,38 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
     },[data])
 
 
+
     const filterData = (data)=>{
         // console.log(data)
         // console.log("data",data[16][0])
 
         //takes off records which don't relate to events,setup of contracts and admin
         let userData = []
+        let cancelledContracts = []
+
         data.forEach((element)=>{
             //the cancel event array is length 2 and the admin stuff does not start witha  string when
             //llooking at data
             if(typeof(element[0])!='string'& element.length==3){
                 userData.push(element)
             }
+           
         })
 
+        
+            data.forEach((element)=>{
+                //event structure for canclled events in length 2 and only take sender from address
+                if(typeof(element[0])!='string'& element.length==2 &element.sender==address){
+                //filter and convert big number to javascript integer
+                    cancelledContracts.push(element.recBuyId.toNumber())
+                }
+               
+            })
+           
+       
+
+        //console.log("cancelled",cancelledContracts)
+        setCanceledIds(cancelledContracts)
         //filter to only records specific to user
         // console.log("address",address)
        let result =[] 
@@ -185,13 +212,21 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
                 transactionBlockFound = true
                 let stringBlock = tx.blockNumber.toString()
                 console.log("COMPLETED BLOCK: " + stringBlock)
+                // setReloadPage(true)
                 setOpenSnackBar(true)
       
             }
         }
       }
     
- 
+ const removeCancelledContracts = (tableData) =>{
+    console.log('tableData',tableData)
+    console.log("cancelled",canceledIds)
+    let refinedData = tableData.filter(element=>!canceledIds.includes(element.buyId))
+    console.log("refined",refinedData)
+    return refinedData
+ }
+
   return (
     <>
    {
@@ -211,7 +246,7 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {tabledata?(tabledata.map((row) => {
+          {tabledata?(removeCancelledContracts(tabledata).map((row) => {
             return(
             <TableRow
               key={row.buyId}
@@ -239,7 +274,7 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
         <Snackbar
         anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
         open={openSnackbar}
-        autoHideDuration={6000}
+        autoHideDuration={3000}
         onClose={handleClose}
         message=""
         action={action}
