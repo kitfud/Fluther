@@ -91,9 +91,14 @@ contract NodeSequencerTest is Test {
             .activeNetworkConfig();
 
         signer = vm.addr(deployerPk);
-
-        ERC20Mock(wNative).mint(user, INITIAL_USER_ERC20_FUNDS);
         vm.deal(user, INITIAL_USER_FUNDS);
+
+        if (block.chainid == 11155111) {
+            vm.prank(user);
+            wNative.call{value: 1 ether}("");
+        } else {
+            ERC20Mock(wNative).mint(user, INITIAL_USER_ERC20_FUNDS);
+        }
     }
 
     modifier pause() {

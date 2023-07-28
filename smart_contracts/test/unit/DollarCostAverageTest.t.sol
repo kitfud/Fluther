@@ -3,6 +3,7 @@ pragma solidity 0.8.19;
 
 import {Test} from "forge-std/Test.sol";
 import {Deploy} from "../../script/Deploy.s.sol";
+import {DeployMocks} from "../../script/DeployMocks.s.sol";
 import {HelperConfig} from "../../script/HelperConfig.s.sol";
 import {AutomationLayer} from "../../src/AutomationLayer.sol";
 import {Security} from "../../src/Security.sol";
@@ -77,8 +78,6 @@ contract DollarCostAverageTest is Test {
         automation = deployer.automation();
         dca = deployer.dca();
         config = deployer.config();
-        token1 = deployer.token1();
-        token2 = deployer.token2();
         defaultRouter = deployer.defaultRouter();
 
         (address wNative, , , , , , , , uint256 deployerPk) = config
@@ -86,13 +85,26 @@ contract DollarCostAverageTest is Test {
         wrapNative = wNative;
         signer = vm.addr(deployerPk);
 
+        vm.deal(user, INITAL_USER_FUNDS);
+        if (block.chainid == 11155111) {
+            vm.prank(user);
+            wNative.call{value: 1 ether}("");
+
+            DeployMocks mocksDeployer = new DeployMocks();
+            mocksDeployer.run();
+            token1 = address(mocksDeployer.weth());
+            token2 = address(mocksDeployer.uni());
+        } else {
+            token1 = deployer.token1();
+            token2 = deployer.token2();
+
+            ERC20Mock(wNative).mint(defaultRouter, INITAL_DEX_ERC20_FUNDS);
+            ERC20Mock(wNative).mint(user, INITAL_USER_ERC20_FUNDS);
+        }
+
         ERC20Mock(token1).mint(defaultRouter, INITAL_DEX_ERC20_FUNDS);
         ERC20Mock(token2).mint(defaultRouter, INITAL_DEX_ERC20_FUNDS);
-        ERC20Mock(wNative).mint(defaultRouter, INITAL_DEX_ERC20_FUNDS);
         ERC20Mock(token1).mint(user, INITAL_USER_ERC20_FUNDS);
-        ERC20Mock(wNative).mint(user, INITAL_USER_ERC20_FUNDS);
-
-        vm.deal(user, INITAL_USER_FUNDS);
     }
 
     /// -----------------------------------------------------------------------
