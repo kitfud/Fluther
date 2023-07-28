@@ -58,13 +58,13 @@ contract HelperConfig is Script {
     function getSepoliaConfig() public view returns (NetworkConfig memory) {
         return
             NetworkConfig({
-                wrapNative: 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9,
+                wrapNative: 0xD0dF82dE051244f04BfF3A8bB1f62E1cD39eED92,
                 defaultRouter: 0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008,
                 // duhToken: DevOpsTools.get_most_recent_deployment(
                 //     "Duh",
                 //     block.chainid
                 // ),
-                duhToken: address(0),
+                duhToken: 0xC981B922bD3A81362388F9f8b68e2e85F57b6FD2,
                 minimumDuh: MINIMUM_DUH,
                 automationFee: AUTOMATION_FEE,
                 oracleAddress: ORACLE,
