@@ -253,7 +253,7 @@ const handleClose = (event, reason) => {
   if (reason === 'clickaway') {
     return;
   }
-
+  window.location.reload(false);
   setOpenSnackBar(false);
 };
 
@@ -598,7 +598,7 @@ const action = (
       <Snackbar
         anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
         open={openSnackbar}
-        autoHideDuration={6000}
+        autoHideDuration={3000}
         onClose={handleClose}
         message=""
         action={action}
