@@ -3,7 +3,16 @@ import './App.css';
 import { ConnectWallet } from "@thirdweb-dev/react";
 import { useAddress } from "@thirdweb-dev/react";
 import { ThemeProvider, createTheme } from '@mui/material';
-import {Snackbar,CircularProgress, Grid, Box, TextField, Typography, Card, Button, InputLabel, MenuItem, FormControl, Select } from "@mui/material";
+import {Snackbar,
+  CircularProgress, 
+  Grid, 
+  Box, 
+  TextField, 
+  Typography, 
+  Card, 
+  Button, 
+  Paper,
+  InputLabel, MenuItem, FormControl, Select,TableContainer,Table,TableHead,TableRow,TableCell,TableBody} from "@mui/material";
 
 import ABI from './chain-info/erc20ABI.json'
 import ERC20Address from './chain-info/erc20Address.json'
@@ -17,11 +26,12 @@ import UserRecurringBuys from './components/UserRecurringBuys';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#af0079',
+      main: '#ec1520',
       //previously yellow #ece115
     },
     secondary: {
-      main: '#15ece1',
+      main:'#42fae8'
+      // main: '#15ece1',
     },
   },
   typography: {
@@ -316,7 +326,7 @@ const action = (
             }}
           >
             <Typography
-              color="#af0079"
+              color='#8c42fa'
               component="h1"
               sx={{
                 fontSize: 20,
@@ -549,50 +559,36 @@ const action = (
           
           {
           wethbalance!==null && address !== null?
-          <Box
-            sx={{
-              backgroundColor:'#15ece1',
-              marginTop:"20px",
-              display:"flex",
-              justifyContent:"center",
-              border: "8px solid #15ece1",
-              borderRadius: 2,
-              width:"20%",
-            }}
-          >
-            <Box
-              sx={{
-                //COINS section
-                minWidth:"40%",
-                display:"flex",
-                flexDirection:"column",
-                justifyContent:"center",
-
-            
-              }}
-            >
-              
-              <Typography sx={{backgroundColor:"#af0079", display:"flex", justifyContent:"center"}}>COINS</Typography>
-              <Typography sx={{backgroundColor:"darkgrey", borderTop: "3px solid #999999", display: "flex", justifyContent:"center",}}>wETH</Typography>
-              <Typography sx={{backgroundColor:"darkgrey", borderTop: "3px solid #999999", display: "flex", justifyContent:"center",}}>UNI</Typography>
-            </Box>
-
+          <>
             <Box 
               sx={{
                 //WALLET AMOUNT section
-                minWidth:"60%",
                 display:"flex",
                 flexDirection:"column",
                 justifyContent:"center",
               
               }}
             >
-              <Typography sx={{backgroundColor:"#af0079", display:"flex", justifyContent:"center", borderLeft:"5px solid #960369"}}>WALLET AMOUNT</Typography>
-              <Typography sx={{backgroundColor:"darkgrey", display:"flex", justifyContent:"center", borderTop: "3px solid #999999", borderLeft: "5px solid #999999"}}>{wethbalance}</Typography>
-              <Typography sx={{backgroundColor:"darkgrey", display:"flex", justifyContent:"center", borderTop: "3px solid #999999", borderLeft: "5px solid #999999"}}>{unibalance}</Typography>
+              <TableContainer sx={{borderRadius:2, marginTop:'10px'}} component={Paper}>
+              <Table aria-label="coin table">
+                <TableHead sx={{backgroundColor:"lightyellow"}}>
+                <TableRow>
+                  <TableCell align="left" >COINS</TableCell>
+                  <TableCell align="left" >WALET AMOUNT</TableCell>
+                </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <TableCell><Typography>WETH</Typography></TableCell>
+                    <TableCell>{wethbalance}</TableCell>
+                  </TableRow>
+                  <TableCell><Typography>UNI</Typography></TableCell>
+                  <TableCell>{unibalance}</TableCell>
+                </TableBody>
+              </Table>
+            </TableContainer> 
             </Box>
-          
-          </Box>:null
+          </>:null
           }
       
       <Snackbar

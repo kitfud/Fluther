@@ -237,7 +237,7 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
         </Box>
         <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="Current Dollar Cost Average">
-        <TableHead>
+        <TableHead sx={{backgroundColor:"lightyellow"}}>
           <TableRow>
             <TableCell>buyId</TableCell>
             <TableCell align="right">Token To Spend</TableCell>
