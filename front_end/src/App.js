@@ -193,7 +193,8 @@ function App() {
     // console.log("amount",amount)
     // console.log(erc20contract)
     try{
-      await erc20contract.connect(signer).approve(quickSwapRouterAddress,parseInt(amount))
+      await erc20contract.connect(signer).approve(quickSwapRouterAddress,ethers.utils.parseEther(amount))
+      await erc20contract.connect(signer).approve(DollarCostAverage.DollarCostAverage.address.sepolia,ethers.utils.parseEther(amount))
       setSpendingApproved(true)
       setDisabledTextFeild(true)
     }
