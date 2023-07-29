@@ -7,6 +7,7 @@ import DollarCost from '../chain-info/smart_contracts.json'
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import erc20Address from '../chain-info/erc20Address.json'
+import smartContracts from '../chain-info/smart_contracts.json'
 
 const UserRecurringBuys = ({signer,contract,provider,address}) => {
 
@@ -230,17 +231,17 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
 
  const translateToken = (row)=>{
     let translatedData = {}
-    if(row.tokenToBuy == erc20Address.UNI){
+    if(row.tokenToBuy == smartContracts.UNIMock.address.sepolia){
         translatedData["tokenToBuy"] ="UNI"
     }
-    else if (row.tokenToBuy == erc20Address.wEthSepolia){
+    else if (row.tokenToBuy == smartContracts.WETHMock.address.sepolia){
         translatedData["tokenToBuy"]="WETH"        
     }
 
-    if(row.tokenToSpend == erc20Address.UNI){
+    if(row.tokenToSpend == smartContracts.UNIMock.address.sepolia){
         translatedData["tokenToSpend"] ="UNI"
     }
-    else if (row.tokenToSpend == erc20Address.wEthSepolia){
+    else if (row.tokenToSpend == smartContracts.WETHMock.address.sepolia){
         translatedData["tokenToSpend"]="WETH"        
     }
 

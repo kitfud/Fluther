@@ -423,7 +423,16 @@ contract AutomationLayer is IAutomationLayer, Security {
 
         __validateAccountNumber(account.status);
 
+        bool isNextNode = true;
+        if (s_sequencerAddress != address(0)) {
+            isNextNode = INodeSequencer(s_sequencerAddress).isCurrentNode(
+                msg.sender
+            );
+        }
+
         return
+            isNextNode &&
+            !(IERC20(s_duh).balanceOf(msg.sender) < s_minimumDuh) &&
             IAutomatedContract(account.automatedContract).checkSimpleAutomation(
                 account.id
             );
