@@ -1,4 +1,19 @@
 {
+    "Liquidity": {
+        "address": {
+            "sepolia": "0xD3Ce19025A1762fAf5F013D052cAF6721ca6C1CF"
+        }
+    },
+    "WETHMock": {
+        "address": {
+            "sepolia": "0x87FF5ccd14Dc002903E5B274C0E569c7a215e5A1"
+        }
+    },
+    "UNIMock": {
+        "address": {
+            "sepolia": "0x6e4c13eD298b5Fcac70dc0F672f75aAeCca52768"
+        }
+    },
     "DollarCostAverage": {
         "address": {
             "sepolia": "0x324B97C7881517BD64D05888431c72877a70df26"
