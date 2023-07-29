@@ -598,8 +598,10 @@ const action = (
                     <TableCell><Typography>WETH</Typography></TableCell>
                     <TableCell>{wethbalance}</TableCell>
                   </TableRow>
+                  <TableRow>
                   <TableCell><Typography>UNI</Typography></TableCell>
                   <TableCell>{unibalance}</TableCell>
+                  </TableRow>
                 </TableBody>
               </Table>
             </TableContainer> 
