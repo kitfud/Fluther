@@ -7,6 +7,7 @@ import DollarCost from '../chain-info/smart_contracts.json'
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import erc20Address from '../chain-info/erc20Address.json'
+import smartContracts from '../chain-info/smart_contracts.json'
 
 const UserRecurringBuys = ({signer,contract,provider,address}) => {
 
@@ -69,7 +70,7 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
 
     useEffect(()=>{
     if(data){
-    console.log("data",data)
+    // console.log("data",data)
     filterData(data)
 }
     },[data])
@@ -115,7 +116,7 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
         result.push(userData[i])
        }
        }
-console.log("result",result)
+// console.log("result",result)
        let tableResult = []
        result.forEach((element)=>{
         // console.log("buy",element.buy)
@@ -136,7 +137,7 @@ console.log("result",result)
         tableResult.push(tdata)
     
        })
-       console.log("tableresult",tableResult)
+    //    console.log("tableresult",tableResult)
     setTableData(tableResult)
     }
 
@@ -221,26 +222,26 @@ console.log("result",result)
       }
     
  const removeCancelledContracts = (tableData) =>{
-    console.log('tableData',tableData)
-    console.log("cancelled",canceledIds)
+    // console.log('tableData',tableData)
+    // console.log("cancelled",canceledIds)
     let refinedData = tableData.filter(element=>!canceledIds.includes(element.buyId))
-    console.log("refined",refinedData)
+    // console.log("refined",refinedData)
     return refinedData
  }
 
  const translateToken = (row)=>{
     let translatedData = {}
-    if(row.tokenToBuy == erc20Address.UNI){
+    if(row.tokenToBuy == smartContracts.UNIMock.address.sepolia){
         translatedData["tokenToBuy"] ="UNI"
     }
-    else if (row.tokenToBuy == erc20Address.wEthSepolia){
+    else if (row.tokenToBuy == smartContracts.WETHMock.address.sepolia){
         translatedData["tokenToBuy"]="WETH"        
     }
 
-    if(row.tokenToSpend == erc20Address.UNI){
+    if(row.tokenToSpend == smartContracts.UNIMock.address.sepolia){
         translatedData["tokenToSpend"] ="UNI"
     }
-    else if (row.tokenToSpend == erc20Address.wEthSepolia){
+    else if (row.tokenToSpend == smartContracts.WETHMock.address.sepolia){
         translatedData["tokenToSpend"]="WETH"        
     }
 

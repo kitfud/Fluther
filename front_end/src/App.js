@@ -102,7 +102,7 @@ function App() {
   const address = useAddress();
 
   //address below is deployment to Polygon mainnet
-  const dollarCostAddress = '0x519DdbffEA597980B19F254892dEc703613e8775'
+  //const dollarCostAddress = '0x519DdbffEA597980B19F254892dEc703613e8775'
 
   //address below is for Polygon mainnet
   //const quickSwapRouterAddress = '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff'
@@ -194,7 +194,8 @@ function App() {
     // console.log(erc20contract)
     try{
       await erc20contract.connect(signer).approve(quickSwapRouterAddress,ethers.utils.parseEther(amount))
-      await erc20contract.connect(signer).approve(DollarCostAverage.DollarCostAverage.address.sepolia,ethers.utils.parseEther(amount))
+      //chhanged the ERC20 for WETH to correspond to Ed address changes/testing
+      await erc20contract.connect(signer).approve(DollarCostAverage.WETHMock.address.sepolia,ethers.utils.parseEther(amount))
       setSpendingApproved(true)
       setDisabledTextFeild(true)
     }
@@ -213,7 +214,7 @@ function App() {
       "interval": interval,
       "intervalAmount": intervalAmount,
     }
-    console.log(JSON.stringify(data))
+    // console.log(JSON.stringify(data))
 
   
 
@@ -222,6 +223,16 @@ const amountInterval = ethers.utils.parseUnits(input)
 
   try{
   setProcessing(true)
+
+  console.log("dollarCostDetails",
+  {'signer':signer,
+  "amountInterval":amountInterval,
+  "token1":token1,
+  "token2":token2,
+  "interval":interval,
+  "quickSwapAddress":quickSwapRouterAddress
+})
+
   let tx = await dollarCostAverageContract.connect(signer).createRecurringBuy(amountInterval,token1,token2,interval,'0x0000000000000000000000000000000000000000',quickSwapRouterAddress)
   // console.log(JSON.stringify(tx))
 
@@ -387,8 +398,8 @@ const action = (
                   value={token1}
                   disabled = {disableText}
                 >
-                  {/* WILL FIGURE OUT A BETTER WAY TO DO THIS PART LATER */}
-                  <MenuItem   value= {ERC20Address.wEthSepolia} >WETH Sepolia</MenuItem>
+           
+                  <MenuItem   value= {DollarCostAverage.WETHMock.address.sepolia} >WETH Sepolia</MenuItem>
                 </Select>
               </FormControl>
             </Box>
@@ -470,9 +481,8 @@ const action = (
                         onChange={ (e) => setToken2(e.target.value) }
                         value={token2}
                       >
-                        {/* WILL FIGURE OUT A BETTER WAY TO DO THIS PART LATER */}
             
-                        <MenuItem value= {ERC20Address.UNI} >UNI</MenuItem>
+                        <MenuItem value= {DollarCostAverage.UNIMock.address.sepolia} >UNI</MenuItem>
                       </Select>
                     </FormControl>
                   </Box>
@@ -588,8 +598,10 @@ const action = (
                     <TableCell><Typography>WETH</Typography></TableCell>
                     <TableCell>{wethbalance}</TableCell>
                   </TableRow>
+                  <TableRow>
                   <TableCell><Typography>UNI</Typography></TableCell>
                   <TableCell>{unibalance}</TableCell>
+                  </TableRow>
                 </TableBody>
               </Table>
             </TableContainer> 
