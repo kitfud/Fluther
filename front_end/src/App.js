@@ -135,7 +135,7 @@ function App() {
     if(provider !== null){
       //setting contract to approve spending amount, wEth in this case
       try{
-      setErc20Contract(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
+      setErc20Contract(new ethers.Contract(DollarCostAverage.WETHMock.address.sepolia,ABI,provider))
       setWEth(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
       setUNI(new ethers.Contract(ERC20Address.UNI,ABI,provider))
       }
@@ -193,9 +193,10 @@ function App() {
     // console.log("amount",amount)
     // console.log(erc20contract)
     try{
+      console.log("dollarcostAddress",DollarCostAverage.DollarCostAverage.address.sepolia)
       await erc20contract.connect(signer).approve(quickSwapRouterAddress,ethers.utils.parseEther(amount))
-      //chhanged the ERC20 for WETH to correspond to Ed address changes/testing
-      await erc20contract.connect(signer).approve(DollarCostAverage.WETHMock.address.sepolia,ethers.utils.parseEther(amount))
+      //chhanged  to correspond to Ed address changes/testing
+      await erc20contract.connect(signer).approve(DollarCostAverage.DollarCostAverage.address.sepolia,ethers.utils.parseEther(amount))
       setSpendingApproved(true)
       setDisabledTextFeild(true)
     }
