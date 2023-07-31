@@ -926,7 +926,7 @@
     },
     "AutomationLayer": {
         "address": {
-            "sepolia": "0xb11e3a80E15e85435c2Dbc1919aFddC6bf58C144"
+            "sepolia": "0x4B5c46a52e5C15D6c5A0552DeB082500C680a497"
         },
         "abi": [
             {
@@ -962,6 +962,11 @@
             },
             {
                 "inputs": [],
+                "name": "AutomationLayer__AutomationFailed",
+                "type": "error"
+            },
+            {
+                "inputs": [],
                 "name": "AutomationLayer__CallerNotOracle",
                 "type": "error"
             },
@@ -993,11 +998,6 @@
             {
                 "inputs": [],
                 "name": "AutomationLayer__OriginNotNode",
-                "type": "error"
-            },
-            {
-                "inputs": [],
-                "name": "AutomationLayer__SimpleAutomationFailed",
                 "type": "error"
             },
             {
@@ -1342,6 +1342,11 @@
                         "internalType": "uint256",
                         "name": "accountNumber",
                         "type": "uint256"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "node",
+                        "type": "address"
                     }
                 ],
                 "name": "checkAutomation",

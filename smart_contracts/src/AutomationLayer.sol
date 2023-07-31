@@ -383,7 +383,7 @@ contract AutomationLayer is IAutomationLayer, Security {
             );
 
             if (revert_ && !success) {
-                revert AutomationLayer__SimpleAutomationFailed();
+                revert AutomationLayer__AutomationFailed();
             }
 
             return success;
@@ -435,7 +435,8 @@ contract AutomationLayer is IAutomationLayer, Security {
 
     /// @inheritdoc IAutomationLayer
     function checkAutomation(
-        uint256 accountNumber
+        uint256 accountNumber,
+        address node
     ) external view override(IAutomationLayer) returns (bool) {
         Account memory account = s_accounts[accountNumber];
 
@@ -443,14 +444,12 @@ contract AutomationLayer is IAutomationLayer, Security {
 
         bool isNextNode = true;
         if (s_sequencerAddress != address(0)) {
-            isNextNode = INodeSequencer(s_sequencerAddress).isCurrentNode(
-                msg.sender
-            );
+            isNextNode = INodeSequencer(s_sequencerAddress).isCurrentNode(node);
         }
 
         return
             isNextNode &&
-            !(IERC20(s_duh).balanceOf(msg.sender) < s_minimumDuh) &&
+            !(IERC20(s_duh).balanceOf(node) < s_minimumDuh) &&
             !(IERC20(s_duh).balanceOf(account.user) < s_automationFee) &&
             !(IERC20(s_duh).allowance(account.user, address(this)) <
                 s_automationFee) &&

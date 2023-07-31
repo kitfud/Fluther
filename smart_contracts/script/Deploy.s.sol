@@ -9,10 +9,10 @@ import {HelperConfig} from "./HelperConfig.s.sol";
 import {Duh} from "../src/Duh.sol";
 
 contract Deploy is Script {
-    bool public constant DEPLOY_DUH = true;
-    bool public constant DEPLOY_DCA = true;
+    bool public constant DEPLOY_DUH = false;
+    bool public constant DEPLOY_DCA = false;
     bool public constant DEPLOY_AUTOMATION = true;
-    bool public constant DEPLOY_SEQUENCER = true;
+    bool public constant DEPLOY_SEQUENCER = false;
 
     AutomationLayer public automation;
     DollarCostAverage public dca;
