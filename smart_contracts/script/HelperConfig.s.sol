@@ -4,6 +4,7 @@ pragma solidity 0.8.19;
 import {Script} from "forge-std/Script.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/ERC20Mock.sol";
 import {UniswapMock} from "../test/mocks/UniswapMock.sol";
+import {DEXFactoryMock} from "../test/mocks/DEXFactoryMock.sol";
 
 // import {DevOpsTools} from "@devops/DevOpsTools.sol";
 
@@ -23,7 +24,7 @@ contract HelperConfig is Script {
     NetworkConfig public activeNetworkConfig;
 
     uint256 public constant MINIMUM_DUH = 1 ether;
-    uint256 public constant AUTOMATION_FEE = 100; // over 10000
+    uint256 public constant AUTOMATION_FEE = 0.001 ether;
     address public constant ORACLE = address(0);
     uint256 public constant DEFAULT_ANVIL_KEY =
         0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
@@ -85,7 +86,8 @@ contract HelperConfig is Script {
         ERC20Mock wrapNative = new ERC20Mock();
         ERC20Mock token1 = new ERC20Mock();
         ERC20Mock token2 = new ERC20Mock();
-        UniswapMock dexRouter = new UniswapMock();
+        DEXFactoryMock factory = new DEXFactoryMock();
+        UniswapMock dexRouter = new UniswapMock(address(factory));
         vm.stopBroadcast();
 
         return

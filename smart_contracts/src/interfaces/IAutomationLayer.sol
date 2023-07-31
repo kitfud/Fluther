@@ -45,6 +45,11 @@ interface IAutomationLayer {
     /// @dev error for when given address is address(0).
     error AutomationLayer__InvalidAddress();
 
+    /** @dev error for when user does not have enough DUH funds and/or automation contract
+     *  does not have enough allowance.
+     */
+    error AutomationLayer__UserDoesNotHaveEnoughBalanceAndOrAllowance();
+
     /// -----------------------------------------------------------------------
     /// Type declarations (structs and enums)
     /// -----------------------------------------------------------------------
@@ -104,7 +109,7 @@ interface IAutomationLayer {
      *  @param user: user address.
      *  @param automatedContract: smart contract address that had a operation automated.
      */
-    event SimpleAutomationDone(
+    event AutomationDone(
         uint256 indexed accountNumber,
         address indexed user,
         address indexed automatedContract
@@ -164,7 +169,7 @@ interface IAutomationLayer {
      *  @param success: array of booleans that specificies if the simple automation for the account number
      *  was successful (true) or not (false).
      */
-    event BatchSimpleAutomationDone(
+    event BatchAutomationDone(
         address indexed node,
         uint256[] accountNumbers,
         bool[] success
@@ -194,12 +199,12 @@ interface IAutomationLayer {
     /** @notice triggers a simple automation operation.
      *  @param accountNumber: number of the account.
      */
-    function simpleAutomation(uint256 accountNumber) external;
+    function triggerAutomation(uint256 accountNumber) external;
 
     /** @notice perform simple automation in batch.
      *  @param accountNumbers: array numbers of accounts.
      */
-    function simpleAutomationBatch(uint256[] calldata accountNumbers) external;
+    function triggerBatchAutomation(uint256[] calldata accountNumbers) external;
 
     /** @notice withdraws the given amount to owner account.
      *  @param amount: amount to withdraw.
@@ -240,7 +245,7 @@ interface IAutomationLayer {
     /** @notice checks if given account number has an operation that can be triggered.
      *  @param accountNumber: number of the account.
      */
-    function checkSimpleAutomation(
+    function checkAutomation(
         uint256 accountNumber
     ) external view returns (bool);
 

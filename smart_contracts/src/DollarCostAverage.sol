@@ -14,7 +14,8 @@ pragma solidity 0.8.19;
 
 import {IDollarCostAverage} from "./interfaces/IDollarCostAverage.sol";
 import {IAutomatedContract} from "./interfaces/IAutomatedContract.sol";
-import {IUniswapV2Router02} from "./interfaces/IUniswapV2Router02.sol";
+import {IDEXRouter} from "./interfaces/IDEXRouter.sol";
+import {IDEXFactory} from "./interfaces/IDEXFactory.sol";
 import {IAutomationLayer} from "./interfaces/IAutomationLayer.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Security} from "./Security.sol";
@@ -34,7 +35,7 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
     address private s_defaultRouter;
     IAutomationLayer private s_automationLayer;
     bool private s_acceptingNewRecurringBuys;
-    address private immutable wrapNative;
+    address private immutable i_wrapNative;
 
     // mappings and arrays
     mapping(uint256 /* recurringBuyId */ => RecurringBuy /* data */)
@@ -108,7 +109,7 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
         s_defaultRouter = defaultRouter;
         s_automationLayer = IAutomationLayer(automationLayerAddress);
         s_acceptingNewRecurringBuys = true;
-        wrapNative = _wrapNative;
+        i_wrapNative = _wrapNative;
     }
 
     /// -----------------------------------------------------------------------
@@ -145,6 +146,8 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
             revert DollarCostAverage__InvalidTimeInterval();
         }
 
+        address router = dexRouter == address(0) ? s_defaultRouter : dexRouter;
+        address[] memory path = __checkPairs(router, tokenToSpend, tokenToBuy);
         uint256 nextRecurringBuyId = s_nextRecurringBuyId;
         uint256 accountNumber = s_automationLayer.createAccount(
             nextRecurringBuyId,
@@ -159,9 +162,10 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
             tokenToBuy,
             timeIntervalInSeconds,
             paymentInterface,
-            dexRouter == address(0) ? s_defaultRouter : dexRouter,
+            router,
             block.timestamp,
             accountNumber,
+            path,
             Status.SET
         );
 
@@ -201,11 +205,11 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
     /** @dev added nonReentrant and whenNotPaused third party modifiers. The given recurring buy ID
      *  must be valid. It reverts if recurring buy is not valid, or if current block timestamp haven't reached
      *  payment due, or if ERC20 transferFrom function doesn't work.
-     *  @inheritdoc IDollarCostAverage
+     *  @inheritdoc IAutomatedContract
      */
-    function transferFunds(
+    function trigger(
         uint256 recurringBuyId
-    ) public override(IDollarCostAverage) {
+    ) public override(IAutomatedContract) {
         __nonReentrant();
         __whenNotPaused();
 
@@ -215,12 +219,14 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
         }
 
         __haveEnoughAllowance(buy.tokenToSpend, buy.sender, buy.amountToSpend);
-
         buy.paymentDue += buy.timeIntervalInSeconds;
-        uint256 fee = (buy.amountToSpend * FEE) / PRECISION;
-        uint256 buyAmount = buy.amountToSpend - fee;
-        uint256 contractFee = (fee * CONTRACT_FEE_SHARE) / PRECISION;
 
+        // calculating fees
+        uint256 fee = (buy.amountToSpend * FEE) / PRECISION;
+        uint256 contractFee = (fee * CONTRACT_FEE_SHARE) / PRECISION;
+        uint256 buyAmount = buy.amountToSpend - fee;
+
+        // payment interface fee
         if (buy.paymentInterface != address(0)) {
             __transferERC20(
                 buy.tokenToSpend,
@@ -231,6 +237,7 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
             );
         }
 
+        // protocol fee
         __transferERC20(
             buy.tokenToSpend,
             buy.sender,
@@ -238,25 +245,8 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
             contractFee,
             true
         );
-        __approveERC20(buy.tokenToSpend, buy.dexRouter, buyAmount);
 
-        address[] memory path;
-        if (buy.tokenToSpend == wrapNative || buy.tokenToBuy == wrapNative) {
-            path = new address[](2);
-            path[0] = buy.tokenToSpend;
-            path[1] = buy.tokenToBuy;
-        } else {
-            path = new address[](3);
-            path[0] = buy.tokenToSpend;
-            path[1] = wrapNative;
-            path[2] = buy.tokenToBuy;
-        }
-
-        IUniswapV2Router02 dexRouter = IUniswapV2Router02(buy.dexRouter);
-        uint256[] memory amountsOut = dexRouter.getAmountsOut(buyAmount, path);
-        uint256 amountOutMin = (amountsOut[amountsOut.length - 1] *
-            SLIPPAGE_PERCENTAGE) / PRECISION;
-
+        // Transfering from user to this address and approving DEX router
         __transferERC20(
             buy.tokenToSpend,
             buy.sender,
@@ -264,25 +254,26 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
             buyAmount,
             true
         );
+        __approveERC20(buy.tokenToSpend, buy.dexRouter, buyAmount);
+
+        // swap process
+        IDEXRouter dexRouter = IDEXRouter(buy.dexRouter);
+        uint256[] memory amountsOut = dexRouter.getAmountsOut(
+            buyAmount,
+            buy.path
+        );
+        uint256 amountOutMin = (amountsOut[amountsOut.length - 1] *
+            SLIPPAGE_PERCENTAGE) / PRECISION;
 
         uint256[] memory amounts = dexRouter.swapExactTokensForTokens(
             buyAmount,
             amountOutMin,
-            path,
+            buy.path,
             buy.sender,
             block.timestamp
         );
 
         emit PaymentTransferred(recurringBuyId, buy.sender, amounts);
-    }
-
-    /** @dev calls transferFunds public function
-     *  @inheritdoc IAutomatedContract
-     */
-    function simpleAutomation(
-        uint256 recurringBuyId
-    ) external override(IAutomatedContract) {
-        transferFunds(recurringBuyId);
     }
 
     /** @dev added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
@@ -373,7 +364,7 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
     }
 
     /// @inheritdoc IAutomatedContract
-    function checkSimpleAutomation(
+    function checkTrigger(
         uint256 recurringBuyId
     ) external view override(IAutomatedContract) returns (bool) {
         return isRecurringBuyValid(recurringBuyId);
@@ -413,7 +404,7 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
         override(IDollarCostAverage)
         returns (address)
     {
-        return wrapNative;
+        return i_wrapNative;
     }
 
     /// @inheritdoc IDollarCostAverage
@@ -510,5 +501,43 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
                 recBuy.sender,
                 address(this)
             ) < recBuy.amountToSpend); // 4. Has this smart contract enough allowance?
+    }
+
+    /** @dev checks the liquidity for given tokens.
+     *  @param router: address of the DEX router.
+     *  @param token1: ERC20 token address.
+     *  @param token2: ERC20 token address.
+     *  @return path address array for the right path of swap.
+     */
+    function __checkPairs(
+        address router,
+        address token1,
+        address token2
+    ) private view returns (address[] memory) {
+        IDEXFactory factory = IDEXFactory(IDEXRouter(router).factory());
+
+        if (factory.getPair(token1, token2) == address(0)) {
+            address pair1AndWrapped = factory.getPair(token1, i_wrapNative);
+            address pair2AndWrapped = factory.getPair(token2, i_wrapNative);
+
+            if (
+                pair1AndWrapped == address(0) || pair2AndWrapped == address(0)
+            ) {
+                revert DollarCostAverage__NoLiquidityPair();
+            }
+
+            address[] memory path = new address[](3);
+            path[0] = token1;
+            path[1] = i_wrapNative;
+            path[2] = token2;
+
+            return path;
+        } else {
+            address[] memory path = new address[](2);
+            path[0] = token1;
+            path[1] = token2;
+
+            return path;
+        }
     }
 }

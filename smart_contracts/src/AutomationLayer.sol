@@ -80,6 +80,18 @@ contract AutomationLayer is IAutomationLayer, Security {
         }
     }
 
+    /** @dev checks if given user has enough DUH balance and gave enough allowance to the automation layer contract.
+     *  @param user: address of the user.
+     */
+    function __hasEnoughBalanceAndAllowance(address user) private view {
+        if (
+            IERC20(s_duh).balanceOf(user) < s_automationFee &&
+            IERC20(s_duh).allowance(user, address(this)) < s_automationFee
+        ) {
+            revert AutomationLayer__UserDoesNotHaveEnoughBalanceAndOrAllowance();
+        }
+    }
+
     /// -----------------------------------------------------------------------
     /// Constructor
     /// -----------------------------------------------------------------------
@@ -180,7 +192,7 @@ contract AutomationLayer is IAutomationLayer, Security {
      *  given account number is not valid.
      *  @inheritdoc IAutomationLayer
      */
-    function simpleAutomation(
+    function triggerAutomation(
         uint256 accountNumber
     ) external override(IAutomationLayer) {
         __nonReentrant();
@@ -190,11 +202,13 @@ contract AutomationLayer is IAutomationLayer, Security {
 
         Account memory account = s_accounts[accountNumber];
 
-        __performSimpleAutomation(accountNumber, true);
+        __hasEnoughBalanceAndAllowance(account.user);
+
+        __performAutomation(accountNumber, true);
         __transferDuhToken(account.user, msg.sender, s_automationFee, true);
         __takeNextBlockNumbers(msg.sender);
 
-        emit SimpleAutomationDone(
+        emit AutomationDone(
             accountNumber,
             account.user,
             account.automatedContract
@@ -205,7 +219,7 @@ contract AutomationLayer is IAutomationLayer, Security {
      *  node does not have enough DUH balance or if it is not an allowed node.
      *  @inheritdoc IAutomationLayer
      */
-    function simpleAutomationBatch(
+    function triggerBatchAutomation(
         uint256[] calldata accountNumbers
     ) external override(IAutomationLayer) {
         __nonReentrant();
@@ -223,13 +237,13 @@ contract AutomationLayer is IAutomationLayer, Security {
                 false
             );
             success[ii] = transferSuccess
-                ? __performSimpleAutomation(accountNumbers[ii], false)
+                ? __performAutomation(accountNumbers[ii], false)
                 : false;
         }
 
         __takeNextBlockNumbers(msg.sender);
 
-        emit BatchSimpleAutomationDone(msg.sender, accountNumbers, success);
+        emit BatchAutomationDone(msg.sender, accountNumbers, success);
     }
 
     /** @dev Added nonReentrant and whenNotPaused third party modifiers. Only allowed callers
@@ -352,7 +366,7 @@ contract AutomationLayer is IAutomationLayer, Security {
      *  @param revert_: true to revert, false otherwise.
      *  @return bool that specifies if it was successful (true) or not (false), if it does not revert.
      */
-    function __performSimpleAutomation(
+    function __performAutomation(
         uint256 accountNumber,
         bool revert_
     ) private returns (bool) {
@@ -362,7 +376,7 @@ contract AutomationLayer is IAutomationLayer, Security {
             (bool success, ) = account.automatedContract.call(
                 abi.encodeWithSelector(
                     IAutomatedContract(account.automatedContract)
-                        .simpleAutomation
+                        .trigger
                         .selector,
                     account.id
                 )
@@ -384,6 +398,7 @@ contract AutomationLayer is IAutomationLayer, Security {
      *  @param from: address from which the tokens will be transferred.
      *  @param to: address to which the tokens will be transferred.
      *  @param amount: amount of tokens to transfer.
+     *  @param revert_: true if the function should revert, false otherwise.
      *  @return true if the transfer was successful, false otherwise.
      */
     function __transferDuhToken(
@@ -392,7 +407,10 @@ contract AutomationLayer is IAutomationLayer, Security {
         uint256 amount,
         bool revert_
     ) private returns (bool) {
-        return __transferERC20(s_duh, from, to, amount, revert_);
+        if (amount > 0) {
+            return __transferERC20(s_duh, from, to, amount, revert_);
+        }
+        return true;
     }
 
     /** @dev Assign next available range of block numbers to current node
@@ -416,7 +434,7 @@ contract AutomationLayer is IAutomationLayer, Security {
     /// -----------------------------------------------------------------------
 
     /// @inheritdoc IAutomationLayer
-    function checkSimpleAutomation(
+    function checkAutomation(
         uint256 accountNumber
     ) external view override(IAutomationLayer) returns (bool) {
         Account memory account = s_accounts[accountNumber];
@@ -433,7 +451,10 @@ contract AutomationLayer is IAutomationLayer, Security {
         return
             isNextNode &&
             !(IERC20(s_duh).balanceOf(msg.sender) < s_minimumDuh) &&
-            IAutomatedContract(account.automatedContract).checkSimpleAutomation(
+            !(IERC20(s_duh).balanceOf(account.user) < s_automationFee) &&
+            !(IERC20(s_duh).allowance(account.user, address(this)) <
+                s_automationFee) &&
+            IAutomatedContract(account.automatedContract).checkTrigger(
                 account.id
             );
     }

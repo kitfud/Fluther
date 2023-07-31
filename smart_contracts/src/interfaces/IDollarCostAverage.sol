@@ -53,6 +53,9 @@ interface IDollarCostAverage {
     /// @dev error for when there is not enough allowance for the recurring buy.
     error DollarCostAverage__TokenNotEnoughAllowance();
 
+    /// @dev error for when there is no liquidity pair for given ERC20 tokens.
+    error DollarCostAverage__NoLiquidityPair();
+
     /// -----------------------------------------------------------------------
     /// Type declarations (structs and enums)
     /// -----------------------------------------------------------------------
@@ -78,6 +81,7 @@ interface IDollarCostAverage {
      *  @param dexRouter: address of the DEX through which the swap will be carried out.
      *  @param paymentDue: next payment due timestamp.
      *  @param accountNumber: number of the account in the automation layer smart contract.
+     *  @param path: address array for the swap path.
      *  @param status: recurring buy status (UNSET, SET, or CANCELLED).
      */
     struct RecurringBuy {
@@ -90,6 +94,7 @@ interface IDollarCostAverage {
         address dexRouter;
         uint256 paymentDue;
         uint256 accountNumber;
+        address[] path;
         Status status;
     }
 
@@ -180,11 +185,6 @@ interface IDollarCostAverage {
      *  @param recurringBuyId: recurring buy ID.
      */
     function cancelRecurringPayment(uint256 recurringBuyId) external;
-
-    /** @notice executes the transfers of funds from a recurring buy (change name of the function to executeRecurringBuy).
-     *  @param recurringBuyId: recurring buy ID.
-     */
-    function transferFunds(uint256 recurringBuyId) external;
 
     /** @notice sets new automation layer address.
      *  @param automationLayerAddress: new automation layer smart contract address.

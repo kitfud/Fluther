@@ -9,8 +9,8 @@ pragma solidity 0.8.19;
 /// Imports
 /// -----------------------------------------------------------------------
 
-import {IUniswapV2Router02} from "./interfaces/IUniswapV2Router02.sol";
-import {IUniswapV2Factory} from "./interfaces/IUniswapV2Factory.sol";
+import {IDEXRouter} from "./interfaces/IDEXRouter.sol";
+import {IDEXFactory} from "./interfaces/IDEXFactory.sol";
 import {Security} from "./Security.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -65,7 +65,7 @@ contract Liquidity is Security {
             uint256 amountAReturned,
             uint256 amountBReturned,
             uint256 liquidity
-        ) = IUniswapV2Router02(ROUTER).addLiquidity(
+        ) = IDEXRouter(ROUTER).addLiquidity(
                 tokenA,
                 tokenB,
                 amountA,
@@ -93,15 +93,14 @@ contract Liquidity is Security {
         __whenNotPaused();
         __nonReentrant();
 
-        address pair = IUniswapV2Factory(FACTORY).getPair(tokenA, tokenB);
+        address pair = IDEXFactory(FACTORY).getPair(tokenA, tokenB);
 
         uint256 liquidity = IERC20(pair).balanceOf(address(this));
 
         __approveERC20(pair, ROUTER, liquidity);
 
-        (uint256 amountAReturned, uint256 amountBReturned) = IUniswapV2Router02(
-            ROUTER
-        ).removeLiquidity(
+        (uint256 amountAReturned, uint256 amountBReturned) = IDEXRouter(ROUTER)
+            .removeLiquidity(
                 tokenA,
                 tokenB,
                 liquidity,
