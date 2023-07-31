@@ -1,6 +1,6 @@
 {
   "dependencies": {
     "dotenv": "^16.3.1",
-    "ethers": "^6.6.4"
+    "ethers": "^5.6.1"
   }
 }
