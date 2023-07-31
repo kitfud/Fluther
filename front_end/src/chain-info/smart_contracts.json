@@ -87,6 +87,11 @@
             },
             {
                 "inputs": [],
+                "name": "DollarCostAverage__NoLiquidityPair",
+                "type": "error"
+            },
+            {
+                "inputs": [],
                 "name": "DollarCostAverage__NotAcceptingNewRecurringBuys",
                 "type": "error"
             },
@@ -331,6 +336,11 @@
                                 "type": "uint256"
                             },
                             {
+                                "internalType": "address[]",
+                                "name": "path",
+                                "type": "address[]"
+                            },
+                            {
                                 "internalType": "enum IDollarCostAverage.Status",
                                 "name": "status",
                                 "type": "uint8"
@@ -379,7 +389,7 @@
                         "type": "uint256"
                     }
                 ],
-                "name": "checkSimpleAutomation",
+                "name": "checkTrigger",
                 "outputs": [
                     {
                         "internalType": "bool",
@@ -575,6 +585,11 @@
                                 "type": "uint256"
                             },
                             {
+                                "internalType": "address[]",
+                                "name": "path",
+                                "type": "address[]"
+                            },
+                            {
                                 "internalType": "enum IDollarCostAverage.Status",
                                 "name": "status",
                                 "type": "uint8"
@@ -644,6 +659,11 @@
                                 "internalType": "uint256",
                                 "name": "accountNumber",
                                 "type": "uint256"
+                            },
+                            {
+                                "internalType": "address[]",
+                                "name": "path",
+                                "type": "address[]"
                             },
                             {
                                 "internalType": "enum IDollarCostAverage.Status",
@@ -720,6 +740,11 @@
                                 "internalType": "uint256",
                                 "name": "accountNumber",
                                 "type": "uint256"
+                            },
+                            {
+                                "internalType": "address[]",
+                                "name": "path",
+                                "type": "address[]"
                             },
                             {
                                 "internalType": "enum IDollarCostAverage.Status",
@@ -867,38 +892,25 @@
             {
                 "inputs": [
                     {
-                        "internalType": "uint256",
-                        "name": "recurringBuyId",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "simpleAutomation",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "recurringBuyId",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "transferFunds",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
                         "internalType": "address",
                         "name": "newOwner",
                         "type": "address"
                     }
                 ],
                 "name": "transferOwnership",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "recurringBuyId",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "trigger",
                 "outputs": [],
                 "stateMutability": "nonpayable",
                 "type": "function"
@@ -990,6 +1002,11 @@
             },
             {
                 "inputs": [],
+                "name": "AutomationLayer__UserDoesNotHaveEnoughBalanceAndOrAllowance",
+                "type": "error"
+            },
+            {
+                "inputs": [],
                 "name": "Security__NotAllowed",
                 "type": "error"
             },
@@ -1077,6 +1094,31 @@
                 "inputs": [
                     {
                         "indexed": true,
+                        "internalType": "uint256",
+                        "name": "accountNumber",
+                        "type": "uint256"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "user",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "automatedContract",
+                        "type": "address"
+                    }
+                ],
+                "name": "AutomationDone",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
                         "internalType": "address",
                         "name": "caller",
                         "type": "address"
@@ -1113,7 +1155,7 @@
                         "type": "bool[]"
                     }
                 ],
-                "name": "BatchSimpleAutomationDone",
+                "name": "BatchAutomationDone",
                 "type": "event"
             },
             {
@@ -1253,31 +1295,6 @@
                 "anonymous": false,
                 "inputs": [
                     {
-                        "indexed": true,
-                        "internalType": "uint256",
-                        "name": "accountNumber",
-                        "type": "uint256"
-                    },
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "user",
-                        "type": "address"
-                    },
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "automatedContract",
-                        "type": "address"
-                    }
-                ],
-                "name": "SimpleAutomationDone",
-                "type": "event"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
                         "indexed": false,
                         "internalType": "address",
                         "name": "account",
@@ -1327,7 +1344,7 @@
                         "type": "uint256"
                     }
                 ],
-                "name": "checkSimpleAutomation",
+                "name": "checkAutomation",
                 "outputs": [
                     {
                         "internalType": "bool",
@@ -1657,12 +1674,25 @@
             {
                 "inputs": [
                     {
+                        "internalType": "address",
+                        "name": "newOwner",
+                        "type": "address"
+                    }
+                ],
+                "name": "transferOwnership",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
                         "internalType": "uint256",
                         "name": "accountNumber",
                         "type": "uint256"
                     }
                 ],
-                "name": "simpleAutomation",
+                "name": "triggerAutomation",
                 "outputs": [],
                 "stateMutability": "nonpayable",
                 "type": "function"
@@ -1675,20 +1705,7 @@
                         "type": "uint256[]"
                     }
                 ],
-                "name": "simpleAutomationBatch",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "address",
-                        "name": "newOwner",
-                        "type": "address"
-                    }
-                ],
-                "name": "transferOwnership",
+                "name": "triggerBatchAutomation",
                 "outputs": [],
                 "stateMutability": "nonpayable",
                 "type": "function"
