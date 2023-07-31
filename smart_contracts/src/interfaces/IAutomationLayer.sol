@@ -40,7 +40,7 @@ interface IAutomationLayer {
     error AutomationLayer__NotAccpetingNewAccounts();
 
     /// @dev error for when the simple automation process fails.
-    error AutomationLayer__SimpleAutomationFailed();
+    error AutomationLayer__AutomationFailed();
 
     /// @dev error for when given address is address(0).
     error AutomationLayer__InvalidAddress();
@@ -244,9 +244,11 @@ interface IAutomationLayer {
 
     /** @notice checks if given account number has an operation that can be triggered.
      *  @param accountNumber: number of the account.
+     *  @param node: node address.
      */
     function checkAutomation(
-        uint256 accountNumber
+        uint256 accountNumber,
+        address node
     ) external view returns (bool);
 
     /** @notice reads an entry of the accounts storage mapping.

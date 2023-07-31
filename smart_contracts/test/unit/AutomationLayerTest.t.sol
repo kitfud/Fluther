@@ -992,7 +992,10 @@ contract AutomationLayerTest is Test {
             address(dca),
             abi.encodeCall(dca.checkTrigger, recurringBuyId)
         );
-        bool canAutomate = automation.checkAutomation(accountNumber);
+        bool canAutomate = automation.checkAutomation(
+            accountNumber,
+            anotherUser
+        );
 
         assertTrue(canAutomate);
     }
@@ -1014,7 +1017,10 @@ contract AutomationLayerTest is Test {
             address(dca),
             abi.encodeCall(dca.checkTrigger, recurringBuyId)
         );
-        bool canAutomate = automation.checkAutomation(accountNumber);
+        bool canAutomate = automation.checkAutomation(
+            accountNumber,
+            anotherUser
+        );
 
         assertTrue(canAutomate);
     }
@@ -1028,7 +1034,7 @@ contract AutomationLayerTest is Test {
         vm.expectRevert(
             IAutomationLayer.AutomationLayer__InvalidAccountNumber.selector
         );
-        automation.checkAutomation(accountNumber);
+        automation.checkAutomation(accountNumber, user);
     }
 
     function testCheckAutomationFalseIfNodeIsNotNextNode()
@@ -1044,7 +1050,7 @@ contract AutomationLayerTest is Test {
         address thirdUser = makeAddr("thirdUser");
 
         vm.prank(thirdUser);
-        bool canAutomate = automation.checkAutomation(accountNumber);
+        bool canAutomate = automation.checkAutomation(accountNumber, thirdUser);
 
         assertTrue(!canAutomate);
     }
@@ -1060,7 +1066,10 @@ contract AutomationLayerTest is Test {
         address anotherUser = makeAddr("thirdUser");
 
         vm.prank(anotherUser);
-        bool canAutomate = automation.checkAutomation(accountNumber);
+        bool canAutomate = automation.checkAutomation(
+            accountNumber,
+            anotherUser
+        );
 
         assertTrue(!canAutomate);
     }
@@ -1080,7 +1089,10 @@ contract AutomationLayerTest is Test {
         duhToken.approve(address(automation), type(uint256).max);
 
         vm.prank(anotherUser);
-        bool canAutomate = automation.checkAutomation(accountNumber);
+        bool canAutomate = automation.checkAutomation(
+            accountNumber,
+            anotherUser
+        );
 
         assertTrue(!canAutomate);
     }
@@ -1102,7 +1114,10 @@ contract AutomationLayerTest is Test {
         duhToken.mint(user, 1 ether);
 
         vm.prank(anotherUser);
-        bool canAutomate = automation.checkAutomation(accountNumber);
+        bool canAutomate = automation.checkAutomation(
+            accountNumber,
+            anotherUser
+        );
 
         assertTrue(!canAutomate);
     }
