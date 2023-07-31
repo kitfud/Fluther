@@ -53,7 +53,7 @@ contract AutomationLayerTest is Test {
         address indexed automatedContract
     );
 
-    event SimpleAutomationDone(
+    event AutomationDone(
         uint256 indexed accountNumber,
         address indexed user,
         address indexed automatedContract
@@ -85,7 +85,7 @@ contract AutomationLayerTest is Test {
 
     event MinimumDuhSet(address indexed caller, uint256 minimumDuh);
 
-    event BatchSimpleAutomationDone(
+    event BatchAutomationDone(
         address indexed node,
         uint256[] accountNumbers,
         bool[] success
@@ -319,7 +319,7 @@ contract AutomationLayerTest is Test {
     }
 
     /// -----------------------------------------------------------------------
-    /// Test for: simpleAutomation
+    /// Test for: triggerAutomation
     /// -----------------------------------------------------------------------
 
     modifier createRecurringBuy(address caller) {
@@ -364,7 +364,7 @@ contract AutomationLayerTest is Test {
         _;
     }
 
-    function testSimpleAutomationSuccess()
+    function testTriggerAutomationSuccess()
         public
         createRecurringBuy(user)
         giveDuhToken(makeAddr("anotherUser"))
@@ -377,8 +377,8 @@ contract AutomationLayerTest is Test {
         uint256 userBalanceBefore = duhToken.balanceOf(anotherUser);
 
         vm.prank(anotherUser);
-        vm.expectCall(address(dca), abi.encodeCall(dca.simpleAutomation, 0));
-        automation.simpleAutomation(accountNumber);
+        vm.expectCall(address(dca), abi.encodeCall(dca.trigger, 0));
+        automation.triggerAutomation(accountNumber);
 
         uint256 userBalanceAfter = duhToken.balanceOf(anotherUser);
 
@@ -398,8 +398,8 @@ contract AutomationLayerTest is Test {
         ERC20Mock(token1).mint(anotherUser, 1 ether);
         ERC20Mock(token1).approve(address(dca), type(uint256).max);
         duhToken.approve(address(automation), type(uint256).max);
-        vm.expectCall(address(dca), abi.encodeCall(dca.simpleAutomation, 0));
-        automation.simpleAutomation(accountNumber);
+        vm.expectCall(address(dca), abi.encodeCall(dca.trigger, 0));
+        automation.triggerAutomation(accountNumber);
         vm.stopPrank();
 
         uint256 anotherUserBalanceAfter = duhToken.balanceOf(anotherUser);
@@ -410,7 +410,7 @@ contract AutomationLayerTest is Test {
         );
     }
 
-    function testSimpleAutomationEvent()
+    function testTriggerAutomationEvent()
         public
         createRecurringBuy(user)
         giveDuhToken(user)
@@ -421,11 +421,11 @@ contract AutomationLayerTest is Test {
         // sequencer != address(0)
         vm.prank(user);
         vm.expectEmit(true, true, true, false, address(automation));
-        emit SimpleAutomationDone(accountNumber, user, address(dca));
-        automation.simpleAutomation(accountNumber);
+        emit AutomationDone(accountNumber, user, address(dca));
+        automation.triggerAutomation(accountNumber);
     }
 
-    function testSimpleAutomationRevertsIfCallerDoesNotHaveEnoughDuhToken()
+    function testTriggerAutomationRevertsIfCallerDoesNotHaveEnoughDuhToken()
         public
         createRecurringBuy(user)
         setSequencerAddress(address(0))
@@ -436,10 +436,10 @@ contract AutomationLayerTest is Test {
         vm.expectRevert(
             IAutomationLayer.AutomationLayer__NotEnoughtTokens.selector
         );
-        automation.simpleAutomation(accountNumber);
+        automation.triggerAutomation(accountNumber);
     }
 
-    function testSimpleAutomationRevertsIfCallerNotCurrentNode()
+    function testTriggerAutomationRevertsIfCallerNotCurrentNode()
         public
         createRecurringBuy(user)
         giveDuhToken(user)
@@ -453,10 +453,10 @@ contract AutomationLayerTest is Test {
         vm.expectRevert(
             IAutomationLayer.AutomationLayer__OriginNotNode.selector
         );
-        automation.simpleAutomation(accountNumber);
+        automation.triggerAutomation(accountNumber);
     }
 
-    function testSimpleAutomationRevertsIfContractPaused()
+    function testTriggerAutomationRevertsIfContractPaused()
         public
         createRecurringBuy(user)
         giveDuhToken(user)
@@ -471,14 +471,14 @@ contract AutomationLayerTest is Test {
 
         vm.prank(user);
         vm.expectRevert("Pausable: paused");
-        automation.simpleAutomation(accountNumber);
+        automation.triggerAutomation(accountNumber);
     }
 
     /// -----------------------------------------------------------------------
-    /// Test for: simpleAutomationBatch
+    /// Test for: triggerBatchAutomation
     /// -----------------------------------------------------------------------
 
-    function testSimpleAutomationBatchSuccess()
+    function testTriggerBatchAutomationSuccess()
         public
         createRecurringBuy(user)
         createRecurringBuy(user)
@@ -502,21 +502,21 @@ contract AutomationLayerTest is Test {
         vm.prank(anotherUser);
         vm.expectCall(
             address(dca),
-            abi.encodeCall(dca.simpleAutomation, accountNumbers[0])
+            abi.encodeCall(dca.trigger, accountNumbers[0])
         );
         vm.expectCall(
             address(dca),
-            abi.encodeCall(dca.simpleAutomation, accountNumbers[1])
+            abi.encodeCall(dca.trigger, accountNumbers[1])
         );
         vm.expectCall(
             address(dca),
-            abi.encodeCall(dca.simpleAutomation, accountNumbers[2])
+            abi.encodeCall(dca.trigger, accountNumbers[2])
         );
         vm.expectCall(
             address(dca),
-            abi.encodeCall(dca.simpleAutomation, accountNumbers[3])
+            abi.encodeCall(dca.trigger, accountNumbers[3])
         );
-        automation.simpleAutomationBatch(accountNumbers);
+        automation.triggerBatchAutomation(accountNumbers);
 
         uint256 userBalanceAfter = duhToken.balanceOf(user);
         uint256 anotherUserBalanceAfter = duhToken.balanceOf(anotherUser);
@@ -531,7 +531,7 @@ contract AutomationLayerTest is Test {
         );
     }
 
-    function testSimpleAutomationBatchEvent()
+    function testTriggerBatchAutomationEvent()
         public
         createRecurringBuy(user)
         createRecurringBuy(makeAddr("thirdUser"))
@@ -558,22 +558,22 @@ contract AutomationLayerTest is Test {
         vm.prank(anotherUser);
         vm.expectCall(
             address(dca),
-            abi.encodeCall(dca.simpleAutomation, accountNumbers[0])
+            abi.encodeCall(dca.trigger, accountNumbers[0])
         );
         vm.expectCall(
             address(dca),
-            abi.encodeCall(dca.simpleAutomation, accountNumbers[2])
+            abi.encodeCall(dca.trigger, accountNumbers[2])
         );
         vm.expectCall(
             address(dca),
-            abi.encodeCall(dca.simpleAutomation, accountNumbers[3])
+            abi.encodeCall(dca.trigger, accountNumbers[3])
         );
         vm.expectEmit(true, false, false, true, address(automation));
-        emit BatchSimpleAutomationDone(anotherUser, accountNumbers, result);
-        automation.simpleAutomationBatch(accountNumbers);
+        emit BatchAutomationDone(anotherUser, accountNumbers, result);
+        automation.triggerBatchAutomation(accountNumbers);
     }
 
-    function testSimpleAutomationBatchRevertsIfCallerDoesNotHaveEnoughDuhToken()
+    function testTriggerBatchAutomationRevertsIfCallerDoesNotHaveEnoughDuhToken()
         public
         createRecurringBuy(user)
         createRecurringBuy(user)
@@ -591,10 +591,10 @@ contract AutomationLayerTest is Test {
         vm.expectRevert(
             IAutomationLayer.AutomationLayer__NotEnoughtTokens.selector
         );
-        automation.simpleAutomationBatch(accountNumbers);
+        automation.triggerBatchAutomation(accountNumbers);
     }
 
-    function testSimpleAutomationBatchRevertsIfCallerNotCurrentNode()
+    function testTriggerBatchAutomationRevertsIfCallerNotCurrentNode()
         public
         createRecurringBuy(user)
         createRecurringBuy(user)
@@ -614,10 +614,10 @@ contract AutomationLayerTest is Test {
         vm.expectRevert(
             IAutomationLayer.AutomationLayer__OriginNotNode.selector
         );
-        automation.simpleAutomationBatch(accountNumbers);
+        automation.triggerBatchAutomation(accountNumbers);
     }
 
-    function testSimpleAutomationBatchRevertsIfContractPaused()
+    function testTriggerBatchAutomationRevertsIfContractPaused()
         public
         createRecurringBuy(user)
         createRecurringBuy(user)
@@ -638,7 +638,7 @@ contract AutomationLayerTest is Test {
 
         vm.prank(user);
         vm.expectRevert("Pausable: paused");
-        automation.simpleAutomationBatch(accountNumbers);
+        automation.triggerBatchAutomation(accountNumbers);
     }
 
     /// -----------------------------------------------------------------------
@@ -968,26 +968,54 @@ contract AutomationLayerTest is Test {
     }
 
     /// -----------------------------------------------------------------------
-    /// Test for: checkSimpleAutomation
+    /// Test for: checkAutomation
     /// -----------------------------------------------------------------------
 
-    function testCheckSimpleAutomationSuccess()
+    function testCheckAutomationTruePath1()
         public
         createRecurringBuy(user)
+        giveDuhToken(user)
+        giveDuhToken(makeAddr("anotherUser"))
+        setNode(makeAddr("anotherUser"))
     {
         uint256 accountNumber = automation.getNextAccountNumber() - 1;
         uint256 recurringBuyId = automation.getAccount(accountNumber).id;
+        console.log(automation.getSequencerAddress());
+        address anotherUser = makeAddr("anotherUser");
 
+        vm.prank(anotherUser);
         vm.expectCall(
             address(dca),
-            abi.encodeCall(dca.checkSimpleAutomation, recurringBuyId)
+            abi.encodeCall(dca.checkTrigger, recurringBuyId)
         );
-        bool canAutomate = automation.checkSimpleAutomation(accountNumber);
+        bool canAutomate = automation.checkAutomation(accountNumber);
 
         assertTrue(canAutomate);
     }
 
-    function testCheckSimpleAutomationRevertsIfGivenAccountIsInvalid()
+    function testCheckAutomationTruePath2()
+        public
+        createRecurringBuy(user)
+        giveDuhToken(user)
+        giveDuhToken(makeAddr("anotherUser"))
+        setSequencerAddress(address(0))
+    {
+        uint256 accountNumber = automation.getNextAccountNumber() - 1;
+        uint256 recurringBuyId = automation.getAccount(accountNumber).id;
+
+        address anotherUser = makeAddr("anotherUser");
+
+        vm.prank(anotherUser);
+        vm.expectCall(
+            address(dca),
+            abi.encodeCall(dca.checkTrigger, recurringBuyId)
+        );
+        bool canAutomate = automation.checkAutomation(accountNumber);
+
+        assertTrue(canAutomate);
+    }
+
+    function testCheckAutomationRevertsIfGivenAccountIsInvalid()
         public
         createRecurringBuy(user)
     {
@@ -996,7 +1024,83 @@ contract AutomationLayerTest is Test {
         vm.expectRevert(
             IAutomationLayer.AutomationLayer__InvalidAccountNumber.selector
         );
-        automation.checkSimpleAutomation(accountNumber);
+        automation.checkAutomation(accountNumber);
+    }
+
+    function testCheckAutomationFalseIfNodeIsNotNextNode()
+        public
+        createRecurringBuy(user)
+        giveDuhToken(user)
+        giveDuhToken(makeAddr("anotherUser"))
+        giveDuhToken(makeAddr("thirdUser"))
+        setNode(makeAddr("anotherUser"))
+    {
+        uint256 accountNumber = automation.getNextAccountNumber() - 1;
+
+        address thirdUser = makeAddr("thirdUser");
+
+        vm.prank(thirdUser);
+        bool canAutomate = automation.checkAutomation(accountNumber);
+
+        assertTrue(!canAutomate);
+    }
+
+    function testCheckAutomationFalseIfNodeDoesNotHaveMininumDuh()
+        public
+        createRecurringBuy(user)
+        giveDuhToken(user)
+        setNode(makeAddr("anotherUser"))
+    {
+        uint256 accountNumber = automation.getNextAccountNumber() - 1;
+
+        address anotherUser = makeAddr("thirdUser");
+
+        vm.prank(anotherUser);
+        bool canAutomate = automation.checkAutomation(accountNumber);
+
+        assertTrue(!canAutomate);
+    }
+
+    function testCheckAutomationFalseIfUserDoesNotHaveEnoughDuhFunds()
+        public
+        createRecurringBuy(user)
+        giveDuhToken(makeAddr("anotherUser"))
+        setNode(makeAddr("anotherUser"))
+    {
+        uint256 accountNumber = automation.getNextAccountNumber() - 1;
+
+        address anotherUser = makeAddr("anotherUser");
+
+        vm.prank(user);
+        duhToken.transfer(anotherUser, 1 ether);
+        duhToken.approve(address(automation), type(uint256).max);
+
+        vm.prank(anotherUser);
+        bool canAutomate = automation.checkAutomation(accountNumber);
+
+        assertTrue(!canAutomate);
+    }
+
+    function testCheckAutomationFalseIfUserHaventApprovedForDuh()
+        public
+        createRecurringBuy(user)
+        giveDuhToken(makeAddr("anotherUser"))
+        setNode(makeAddr("anotherUser"))
+    {
+        uint256 accountNumber = automation.getNextAccountNumber() - 1;
+
+        address anotherUser = makeAddr("anotherUser");
+
+        vm.prank(user);
+        duhToken.approve(address(automation), 0);
+
+        vm.prank(signer);
+        duhToken.mint(user, 1 ether);
+
+        vm.prank(anotherUser);
+        bool canAutomate = automation.checkAutomation(accountNumber);
+
+        assertTrue(!canAutomate);
     }
 
     /// -----------------------------------------------------------------------

@@ -7,8 +7,13 @@ contract UniswapMock {
     /* solhint-disable */
     uint256 private constant TOKENS_RATE = 110; // over 10000
     uint256 private constant PRECISION = 10000;
+    address public factory;
 
     /* solhint-enable */
+
+    constructor(address factory_) {
+        factory = factory_;
+    }
 
     function getAmountsOut(
         uint256 buyAmount,

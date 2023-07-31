@@ -16,7 +16,7 @@ pragma solidity 0.8.19;
 /// Interface
 /// -----------------------------------------------------------------------
 
-interface IUniswapV2Router02 {
+interface IDEXRouter {
     /// -----------------------------------------------------------------------
     /// Functions
     /// -----------------------------------------------------------------------
@@ -54,4 +54,6 @@ interface IUniswapV2Router02 {
         address to,
         uint deadline
     ) external returns (uint amountA, uint amountB);
+
+    function factory() external view returns (address);
 }
