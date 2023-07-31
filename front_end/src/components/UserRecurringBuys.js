@@ -6,16 +6,16 @@ import DollarCost from '../chain-info/smart_contracts.json'
 
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import erc20Address from '../chain-info/erc20Address.json'
+
 import smartContracts from '../chain-info/smart_contracts.json'
 
 const UserRecurringBuys = ({signer,contract,provider,address}) => {
 
     // console.log(DollarCost.DollarCostAverage.address.sepolia)
 // console.log("address",address)
-    const [data, setData] = useState(null)
-    const [tabledata,setTableData] = useState(null)
-    const [processing, setProcessing] = useState(false)
+const [data, setData] = useState(null)
+const [tabledata,setTableData] = useState(null)
+const [processing, setProcessing] = useState(false)
 
   const [openSnackbar,setOpenSnackBar] = useState(false)
   const [txHash, setTxHash] = useState(null)
@@ -54,6 +54,7 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
 
     const loggingData = async()=>{
     const data = await logEventData("RecurringBuyCreated",[], provider)
+    console.log("data",data)
     setData(data)
     }
 
@@ -69,8 +70,8 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
     },[provider,address])
 
     useEffect(()=>{
-    if(data){
-    // console.log("data",data)
+    if(data != undefined){
+    console.log("data",data)
     filterData(data)
 }
     },[data])
@@ -109,20 +110,21 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
         //console.log("cancelled",cancelledContracts)
         setCanceledIds(cancelledContracts)
         //filter to only records specific to user
-        // console.log("address",address)
+        console.log("userData",userData.buy)
        let result =[] 
        for(let i = 0; i<userData.length; i++){
-       if (userData[i][1]==address){
+       if (userData[i][1]==address&& userData[i].buy){
         result.push(userData[i])
        }
        }
-// console.log("result",result)
+console.log("result",result)
        let tableResult = []
        result.forEach((element)=>{
         // console.log("buy",element.buy)
         // console.log("timeIntervalSeconds",element.buy.timeIntervalInSeconds.toNumber())
-        // console.log("tokenToBuy",element.buy.tokenToBuy)
-        // console.log("token to spend",element.buy.tokenToSpend)
+      
+        console.log("tokenToBuy",element.buy.tokenToBuy)
+        console.log("token to spend",element.buy.tokenToSpend)
         // console.log(element.recBuyId.toNumber())
         
         // console.log("amount",ethers.utils.formatEther(element.buy[1]))
@@ -306,7 +308,7 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
               <TableCell align="right">{time.timeInterval}</TableCell>
               <TableCell><Button onClick={()=>handleCancel(row.buyId)} variant='contained' color="error">Cancel</Button></TableCell>
             </TableRow>)
-          })):null}
+          })):<div></div>}
         </TableBody>
       </Table>
     </TableContainer>
