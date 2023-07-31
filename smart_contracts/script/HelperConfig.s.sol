@@ -59,7 +59,7 @@ contract HelperConfig is Script {
     function getSepoliaConfig() public view returns (NetworkConfig memory) {
         return
             NetworkConfig({
-                wrapNative: 0xD0dF82dE051244f04BfF3A8bB1f62E1cD39eED92,
+                wrapNative: 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9, //0xD0dF82dE051244f04BfF3A8bB1f62E1cD39eED92,
                 defaultRouter: 0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008,
                 // duhToken: DevOpsTools.get_most_recent_deployment(
                 //     "Duh",
@@ -69,8 +69,16 @@ contract HelperConfig is Script {
                 minimumDuh: MINIMUM_DUH,
                 automationFee: AUTOMATION_FEE,
                 oracleAddress: ORACLE,
-                token1: 0x779877A7B0D9E8603169DdbD7836e478b4624789, // LINK
-                token2: 0x7169D38820dfd117C3FA1f22a697dBA58d90BA06, // USDT
+                // token1: DevOpsTools.get_most_recent_deployment(
+                //     "WETHMock",
+                //     block.chainid
+                // ), // WETHMock
+                token1: 0x87FF5ccd14Dc002903E5B274C0E569c7a215e5A1, //WETHMock
+                // token2: DevOpsTools.get_most_recent_deployment(
+                //     "UNIMock",
+                //     block.chainid
+                // ), // UNIMock
+                token2: 0x6e4c13eD298b5Fcac70dc0F672f75aAeCca52768, //UNIMock
                 deployerKey: vm.envUint("PRIVATE_KEY")
             });
     }
