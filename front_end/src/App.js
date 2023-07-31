@@ -15,8 +15,8 @@ import {Snackbar,
   InputLabel, MenuItem, FormControl, Select,TableContainer,Table,TableHead,TableRow,TableCell,TableBody, Icon} from "@mui/material";
 
 import ABI from './chain-info/erc20ABI.json'
-import ERC20Address from './chain-info/erc20Address.json'
-import DollarCostAverage from './chain-info/smart_contracts.json'
+import ERC20Address from './chain-info/smart_contracts.json'
+import smartContracts from './chain-info/smart_contracts.json'
 import {ethers} from 'ethers'
 
 import IconButton from '@mui/material/IconButton';
@@ -89,6 +89,7 @@ function App() {
   const [spendingApproved, setSpendingApproved] = useState(false)
   const [dollarCostAverageContract,setDollarCostAverageContract] = useState(null)
   const [disableText, setDisabledTextFeild] = useState(false)
+  const [duhcontract, setDuhContract] = useState(null)
 
 
   const [wethtoken,setWEth] = useState(null)
@@ -137,9 +138,10 @@ function App() {
     if(provider !== null){
       //setting contract to approve spending amount, wEth in this case
       try{
-      setErc20Contract(new ethers.Contract(DollarCostAverage.WETHMock.address.sepolia,ABI,provider))
-      setWEth(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
-      setUNI(new ethers.Contract(ERC20Address.UNI,ABI,provider))
+      setErc20Contract(new ethers.Contract(smartContracts.WETHMock.address.sepolia,ABI,provider))
+      setDuhContract(new ethers.Contract(smartContracts.Duh.address.sepolia,ABI,provider))
+      setWEth(new ethers.Contract(smartContracts.WETHMock.address.sepolia,ABI,provider))
+      setUNI(new ethers.Contract(smartContracts.UNIMock.address.sepolia,ABI,provider))
       }
       catch(err){
       console.log(err)
@@ -166,11 +168,11 @@ function App() {
     setSigner(tempSigner);
     setDataLoad(true)
 
-    // console.log(DollarCostAverage.DollarCostAverage.address.sepolia)
-    // console.log(DollarCostAverage.DollarCostAverage.abi)
+    // console.log(smartContracts.smartContracts.address.sepolia)
+    // console.log(smartContracts.smartContracts.abi)
 
-    let dollaAverageAddress = DollarCostAverage.DollarCostAverage.address.sepolia
-    let dollaAverageAbi = DollarCostAverage.DollarCostAverage.abi
+    let dollaAverageAddress = smartContracts.DollarCostAverage.address.sepolia
+    let dollaAverageAbi = smartContracts.DollarCostAverage.abi
   
     //lines below prepped for direct contract interaction [en future]....
     let tempContract = await new ethers.Contract(dollaAverageAddress,dollaAverageAbi,tempProvider);
@@ -195,10 +197,15 @@ function App() {
     // console.log("amount",amount)
     // console.log(erc20contract)
     try{
-      console.log("dollarcostAddress",DollarCostAverage.DollarCostAverage.address.sepolia)
-      await erc20contract.connect(signer).approve(quickSwapRouterAddress,ethers.utils.parseEther(amount))
+      // console.log("dollarcostAddress",DollarCostAverage.DollarCostAverage.address.sepolia)
+      // await erc20contract.connect(signer).approve(quickSwapRouterAddress,ethers.utils.parseEther(amount))
       //chhanged  to correspond to Ed address changes/testing
-      await erc20contract.connect(signer).approve(DollarCostAverage.DollarCostAverage.address.sepolia,ethers.utils.parseEther(amount))
+
+      //first contract object made from token to spend erc20contract
+      await erc20contract.connect(signer).approve(smartContracts.DollarCostAverage.address.sepolia,ethers.utils.parseEther(amount))
+
+      //this contract object must be made from the DUH token 
+      await duhcontract.connect(signer).approve(smartContracts.AutomationLayer.address.sepolia,ethers.utils.parseEther(amount))
       setSpendingApproved(true)
       setDisabledTextFeild(true)
     }
@@ -409,7 +416,7 @@ const action = (
                   }}
                 >
            
-                  <MenuItem value={DollarCostAverage.WETHMock.address.sepolia}>
+                  <MenuItem value={smartContracts.WETHMock.address.sepolia}>
                     <Icon sx={{height:"25px", width:"25px", borderRadius: "50%",}}><img src={WETHicon} height="25px" width="25px"/></Icon>
                       wETH Sepolia
                   </MenuItem>
@@ -464,7 +471,7 @@ const action = (
                     <TextField
                       onChange={ (e) => setIntervalAmount(e.target.value) }
                       id="filled-basic"
-                      label="Interval purchase amount"
+                      label="Interval spend amount"
                       variant="filled"
                       sx={{
                         width: "80%"
@@ -495,7 +502,7 @@ const action = (
                         value={token2}
                       >
             
-                        <MenuItem value= {DollarCostAverage.UNIMock.address.sepolia} >
+                        <MenuItem value= {smartContracts.UNIMock.address.sepolia} >
                         <Icon sx={{height:"25px", width:"25px", borderRadius: "50%",}}><img src={UNIicon} height="25px" width="25px"/></Icon>
                           UNI
                         </MenuItem>
@@ -650,9 +657,8 @@ const action = (
         </a>
         </Snackbar>
 
+        <UserRecurringBuys signer={signer} contract={dollarCostAverageContract} provider={provider} address={address}/>:null
        
-        <UserRecurringBuys signer={signer} contract={dollarCostAverageContract} provider={provider} address={address}/>
-        
        
         </Grid>      
       </ThemeProvider>
