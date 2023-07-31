@@ -545,8 +545,7 @@ const action = (
                   </Box> 
                 </>
               )
-              :
-              null
+              :<Box></Box>
             }
 
             {/* "SUBMIT AGREEMENT" BUTTON LOGIC
@@ -657,7 +656,7 @@ const action = (
         </a>
         </Snackbar>
 
-        <UserRecurringBuys signer={signer} contract={dollarCostAverageContract} provider={provider} address={address}/>:null
+        <UserRecurringBuys signer={signer} contract={dollarCostAverageContract} provider={provider} address={address}/>
        
        
         </Grid>      
