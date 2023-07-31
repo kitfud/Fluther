@@ -12,7 +12,7 @@ import {Snackbar,
   Card, 
   Button, 
   Paper,
-  InputLabel, MenuItem, FormControl, Select,TableContainer,Table,TableHead,TableRow,TableCell,TableBody} from "@mui/material";
+  InputLabel, MenuItem, FormControl, Select,TableContainer,Table,TableHead,TableRow,TableCell,TableBody, Icon} from "@mui/material";
 
 import ABI from './chain-info/erc20ABI.json'
 import ERC20Address from './chain-info/erc20Address.json'
@@ -22,6 +22,8 @@ import {ethers} from 'ethers'
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import UserRecurringBuys from './components/UserRecurringBuys';
+import WETHicon from './img/wETH.png'
+import UNIicon from './img/UNIicon.jpg'
 
 const theme = createTheme({
   palette: {
@@ -590,16 +592,27 @@ const action = (
               <Table aria-label="coin table">
                 <TableHead sx={{backgroundColor:"lightyellow"}}>
                 <TableRow>
+                  <TableCell align="left" >ICON</TableCell>
                   <TableCell align="left" >COINS</TableCell>
                   <TableCell align="left" >WALLET AMOUNT</TableCell>
                 </TableRow>
                 </TableHead>
                 <TableBody>
                   <TableRow>
+                    <TableCell>
+                      <Icon sx={{width: "50px", height: "50px", borderRadius: "50%"}}>
+                        <img src={WETHicon} height="50px" width="50px"/>
+                      </Icon>
+                    </TableCell>
                     <TableCell><Typography>WETH</Typography></TableCell>
                     <TableCell>{wethbalance}</TableCell>
                   </TableRow>
                   <TableRow>
+                    <TableCell>
+                      <Icon sx={{width: "50px", height: "50px", borderRadius: "50%"}}>
+                        <img src={UNIicon} width="50px" height="50px"/>
+                      </Icon>
+                    </TableCell>
                   <TableCell><Typography>UNI</Typography></TableCell>
                   <TableCell>{unibalance}</TableCell>
                   </TableRow>
