@@ -130,8 +130,12 @@ contract AutomationLayerTest is Test {
 
             DeployMocks mocksDeployer = new DeployMocks();
             mocksDeployer.run();
-            token1 = address(mocksDeployer.weth());
-            token2 = address(mocksDeployer.uni());
+            token1 = deployer.token1() == address(0)
+                ? address(mocksDeployer.weth())
+                : deployer.token1();
+            token2 = deployer.token2() == address(0)
+                ? address(mocksDeployer.uni())
+                : deployer.token2();
         } else {
             token1 = deployer.token1();
             token2 = deployer.token2();
