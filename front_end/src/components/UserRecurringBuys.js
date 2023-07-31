@@ -156,6 +156,7 @@ const UserRecurringBuys = ({signer,contract,provider,address}) => {
         // console.log(iface)
 
         let dollarCostAddress = DollarCost.DollarCostAverage.address.sepolia
+        // console.log(dollarCostAddress)
         let filter = {
             address: dollarCostAddress,
             fromBlock:0,     

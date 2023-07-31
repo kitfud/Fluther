@@ -89,6 +89,7 @@ function App() {
   const [spendingApproved, setSpendingApproved] = useState(false)
   const [dollarCostAverageContract,setDollarCostAverageContract] = useState(null)
   const [disableText, setDisabledTextFeild] = useState(false)
+  const [duhcontract, setDuhContract] = useState(null)
 
 
   const [wethtoken,setWEth] = useState(null)
@@ -138,6 +139,7 @@ function App() {
       //setting contract to approve spending amount, wEth in this case
       try{
       setErc20Contract(new ethers.Contract(DollarCostAverage.WETHMock.address.sepolia,ABI,provider))
+      setDuhContract(new ethers.Contract(DollarCostAverage.Duh.address.sepolia,ABI,provider))
       setWEth(new ethers.Contract(ERC20Address.wEthSepolia,ABI,provider))
       setUNI(new ethers.Contract(ERC20Address.UNI,ABI,provider))
       }
@@ -196,9 +198,14 @@ function App() {
     // console.log(erc20contract)
     try{
       console.log("dollarcostAddress",DollarCostAverage.DollarCostAverage.address.sepolia)
-      await erc20contract.connect(signer).approve(quickSwapRouterAddress,ethers.utils.parseEther(amount))
+      // await erc20contract.connect(signer).approve(quickSwapRouterAddress,ethers.utils.parseEther(amount))
       //chhanged  to correspond to Ed address changes/testing
+
+      //first contract object made from token to spend erc20contract
       await erc20contract.connect(signer).approve(DollarCostAverage.DollarCostAverage.address.sepolia,ethers.utils.parseEther(amount))
+
+      //this contract object must be made from the DUH token 
+      await duhcontract.connect(signer).approve(DollarCostAverage.DollarCostAverage.address.sepolia,ethers.utils.parseEther(amount))
       setSpendingApproved(true)
       setDisabledTextFeild(true)
     }
