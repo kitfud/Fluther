@@ -386,7 +386,11 @@ const action = (
               <FormControl
                 variant="filled"
                 sx={{
-                  width: "80%"
+                  width: "80%",
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-around",
+                  alignItems:"center",
                 }}
                 
               >
@@ -400,9 +404,15 @@ const action = (
                   onChange={ (e) => setToken1(e.target.value) }
                   value={token1}
                   disabled = {disableText}
+                  sx={{
+                    width:"100%"
+                  }}
                 >
            
-                  <MenuItem   value= {DollarCostAverage.WETHMock.address.sepolia} >WETH Sepolia</MenuItem>
+                  <MenuItem value={DollarCostAverage.WETHMock.address.sepolia}>
+                    <Icon sx={{height:"25px", width:"25px", borderRadius: "50%",}}><img src={WETHicon} height="25px" width="25px"/></Icon>
+                      wETH Sepolia
+                  </MenuItem>
                 </Select>
               </FormControl>
             </Box>
@@ -485,7 +495,10 @@ const action = (
                         value={token2}
                       >
             
-                        <MenuItem value= {DollarCostAverage.UNIMock.address.sepolia} >UNI</MenuItem>
+                        <MenuItem value= {DollarCostAverage.UNIMock.address.sepolia} >
+                        <Icon sx={{height:"25px", width:"25px", borderRadius: "50%",}}><img src={UNIicon} height="25px" width="25px"/></Icon>
+                          UNI
+                        </MenuItem>
                       </Select>
                     </FormControl>
                   </Box>
