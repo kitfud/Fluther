@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import './App.css';
 import { ConnectWallet } from "@thirdweb-dev/react";
 import { useAddress } from "@thirdweb-dev/react";
@@ -24,6 +24,11 @@ import CloseIcon from '@mui/icons-material/Close';
 import UserRecurringBuys from './components/UserRecurringBuys';
 import WETHicon from './img/wETH.png'
 import UNIicon from './img/UNIicon.jpg'
+
+import Particles from "react-particles"
+import { loadFull } from "tsparticles";
+import particlesOptions from "./particlesConfig.json";
+import zIndex from '@mui/material/styles/zIndex';
 
 const theme = createTheme({
   palette: {
@@ -115,6 +120,10 @@ function App() {
   //address below is for testing on Sepolia testnet
   const quickSwapRouterAddress = '0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008'
   const [dataload,setDataLoad] = useState(false)
+
+  const particlesInit = useCallback(main => {
+    loadFull(main);
+  },[])
 
   useEffect(() => {
     if(!dataload){
@@ -344,26 +353,38 @@ const action = (
     <>
       {/* {address?console.log(address):null} */}
 
+      <Particles
+        id="particles_stuff"
+        options={particlesOptions}
+        init={particlesInit}
+      />
+      
       <ThemeProvider theme={theme}>
+        {/*
+      HAD TO MOVE CONNECT WALLET BUTTON INSIDE GRID OR YOU WOULDN'T BE ABLE TO CLICK IT WITH TSPARTICLES BACKGROUND FOR SOME REASON.
 
-        {/* CONNECT WALLET BUTTON */}
+        CONNECT WALLET BUTTON
+
         <Box 
           sx={{
             marginBottom:'10px',
-            marginTop:'4vh'
+            marginTop:'4vh',
+            zIndex: 10,
+            backgroundColor: "red",
           }}
           display="flex"
           alignItems="center"
           justifyContent="center"
         >
-          <ConnectWallet
+          <ConnectWallet 
             dropdownPosition={{
               side: "top",
               align: "center",
             }}
           />
         </Box>
-        
+        */}
+
         <Grid container
           spacing={0}
           direction="column"
@@ -371,6 +392,24 @@ const action = (
           justify="center"
           style={{ minHeight: '100vh' }}
         >
+          {/* CONNECT WALLET BUTTON */}
+        <Box 
+          sx={{
+            marginBottom:'10px',
+            marginTop:'4vh',
+            zIndex: 10,
+          }}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <ConnectWallet 
+            dropdownPosition={{
+              side: "top",
+              align: "center",
+            }}
+          />
+        </Box>
 
           {/* MAIN CARD */}
           <Card 
@@ -379,7 +418,7 @@ const action = (
               alignSelf:'center',
               display: 'inline-block',
               backgroundColor:theme.palette.secondary.main,
-              opacity: 0.9,
+              //opacity: 0.9,
             }}
           >
             <Typography
@@ -634,6 +673,7 @@ const action = (
                 display:"flex",
                 flexDirection:"column",
                 justifyContent:"center",
+                zIndex:1,
               
               }}
             >

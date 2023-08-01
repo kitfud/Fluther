@@ -16,9 +16,13 @@
     "@thirdweb-dev/sdk": "^3",
     "ethers": "^5",
     "material-icons": "^1.13.9",
+    "particles.js": "^2.0.0",
     "react": "^18.2",
     "react-dom": "^18.2",
+    "react-particles": "^2.11.0",
     "react-scripts": "^5.0.1",
+    "tsparticles": "^2.11.1",
+    "tsparticles-slim": "^2.11.1",
     "web-vitals": "^3.1.0"
   },
   "devDependencies": {
