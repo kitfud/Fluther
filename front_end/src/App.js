@@ -102,6 +102,8 @@ function App() {
 
   const [openSnackbar,setOpenSnackBar] = useState(false)
 
+  const [unicolor,setUniColor] = useState('black')
+
   const address = useAddress();
 
   //address below is deployment to Polygon mainnet
@@ -113,6 +115,7 @@ function App() {
   //address below is for testing on Sepolia testnet
   const quickSwapRouterAddress = '0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008'
   const [dataload,setDataLoad] = useState(false)
+
   useEffect(() => {
     if(!dataload){
     updateEthers()
@@ -121,15 +124,19 @@ function App() {
 
   useEffect(() => {
     // console.log("token",wethtoken)
+  let tokenCheckInterval
   if(wethtoken!==null && address!==null && address !== undefined){
     try{
     checkTokenBalance()
+    tokenCheckInterval = setInterval(()=>{
+      checkTokenBalance()
+    },1000)
     }
     catch(err){
       console.log(err)
     }
   }
-  
+  return ()=>clearInterval(tokenCheckInterval)
   },[wethtoken,address])
 
 
@@ -160,6 +167,28 @@ function App() {
   },[amount,token1,token2,interval, intervalAmount])
 
 
+let currentWETH = 0
+let currentUNI = 0
+const checkTokenIncrease = (incomingUNI,incomingWETH) =>{
+ 
+    if(incomingUNI>currentUNI && currentUNI != 0){
+      console.log("INCREASE DETECTED")
+      setUniColor("green")
+    }
+    currentUNI = incomingUNI
+    currentWETH = incomingWETH
+  }
+
+useEffect(()=>{
+let colorChange
+if(unicolor=="green"){
+  colorChange = setTimeout(()=>{
+    setUniColor("black")
+  },2000)
+}
+return ()=>clearTimeout(colorChange)
+},[unicolor])  
+
   const updateEthers = async ()=>{
     let tempProvider = await new ethers.providers.Web3Provider(window.ethereum);
     setProvider(tempProvider);
@@ -174,7 +203,6 @@ function App() {
     let dollaAverageAddress = smartContracts.DollarCostAverage.address.sepolia
     let dollaAverageAbi = smartContracts.DollarCostAverage.abi
   
-    //lines below prepped for direct contract interaction [en future]....
     let tempContract = await new ethers.Contract(dollaAverageAddress,dollaAverageAbi,tempProvider);
     setDollarCostAverageContract(tempContract);
   }
@@ -191,15 +219,17 @@ function App() {
     var unibal= (await unitoken.balanceOf(user)/10**18).toString();
     setUniBalance(unibal)
     }
+    //this is the if statement which controls the color change on amount increase
+    if(unitoken !==null && address !==null && address!== undefined ){
+    checkTokenIncrease(unibal,wethbal)
+      }
   }
 
   const approveSpending = async()=>{
     // console.log("amount",amount)
     // console.log(erc20contract)
     try{
-      // console.log("dollarcostAddress",DollarCostAverage.DollarCostAverage.address.sepolia)
-      // await erc20contract.connect(signer).approve(quickSwapRouterAddress,ethers.utils.parseEther(amount))
-      //chhanged  to correspond to Ed address changes/testing
+ 
 
       //first contract object made from token to spend erc20contract
       await erc20contract.connect(signer).approve(smartContracts.DollarCostAverage.address.sepolia,ethers.utils.parseEther(amount))
@@ -545,8 +575,7 @@ const action = (
                   </Box> 
                 </>
               )
-              :
-              null
+              :<Box></Box>
             }
 
             {/* "SUBMIT AGREEMENT" BUTTON LOGIC
@@ -625,7 +654,7 @@ const action = (
                       </Icon>
                     </TableCell>
                     <TableCell><Typography>WETH</Typography></TableCell>
-                    <TableCell>{wethbalance}</TableCell>
+                    <TableCell><Typography>{wethbalance}</Typography></TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell>
@@ -634,7 +663,7 @@ const action = (
                       </Icon>
                     </TableCell>
                   <TableCell><Typography>UNI</Typography></TableCell>
-                  <TableCell>{unibalance}</TableCell>
+                  <TableCell><Typography color={unicolor}>{unibalance}</Typography></TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -657,7 +686,7 @@ const action = (
         </a>
         </Snackbar>
 
-        <UserRecurringBuys signer={signer} contract={dollarCostAverageContract} provider={provider} address={address}/>:null
+        <UserRecurringBuys signer={signer} contract={dollarCostAverageContract} provider={provider} address={address}/>
        
        
         </Grid>      
