@@ -286,6 +286,7 @@ console.log("result",result)
             <TableCell align="right">Token To Buy</TableCell>
             <TableCell align="right">Amount</TableCell>
             <TableCell align="right">Interval&nbsp;</TableCell>
+            <TableCell align="right"></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
