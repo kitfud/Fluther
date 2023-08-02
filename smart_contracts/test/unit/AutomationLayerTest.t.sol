@@ -431,6 +431,33 @@ contract AutomationLayerTest is Test {
         automation.triggerAutomation(accountNumber);
     }
 
+    function testTriggerAutomationShouldTakeNextBlocksIfCurrentBlockIsLastBlock()
+        public
+        createRecurringBuy(user)
+        giveDuhToken(makeAddr("anotherUser"))
+        setNode(makeAddr("anotherUser"))
+    {
+        address anotherUser = makeAddr("anotherUser");
+        uint256 accountNumber = automation.getNextAccountNumber() - 1;
+
+        uint256 endBlockNumber = sequencer.getNode(anotherUser).endBlockNumber;
+        vm.roll(endBlockNumber);
+
+        vm.prank(anotherUser);
+        vm.expectCall(
+            address(sequencer),
+            abi.encodeCall(sequencer.getNode, anotherUser)
+        );
+        vm.expectCall(
+            address(sequencer),
+            abi.encodeWithSignature(
+                "takeNextBlockNumbers(address)",
+                anotherUser
+            )
+        );
+        automation.triggerAutomation(accountNumber);
+    }
+
     function testTriggerAutomationRevertsIfCallerDoesNotHaveEnoughDuhToken()
         public
         createRecurringBuy(user)
@@ -561,6 +588,47 @@ contract AutomationLayerTest is Test {
         vm.expectCall(address(dca), abi.encodeCall(dca.trigger, ids[3]));
         vm.expectEmit(true, false, false, true, address(automation));
         emit BatchAutomationDone(anotherUser, accountNumbers, result);
+        automation.triggerBatchAutomation(accountNumbers);
+    }
+
+    function testTriggerBatchAutomationShouldTakeNextBlocksIfCurrentBlockIsLastBlock()
+        public
+        createRecurringBuy(user)
+        createRecurringBuy(user)
+        createRecurringBuy(user)
+        createRecurringBuy(user)
+        giveDuhToken(user)
+        giveDuhToken(makeAddr("anotherUser"))
+        setNode(makeAddr("anotherUser"))
+    {
+        uint256[] memory accountNumbers = new uint256[](4);
+        accountNumbers[0] = 0;
+        accountNumbers[1] = 1;
+        accountNumbers[2] = 2;
+        accountNumbers[3] = 3;
+
+        uint256[] memory ids = new uint256[](4);
+        ids[0] = automation.getAccount(accountNumbers[0]).id;
+        ids[1] = automation.getAccount(accountNumbers[1]).id;
+        ids[2] = automation.getAccount(accountNumbers[2]).id;
+        ids[3] = automation.getAccount(accountNumbers[3]).id;
+        address anotherUser = makeAddr("anotherUser");
+
+        uint256 endBlockNumber = sequencer.getNode(anotherUser).endBlockNumber;
+        vm.roll(endBlockNumber);
+
+        vm.prank(anotherUser);
+        vm.expectCall(
+            address(sequencer),
+            abi.encodeCall(sequencer.getNode, anotherUser)
+        );
+        vm.expectCall(
+            address(sequencer),
+            abi.encodeWithSignature(
+                "takeNextBlockNumbers(address)",
+                anotherUser
+            )
+        );
         automation.triggerBatchAutomation(accountNumbers);
     }
 
@@ -971,7 +1039,6 @@ contract AutomationLayerTest is Test {
     {
         uint256 accountNumber = automation.getNextAccountNumber() - 1;
         uint256 recurringBuyId = automation.getAccount(accountNumber).id;
-        console.log(automation.getSequencerAddress());
         address anotherUser = makeAddr("anotherUser");
 
         vm.prank(anotherUser);
@@ -1145,5 +1212,44 @@ contract AutomationLayerTest is Test {
         bool accept = automation.getAcceptingNewAccounts();
 
         assertTrue(accept);
+    }
+
+    /// -----------------------------------------------------------------------
+    /// Test for: prospectPayment
+    /// -----------------------------------------------------------------------
+
+    function testProspectPayment()
+        public
+        createRecurringBuy(user)
+        giveDuhToken(user)
+    {
+        uint256 accountNumber = automation.getNextAccountNumber() - 1;
+
+        uint256 payment = automation.prospectPayment(accountNumber);
+
+        assertTrue(payment > 0);
+    }
+
+    /// -----------------------------------------------------------------------
+    /// Test for: prospectPaymentBatch
+    /// -----------------------------------------------------------------------
+
+    function testProspectPaymentBatch()
+        public
+        createRecurringBuy(user)
+        createRecurringBuy(user)
+        createRecurringBuy(user)
+        createRecurringBuy(user)
+        giveDuhToken(user)
+    {
+        uint256[] memory accountNumbers = new uint256[](4);
+        accountNumbers[0] = 0;
+        accountNumbers[1] = 1;
+        accountNumbers[2] = 2;
+        accountNumbers[3] = 3;
+
+        uint256 payment = automation.prospectPaymentBatch(accountNumbers);
+
+        assertTrue(payment > 0);
     }
 }
