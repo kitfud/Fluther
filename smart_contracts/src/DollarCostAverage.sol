@@ -274,7 +274,8 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
         }
 
         // automation node payment
-        if (msg.sender != buy.sender) {
+        uint256 feeFromAutomationLayer = s_automationLayer.getAutomationFee();
+        if (msg.sender != buy.sender && feeFromAutomationLayer > 0) {
             // building path
             address[] memory pathPayment = __checkPairs(
                 s_defaultRouter,
@@ -283,8 +284,8 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
             );
 
             // fees calculation
-            uint256 automationFee = (protocolFee *
-                s_automationLayer.getAutomationFee()) / PRECISION;
+            uint256 automationFee = (protocolFee * feeFromAutomationLayer) /
+                PRECISION;
             protocolFee -= automationFee;
             uint256 payment = __prospectPayment(automationFee, pathPayment);
 

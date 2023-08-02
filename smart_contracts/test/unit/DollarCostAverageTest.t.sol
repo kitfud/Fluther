@@ -867,6 +867,44 @@ contract DollarCostAverageTest is Test {
         assertEq(buy.paymentDue, currTimestamp + buy.timeIntervalInSeconds);
     }
 
+    function testTriggerSuccessWhenCallerIsNOTSenderAndAutomationFeeIs0()
+        public
+        createRecurringBuy(token1, token2, address(0))
+        transferFundsApproves(makeAddr("anotherUser"))
+        transferFundsApproves(user)
+    {
+        address anotherUser = makeAddr("anotherUser");
+        vm.startPrank(signer);
+        ERC20Mock(duhToken).mint(defaultRouter, INITAL_DEX_ERC20_FUNDS);
+        automation.setAutomationFee(0);
+        vm.stopPrank();
+
+        uint256 currRecurringBuyId = dca.getNextRecurringBuyId() - 1;
+
+        uint256 tokenToSpendBalanceBefore = ERC20Mock(token1).balanceOf(user);
+        uint256 tokenToBuyBalanceBefore = ERC20Mock(token2).balanceOf(user);
+
+        vm.prank(anotherUser);
+        dca.trigger(currRecurringBuyId);
+
+        uint256 tokenToSpendBalanceAfter = ERC20Mock(token1).balanceOf(user);
+        uint256 tokenToBuyBalanceAfter = ERC20Mock(token2).balanceOf(user);
+
+        IDollarCostAverage.RecurringBuy memory buy = dca.getRecurringBuy(
+            currRecurringBuyId
+        );
+
+        uint256 fee = (buy.amountToSpend * 100) / 10000;
+        uint256 currTimestamp = dca.getCurrentBlockTimestamp();
+
+        assertEq(
+            tokenToSpendBalanceAfter,
+            tokenToSpendBalanceBefore - (buy.amountToSpend - fee / 2)
+        );
+        assertGt(tokenToBuyBalanceAfter, tokenToBuyBalanceBefore);
+        assertEq(buy.paymentDue, currTimestamp + buy.timeIntervalInSeconds);
+    }
+
     function testTriggerEvent()
         public
         createRecurringBuy(token1, token2, address(0))

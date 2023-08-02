@@ -16,7 +16,7 @@
     },
     "DollarCostAverage": {
         "address": {
-            "sepolia": "0x33e6961eDc112C0213B70c17ad01AD6Ae9E09A96"
+            "sepolia": "0xf55E52bEb2EBa42AB68e66Dd50305F8F7D51082B"
         },
         "abi": [
             {
@@ -1169,7 +1169,7 @@
     },
     "AutomationLayer": {
         "address": {
-            "sepolia": "0x5D2d865CE8E16aEaAe7671B0Ef5f0892301d1783"
+            "sepolia": "0x2Ee43eDD9c3768b9fF3cB8F4f17A061eb8a2d847"
         },
         "abi": [
             {
@@ -2015,7 +2015,7 @@
     },
     "NodeSequencer": {
         "address": {
-            "sepolia": "0x2823f28093621E7bDD357C02cd60EB0AAa4D0076"
+            "sepolia": "0x20F278a77BfB77131a099e20C15985fDA4aA1Fc3"
         },
         "abi": [
             {
