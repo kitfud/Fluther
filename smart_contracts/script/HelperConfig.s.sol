@@ -24,7 +24,7 @@ contract HelperConfig is Script {
     NetworkConfig public activeNetworkConfig;
 
     uint256 public constant MINIMUM_DUH = 1 ether;
-    uint256 public constant AUTOMATION_FEE = 0.001 ether;
+    uint256 public constant AUTOMATION_FEE = 100;
     address public constant ORACLE = address(0);
     uint256 public constant DEFAULT_ANVIL_KEY =
         0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;

@@ -45,10 +45,8 @@ interface IAutomationLayer {
     /// @dev error for when given address is address(0).
     error AutomationLayer__InvalidAddress();
 
-    /** @dev error for when user does not have enough DUH funds and/or automation contract
-     *  does not have enough allowance.
-     */
-    error AutomationLayer__UserDoesNotHaveEnoughBalanceAndOrAllowance();
+    /// @dev error for when there is no liquidity pair for given ERC20 tokens.
+    error AutomationLayer__NoLiquidityPair();
 
     /// -----------------------------------------------------------------------
     /// Type declarations (structs and enums)
@@ -294,4 +292,20 @@ interface IAutomationLayer {
      *  creation of new accounts (true) or not (false).
      */
     function getAcceptingNewAccounts() external view returns (bool);
+
+    /** @notice calculates a prospect for automation payment.
+     *  @param accountNumber: number of account.
+     *  @return uint256 value for the payment prospect.
+     */
+    function prospectPayment(
+        uint256 accountNumber
+    ) external view returns (uint256);
+
+    /** @notice calculates a prospect for automation payment in batch.
+     *  @param accountNumbers: array of numbers of accounts.
+     *  @return payment uint256 value for the payment prospect.
+     */
+    function prospectPaymentBatch(
+        uint256[] calldata accountNumbers
+    ) external view returns (uint256 payment);
 }

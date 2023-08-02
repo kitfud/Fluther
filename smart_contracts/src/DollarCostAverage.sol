@@ -31,21 +31,23 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
 
     /* solhint-disable */
     // base types
-    uint256 private s_nextRecurringBuyId;
+    uint256 private s_nextRecurringBuyId = 1;
     address private s_defaultRouter;
     IAutomationLayer private s_automationLayer;
     bool private s_acceptingNewRecurringBuys;
     address private immutable i_wrapNative;
+    uint256 private s_fee = 100; // over 10000
+    uint256 private s_contractFeeShare = 5000; // over 10000
+    uint256 private s_slippagePercentage = 100; // over 10000
+    address private s_duh;
 
     // mappings and arrays
     mapping(uint256 /* recurringBuyId */ => RecurringBuy /* data */)
         private s_recurringBuys;
+    mapping(address /* sender */ => uint256[] /* ids */) private s_senderToIds;
 
     // constants
-    uint256 private constant FEE = 100; // over 10000
     uint256 private constant PRECISION = 10000;
-    uint256 private constant CONTRACT_FEE_SHARE = 5000; // over 10000
-    uint256 private SLIPPAGE_PERCENTAGE = 100; // over 10000
 
     /* solhint-enable */
 
@@ -79,7 +81,9 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
     ) private view {
         if (
             !(startRecBuyId < endRecBuyId) ||
-            !(endRecBuyId < s_nextRecurringBuyId)
+            !(endRecBuyId < s_nextRecurringBuyId) ||
+            startRecBuyId == 0 ||
+            endRecBuyId == 0
         ) {
             revert DollarCostAverage__InvalidIndexRange();
         }
@@ -92,12 +96,14 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
     /** @notice constructor logic.
      *  @param defaultRouter: default DEX router address.
      *  @param automationLayerAddress: address for the automation layer smart contract.
-     *  @param _wrapNative: ERC20 smart contract address for the wrapped version of the native blockchain coin.
+     *  @param wrapNative: ERC20 smart contract address for the wrapped version of the native blockchain coin.
+     *  @param duh: ERC20 smart contract address the DUH token.
      */
     constructor(
         address defaultRouter,
         address automationLayerAddress,
-        address _wrapNative
+        address wrapNative,
+        address duh
     ) Security(msg.sender) {
         if (defaultRouter == address(0)) {
             revert DollarCostAverage__InvalidDefaultRouterAddress();
@@ -109,7 +115,8 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
         s_defaultRouter = defaultRouter;
         s_automationLayer = IAutomationLayer(automationLayerAddress);
         s_acceptingNewRecurringBuys = true;
-        i_wrapNative = _wrapNative;
+        i_wrapNative = wrapNative;
+        s_duh = duh;
     }
 
     /// -----------------------------------------------------------------------
@@ -146,6 +153,11 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
             revert DollarCostAverage__InvalidTimeInterval();
         }
 
+        uint256[] storage recurringBuyIds = s_senderToIds[msg.sender];
+        if (recurringBuyIds.length == 0) {
+            recurringBuyIds.push(0);
+        }
+
         address router = dexRouter == address(0) ? s_defaultRouter : dexRouter;
         address[] memory path = __checkPairs(router, tokenToSpend, tokenToBuy);
         uint256 nextRecurringBuyId = s_nextRecurringBuyId;
@@ -155,6 +167,7 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
             address(this)
         );
 
+        recurringBuyIds.push(nextRecurringBuyId);
         RecurringBuy memory buy = RecurringBuy(
             msg.sender,
             amountToSpend,
@@ -166,6 +179,7 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
             block.timestamp,
             accountNumber,
             path,
+            recurringBuyIds.length - 1,
             Status.SET
         );
 
@@ -199,6 +213,14 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
         buy.status = Status.CANCELLED;
         s_automationLayer.cancelAccount(buy.accountNumber);
 
+        // removing the ID from the array
+        uint256[] storage ids = s_senderToIds[msg.sender];
+        uint256 indexToRemove = buy.index;
+        uint256 lastId = ids[ids.length - 1];
+        ids[indexToRemove] = lastId;
+        s_recurringBuys[lastId].index = indexToRemove;
+        ids.pop();
+
         emit RecurringBuyCancelled(recurringBuyId, buy.sender);
     }
 
@@ -213,18 +235,32 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
         __nonReentrant();
         __whenNotPaused();
 
+        // initial checks
         RecurringBuy storage buy = s_recurringBuys[recurringBuyId];
         if (buy.status != Status.SET || buy.paymentDue > block.timestamp) {
             revert DollarCostAverage__InvalidRecurringBuy();
         }
 
         __haveEnoughAllowance(buy.tokenToSpend, buy.sender, buy.amountToSpend);
+
+        // updating payment due
         buy.paymentDue += buy.timeIntervalInSeconds;
 
         // calculating fees
-        uint256 fee = (buy.amountToSpend * FEE) / PRECISION;
-        uint256 contractFee = (fee * CONTRACT_FEE_SHARE) / PRECISION;
-        uint256 buyAmount = buy.amountToSpend - fee;
+        (
+            uint256 paymentInterfaceFee,
+            uint256 protocolFee,
+            uint256 buyAmount
+        ) = __calculateFees(buy.amountToSpend);
+
+        // Transfering from user to this address
+        __transferERC20(
+            buy.tokenToSpend,
+            buy.sender,
+            address(this),
+            buyAmount + protocolFee,
+            true
+        );
 
         // payment interface fee
         if (buy.paymentInterface != address(0)) {
@@ -232,28 +268,47 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
                 buy.tokenToSpend,
                 buy.sender,
                 buy.paymentInterface,
-                fee - contractFee,
+                paymentInterfaceFee,
                 true
+            );
+        }
+
+        // automation node payment
+        if (msg.sender != buy.sender) {
+            // building path
+            address[] memory pathPayment = __checkPairs(
+                s_defaultRouter,
+                buy.tokenToSpend,
+                s_duh
+            );
+
+            // fees calculation
+            uint256 automationFee = (protocolFee *
+                s_automationLayer.getAutomationFee()) / PRECISION;
+            protocolFee -= automationFee;
+            uint256 payment = __prospectPayment(automationFee, pathPayment);
+
+            // swap process
+            __approveERC20(buy.tokenToSpend, s_defaultRouter, payment);
+            __swap(
+                payment,
+                payment,
+                IDEXRouter(s_defaultRouter),
+                pathPayment,
+                msg.sender
             );
         }
 
         // protocol fee
         __transferERC20(
             buy.tokenToSpend,
-            buy.sender,
-            owner(),
-            contractFee,
+            address(this),
+            address(s_automationLayer),
+            protocolFee,
             true
         );
 
-        // Transfering from user to this address and approving DEX router
-        __transferERC20(
-            buy.tokenToSpend,
-            buy.sender,
-            address(this),
-            buyAmount,
-            true
-        );
+        // approving DEX router
         __approveERC20(buy.tokenToSpend, buy.dexRouter, buyAmount);
 
         // swap process
@@ -262,21 +317,19 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
             buyAmount,
             buy.path
         );
-        uint256 amountOutMin = (amountsOut[amountsOut.length - 1] *
-            SLIPPAGE_PERCENTAGE) / PRECISION;
-
-        uint256[] memory amounts = dexRouter.swapExactTokensForTokens(
+        uint256[] memory amounts = __swap(
             buyAmount,
-            amountOutMin,
+            amountsOut[amountsOut.length - 1],
+            dexRouter,
             buy.path,
-            buy.sender,
-            block.timestamp
+            buy.sender
         );
 
         emit PaymentTransferred(recurringBuyId, buy.sender, amounts);
     }
 
-    /** @dev added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
+    /** @dev added nonReentrant and whenNotPaused third party modifiers.
+     *  Only allowed addresses can call this function.
      *  @inheritdoc IDollarCostAverage
      */
     function setAutomationLayer(
@@ -295,7 +348,8 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
         emit AutomationLayerSet(msg.sender, automationLayerAddress);
     }
 
-    /** @dev added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
+    /** @dev added nonReentrant and whenNotPaused third party modifiers.
+     *  Only allowed addresses can call this function.
      *  @inheritdoc IDollarCostAverage
      */
     function setDefaultRouter(
@@ -314,7 +368,8 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
         emit DefaultRouterSet(msg.sender, defaultRouter);
     }
 
-    /** @dev added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
+    /** @dev added nonReentrant and whenNotPaused third party modifiers.
+     *  Only allowed addresses can call this function.
      *  @inheritdoc IDollarCostAverage
      */
     function setAcceptingNewRecurringBuys(
@@ -327,6 +382,102 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
         s_acceptingNewRecurringBuys = acceptingNewRecurringBuys;
 
         emit AcceptingRecurringBuysSet(msg.sender, acceptingNewRecurringBuys);
+    }
+
+    /** @dev added nonReentrant and whenNotPaused third party modifiers.
+     *  Only allowed addresses can call this function.
+     *  @inheritdoc IDollarCostAverage
+     */
+    function setFee(uint256 fee) external override(IDollarCostAverage) {
+        __nonReentrant();
+        __whenNotPaused();
+        __onlyAllowed();
+
+        s_fee = fee;
+
+        emit FeeSet(msg.sender, fee);
+    }
+
+    /** @dev added nonReentrant and whenNotPaused third party modifiers.
+     *  Only allowed addresses can call this function.
+     *  @inheritdoc IDollarCostAverage
+     */
+    function setContractFeeShare(
+        uint256 contractFeeShare
+    ) external override(IDollarCostAverage) {
+        __nonReentrant();
+        __whenNotPaused();
+        __onlyAllowed();
+
+        s_contractFeeShare = contractFeeShare;
+
+        emit ContractFeeShareSet(msg.sender, contractFeeShare);
+    }
+
+    /** @dev added nonReentrant and whenNotPaused third party modifiers.
+     *  Only allowed addresses can call this function.
+     *  @inheritdoc IDollarCostAverage
+     */
+    function setSlippagePercentage(
+        uint256 slippagePercentage
+    ) external override(IDollarCostAverage) {
+        __nonReentrant();
+        __whenNotPaused();
+        __onlyAllowed();
+
+        s_slippagePercentage = slippagePercentage;
+
+        emit SlippagePercentageSet(msg.sender, slippagePercentage);
+    }
+
+    /** @dev Added nonReentrant and whenNotPaused third party modifiers. Only allowed callers
+     *  can call this function.
+     *  @inheritdoc IDollarCostAverage
+     */
+    function setDuh(address duh) external override(IDollarCostAverage) {
+        __nonReentrant();
+        __whenNotPaused();
+        __onlyAllowed();
+
+        if (duh == address(0)) {
+            revert DollarCostAverage__InvalidTokenAddresses();
+        }
+
+        s_duh = duh;
+
+        emit DuhTokenSet(msg.sender, duh);
+    }
+
+    /// -----------------------------------------------------------------------
+    /// Internal state-change functions
+    /// -----------------------------------------------------------------------
+
+    /** @dev performs the swap for the given path of tokens.
+     *  @param buyAmount: amount left to buy.
+     *  @param amountOut: expected amount out after swap.
+     *  @param dexRouter: DEX router interface instance used to perform the swap.
+     *  @param path: token addresses swap path.
+     *  @param to: recipient address that will receive the swap output.
+     *  @return uint256 array with the swap amounts.
+     */
+    function __swap(
+        uint256 buyAmount,
+        uint256 amountOut,
+        IDEXRouter dexRouter,
+        address[] memory path,
+        address to
+    ) private returns (uint256[] memory) {
+        uint256 amountOutMin = (amountOut * s_slippagePercentage) / PRECISION;
+
+        uint256[] memory amounts = dexRouter.swapExactTokensForTokens(
+            buyAmount,
+            amountOutMin,
+            path,
+            to,
+            block.timestamp
+        );
+
+        return amounts;
     }
 
     /// -----------------------------------------------------------------------
@@ -475,11 +626,78 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
     }
 
     /// @inheritdoc IDollarCostAverage
+    function getFee()
+        external
+        view
+        override(IDollarCostAverage)
+        returns (uint256)
+    {
+        return s_fee;
+    }
+
+    /// @inheritdoc IDollarCostAverage
+    function getContractFeeShare()
+        external
+        view
+        override(IDollarCostAverage)
+        returns (uint256)
+    {
+        return s_contractFeeShare;
+    }
+
+    /// @inheritdoc IDollarCostAverage
+    function getSlippagePercentage()
+        external
+        view
+        override(IDollarCostAverage)
+        returns (uint256)
+    {
+        return s_slippagePercentage;
+    }
+
+    /// @inheritdoc IDollarCostAverage
+    function getDuh()
+        external
+        view
+        override(IDollarCostAverage)
+        returns (address)
+    {
+        return s_duh;
+    }
+
+    /// @inheritdoc IDollarCostAverage
+    function getSenderToIds(
+        address sender
+    ) external view override(IDollarCostAverage) returns (uint256[] memory) {
+        return s_senderToIds[sender];
+    }
+
+    /// @inheritdoc IDollarCostAverage
     function isRecurringBuyValid(
         uint256 recurringBuyId
     ) public view override(IDollarCostAverage) returns (bool) {
         RecurringBuy memory buy = s_recurringBuys[recurringBuyId];
         return __validateRecurringBuy(buy);
+    }
+
+    /// @inheritdoc IAutomatedContract
+    function prospectAutomationPayment(
+        uint256 recurringBuyId
+    ) external view override(IAutomatedContract) returns (uint256) {
+        RecurringBuy memory buy = s_recurringBuys[recurringBuyId];
+
+        (, uint256 protocolFee, ) = __calculateFees(buy.amountToSpend);
+        address[] memory path = __checkPairs(
+            s_defaultRouter,
+            buy.tokenToSpend,
+            s_duh
+        );
+        uint256 automationPayment = (protocolFee *
+            s_automationLayer.getAutomationFee()) / PRECISION;
+
+        uint256 payment = __prospectPayment(automationPayment, path);
+
+        return payment;
     }
 
     /// -----------------------------------------------------------------------
@@ -517,8 +735,9 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
         IDEXFactory factory = IDEXFactory(IDEXRouter(router).factory());
 
         if (factory.getPair(token1, token2) == address(0)) {
-            address pair1AndWrapped = factory.getPair(token1, i_wrapNative);
-            address pair2AndWrapped = factory.getPair(token2, i_wrapNative);
+            address wrapNative = i_wrapNative;
+            address pair1AndWrapped = factory.getPair(token1, wrapNative);
+            address pair2AndWrapped = factory.getPair(token2, wrapNative);
 
             if (
                 pair1AndWrapped == address(0) || pair2AndWrapped == address(0)
@@ -528,7 +747,7 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
 
             address[] memory path = new address[](3);
             path[0] = token1;
-            path[1] = i_wrapNative;
+            path[1] = wrapNative;
             path[2] = token2;
 
             return path;
@@ -539,5 +758,41 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
 
             return path;
         }
+    }
+
+    /** @dev calculates the fees.
+     *  @param amount: amount to be spend in the swap.
+     *  @return paymentInterfaceFee uint256 value for the fee of the payment interface.
+     *  @return protocolFee uint256 value for the protocol fee.
+     *  @return buyAmount amount left to buy.
+     */
+    function __calculateFees(
+        uint256 amount
+    )
+        private
+        view
+        returns (
+            uint256 paymentInterfaceFee,
+            uint256 protocolFee,
+            uint256 buyAmount
+        )
+    {
+        uint256 fee = (amount * s_fee) / PRECISION;
+        protocolFee = (fee * s_contractFeeShare) / PRECISION;
+        buyAmount = amount - fee;
+        paymentInterfaceFee = fee - protocolFee;
+    }
+
+    function __prospectPayment(
+        uint256 automationFee,
+        address[] memory path
+    ) private view returns (uint256) {
+        IDEXRouter dexRouter = IDEXRouter(s_defaultRouter);
+        uint256[] memory amountsOut = dexRouter.getAmountsOut(
+            automationFee,
+            path
+        );
+
+        return amountsOut[amountsOut.length - 1];
     }
 }
