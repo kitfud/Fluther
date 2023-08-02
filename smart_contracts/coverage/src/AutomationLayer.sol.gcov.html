@@ -31,27 +31,27 @@
             <td class="headerValue">lcov.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">106</td>
+            <td class="headerCovTableEntry">113</td>
             <td class="headerCovTableEntry">117</td>
-            <td class="headerCovTableEntryHi">90.6 %</td>
+            <td class="headerCovTableEntryHi">96.6 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-08-01 23:05:11</td>
+            <td class="headerValue">2023-08-02 15:30:18</td>
             <td></td>
             <td class="headerItem">Functions:</td>
-            <td class="headerCovTableEntry">27</td>
             <td class="headerCovTableEntry">29</td>
-            <td class="headerCovTableEntryHi">93.1 %</td>
+            <td class="headerCovTableEntry">29</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
           </tr>
           <tr>
             <td></td>
             <td></td>
             <td></td>
             <td class="headerItem">Branches:</td>
-            <td class="headerCovTableEntry">19</td>
+            <td class="headerCovTableEntry">21</td>
             <td class="headerCovTableEntry">28</td>
-            <td class="headerCovTableEntryLo">67.9 %</td>
+            <td class="headerCovTableEntryMed">75.0 %</td>
           </tr>
           <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -138,15 +138,15 @@
 <a name="67"><span class="lineNum">      67 </span>                :            : </a>
 <a name="68"><span class="lineNum">      68 </span>                :            :     /// @dev checks if node has sufficient DUH tokens.</a>
 <a name="69"><span class="lineNum">      69 </span>                :            :     function __hasSufficientTokens() private view {</a>
-<a name="70"><span class="lineNum">      70 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 7 times"> + </span>]:<span class="lineCov">          9 :         if (IERC20(s_duh).balanceOf(msg.sender) &lt; s_minimumDuh) {</span></a>
+<a name="70"><span class="lineNum">      70 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 9 times"> + </span>]:<span class="lineCov">         11 :         if (IERC20(s_duh).balanceOf(msg.sender) &lt; s_minimumDuh) {</span></a>
 <a name="71"><span class="lineNum">      71 </span>                :<span class="lineCov">          2 :             revert AutomationLayer__NotEnoughtTokens();</span></a>
 <a name="72"><span class="lineNum">      72 </span>                :            :         }</a>
 <a name="73"><span class="lineNum">      73 </span>                :            :     }</a>
 <a name="74"><span class="lineNum">      74 </span>                :            : </a>
 <a name="75"><span class="lineNum">      75 </span>                :            :     /// @dev checks if transaction origin is from an allowed node.</a>
 <a name="76"><span class="lineNum">      76 </span>                :            :     function __isCurrentNode() private view {</a>
-<a name="77"><span class="lineNum">      77 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 5 times"> + </span>]:            :         if (</a>
-<a name="78"><span class="lineNum">      78 </span>                :<span class="lineCov">          7 :             s_sequencerAddress != address(0) &amp;&amp;</span></a>
+<a name="77"><span class="lineNum">      77 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 7 times"> + </span>]:            :         if (</a>
+<a name="78"><span class="lineNum">      78 </span>                :<span class="lineCov">          9 :             s_sequencerAddress != address(0) &amp;&amp;</span></a>
 <a name="79"><span class="lineNum">      79 </span>                :            :             !INodeSequencer(s_sequencerAddress).isCurrentNode(msg.sender)</a>
 <a name="80"><span class="lineNum">      80 </span>                :            :         ) {</a>
 <a name="81"><span class="lineNum">      81 </span>                :<span class="lineCov">          2 :             revert AutomationLayer__OriginNotNode();</span></a>
@@ -191,18 +191,18 @@
 <a name="120"><span class="lineNum">     120 </span>                :            :         address user,</a>
 <a name="121"><span class="lineNum">     121 </span>                :            :         address contractAddress</a>
 <a name="122"><span class="lineNum">     122 </span>                :            :     ) external override(IAutomationLayer) returns (uint256) {</a>
-<a name="123"><span class="lineNum">     123 </span>                :<span class="lineCov">        112 :         __nonReentrant();</span></a>
-<a name="124"><span class="lineNum">     124 </span>                :<span class="lineCov">        112 :         __whenNotPaused();</span></a>
-<a name="125"><span class="lineNum">     125 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 110 times"> + </span>]:<span class="lineCov">        111 :         if (!s_acceptingNewAccounts) {</span></a>
+<a name="123"><span class="lineNum">     123 </span>                :<span class="lineCov">        131 :         __nonReentrant();</span></a>
+<a name="124"><span class="lineNum">     124 </span>                :<span class="lineCov">        131 :         __whenNotPaused();</span></a>
+<a name="125"><span class="lineNum">     125 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 129 times"> + </span>]:<span class="lineCov">        130 :         if (!s_acceptingNewAccounts) {</span></a>
 <a name="126"><span class="lineNum">     126 </span>                :<span class="lineCov">          1 :             revert AutomationLayer__NotAccpetingNewAccounts();</span></a>
 <a name="127"><span class="lineNum">     127 </span>                :            :         }</a>
-<a name="128"><span class="lineNum">     128 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 108 times"> + </span>]:<span class="lineCov">        110 :         if (user == address(0) || contractAddress == address(0)) {</span></a>
+<a name="128"><span class="lineNum">     128 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 127 times"> + </span>]:<span class="lineCov">        129 :         if (user == address(0) || contractAddress == address(0)) {</span></a>
 <a name="129"><span class="lineNum">     129 </span>                :<span class="lineCov">          2 :             revert AutomationLayer__InvalidAddress();</span></a>
 <a name="130"><span class="lineNum">     130 </span>                :            :         }</a>
 <a name="131"><span class="lineNum">     131 </span>                :            : </a>
-<a name="132"><span class="lineNum">     132 </span>                :<span class="lineCov">        108 :         uint256 accountNumber = s_nextAccountNumber;</span></a>
+<a name="132"><span class="lineNum">     132 </span>                :<span class="lineCov">        127 :         uint256 accountNumber = s_nextAccountNumber;</span></a>
 <a name="133"><span class="lineNum">     133 </span>                :            : </a>
-<a name="134"><span class="lineNum">     134 </span>                :<span class="lineCov">        108 :         s_accounts[accountNumber] = Account(</span></a>
+<a name="134"><span class="lineNum">     134 </span>                :<span class="lineCov">        127 :         s_accounts[accountNumber] = Account(</span></a>
 <a name="135"><span class="lineNum">     135 </span>                :            :             user,</a>
 <a name="136"><span class="lineNum">     136 </span>                :            :             contractAddress,</a>
 <a name="137"><span class="lineNum">     137 </span>                :            :             id,</a>
@@ -210,12 +210,12 @@
 <a name="139"><span class="lineNum">     139 </span>                :            :         );</a>
 <a name="140"><span class="lineNum">     140 </span>                :            : </a>
 <a name="141"><span class="lineNum">     141 </span>                :            :         unchecked {</a>
-<a name="142"><span class="lineNum">     142 </span>                :<span class="lineCov">        108 :             ++s_nextAccountNumber;</span></a>
+<a name="142"><span class="lineNum">     142 </span>                :<span class="lineCov">        127 :             ++s_nextAccountNumber;</span></a>
 <a name="143"><span class="lineNum">     143 </span>                :            :         }</a>
 <a name="144"><span class="lineNum">     144 </span>                :            : </a>
-<a name="145"><span class="lineNum">     145 </span>                :<span class="lineCov">        108 :         emit AccountCreated(user, contractAddress, id);</span></a>
+<a name="145"><span class="lineNum">     145 </span>                :<span class="lineCov">        127 :         emit AccountCreated(user, contractAddress, id);</span></a>
 <a name="146"><span class="lineNum">     146 </span>                :            : </a>
-<a name="147"><span class="lineNum">     147 </span>                :<span class="lineCov">        108 :         return accountNumber;</span></a>
+<a name="147"><span class="lineNum">     147 </span>                :<span class="lineCov">        127 :         return accountNumber;</span></a>
 <a name="148"><span class="lineNum">     148 </span>                :            :     }</a>
 <a name="149"><span class="lineNum">     149 </span>                :            : </a>
 <a name="150"><span class="lineNum">     150 </span>                :            :     /** @dev added nonReentrant and whenNotPaused third party modifiers. It reverts if</a>
@@ -256,24 +256,24 @@
 <a name="185"><span class="lineNum">     185 </span>                :            :     function triggerAutomation(</a>
 <a name="186"><span class="lineNum">     186 </span>                :            :         uint256 accountNumber</a>
 <a name="187"><span class="lineNum">     187 </span>                :            :     ) external override(IAutomationLayer) {</a>
-<a name="188"><span class="lineNum">     188 </span>                :<span class="lineCov">          6 :         __nonReentrant();</span></a>
-<a name="189"><span class="lineNum">     189 </span>                :<span class="lineCov">          6 :         __whenNotPaused();</span></a>
-<a name="190"><span class="lineNum">     190 </span>                :<span class="lineCov">          5 :         __hasSufficientTokens();</span></a>
-<a name="191"><span class="lineNum">     191 </span>                :<span class="lineCov">          4 :         __isCurrentNode();</span></a>
+<a name="188"><span class="lineNum">     188 </span>                :<span class="lineCov">          7 :         __nonReentrant();</span></a>
+<a name="189"><span class="lineNum">     189 </span>                :<span class="lineCov">          7 :         __whenNotPaused();</span></a>
+<a name="190"><span class="lineNum">     190 </span>                :<span class="lineCov">          6 :         __hasSufficientTokens();</span></a>
+<a name="191"><span class="lineNum">     191 </span>                :<span class="lineCov">          5 :         __isCurrentNode();</span></a>
 <a name="192"><span class="lineNum">     192 </span>                :            : </a>
-<a name="193"><span class="lineNum">     193 </span>                :<span class="lineCov">          3 :         Account memory account = s_accounts[accountNumber];</span></a>
+<a name="193"><span class="lineNum">     193 </span>                :<span class="lineCov">          4 :         Account memory account = s_accounts[accountNumber];</span></a>
 <a name="194"><span class="lineNum">     194 </span>                :            : </a>
-<a name="195"><span class="lineNum">     195 </span>                :<span class="lineCov">          3 :         __performAutomation(accountNumber, true);</span></a>
-<a name="196"><span class="lineNum">     196 </span>                :<span class="lineCov">          3 :         __transferERC20(</span></a>
+<a name="195"><span class="lineNum">     195 </span>                :<span class="lineCov">          4 :         __performAutomation(accountNumber, true);</span></a>
+<a name="196"><span class="lineNum">     196 </span>                :<span class="lineCov">          4 :         __transferERC20(</span></a>
 <a name="197"><span class="lineNum">     197 </span>                :            :             s_duh,</a>
 <a name="198"><span class="lineNum">     198 </span>                :            :             address(this),</a>
 <a name="199"><span class="lineNum">     199 </span>                :            :             msg.sender,</a>
 <a name="200"><span class="lineNum">     200 </span>                :            :             IERC20(s_duh).balanceOf(address(this)),</a>
 <a name="201"><span class="lineNum">     201 </span>                :            :             true</a>
 <a name="202"><span class="lineNum">     202 </span>                :            :         );</a>
-<a name="203"><span class="lineNum">     203 </span>                :<span class="lineCov">          3 :         __takeNextBlockNumbers(msg.sender);</span></a>
+<a name="203"><span class="lineNum">     203 </span>                :<span class="lineCov">          4 :         __takeNextBlockNumbers(msg.sender);</span></a>
 <a name="204"><span class="lineNum">     204 </span>                :            : </a>
-<a name="205"><span class="lineNum">     205 </span>                :<span class="lineCov">          3 :         emit AutomationDone(</span></a>
+<a name="205"><span class="lineNum">     205 </span>                :<span class="lineCov">          4 :         emit AutomationDone(</span></a>
 <a name="206"><span class="lineNum">     206 </span>                :            :             accountNumber,</a>
 <a name="207"><span class="lineNum">     207 </span>                :            :             account.user,</a>
 <a name="208"><span class="lineNum">     208 </span>                :            :             account.automatedContract</a>
@@ -287,26 +287,26 @@
 <a name="216"><span class="lineNum">     216 </span>                :            :     function triggerBatchAutomation(</a>
 <a name="217"><span class="lineNum">     217 </span>                :            :         uint256[] calldata accountNumbers</a>
 <a name="218"><span class="lineNum">     218 </span>                :            :     ) external override(IAutomationLayer) {</a>
-<a name="219"><span class="lineNum">     219 </span>                :<span class="lineCov">          5 :         __nonReentrant();</span></a>
-<a name="220"><span class="lineNum">     220 </span>                :<span class="lineCov">          5 :         __whenNotPaused();</span></a>
-<a name="221"><span class="lineNum">     221 </span>                :<span class="lineCov">          4 :         __hasSufficientTokens();</span></a>
-<a name="222"><span class="lineNum">     222 </span>                :<span class="lineCov">          3 :         __isCurrentNode();</span></a>
+<a name="219"><span class="lineNum">     219 </span>                :<span class="lineCov">          6 :         __nonReentrant();</span></a>
+<a name="220"><span class="lineNum">     220 </span>                :<span class="lineCov">          6 :         __whenNotPaused();</span></a>
+<a name="221"><span class="lineNum">     221 </span>                :<span class="lineCov">          5 :         __hasSufficientTokens();</span></a>
+<a name="222"><span class="lineNum">     222 </span>                :<span class="lineCov">          4 :         __isCurrentNode();</span></a>
 <a name="223"><span class="lineNum">     223 </span>                :            : </a>
-<a name="224"><span class="lineNum">     224 </span>                :<span class="lineCov">          2 :         bool[] memory success = new bool[](accountNumbers.length);</span></a>
-<a name="225"><span class="lineNum">     225 </span>                :<span class="lineCov">          2 :         for (uint256 ii = 0; ii &lt; accountNumbers.length; ++ii) {</span></a>
-<a name="226"><span class="lineNum">     226 </span>                :<span class="lineCov">          8 :             success[ii] = __performAutomation(accountNumbers[ii], false);</span></a>
+<a name="224"><span class="lineNum">     224 </span>                :<span class="lineCov">          3 :         bool[] memory success = new bool[](accountNumbers.length);</span></a>
+<a name="225"><span class="lineNum">     225 </span>                :<span class="lineCov">          3 :         for (uint256 ii = 0; ii &lt; accountNumbers.length; ++ii) {</span></a>
+<a name="226"><span class="lineNum">     226 </span>                :<span class="lineCov">         12 :             success[ii] = __performAutomation(accountNumbers[ii], false);</span></a>
 <a name="227"><span class="lineNum">     227 </span>                :            :         }</a>
 <a name="228"><span class="lineNum">     228 </span>                :            : </a>
-<a name="229"><span class="lineNum">     229 </span>                :<span class="lineCov">          2 :         __transferERC20(</span></a>
+<a name="229"><span class="lineNum">     229 </span>                :<span class="lineCov">          3 :         __transferERC20(</span></a>
 <a name="230"><span class="lineNum">     230 </span>                :            :             s_duh,</a>
 <a name="231"><span class="lineNum">     231 </span>                :            :             address(this),</a>
 <a name="232"><span class="lineNum">     232 </span>                :            :             msg.sender,</a>
 <a name="233"><span class="lineNum">     233 </span>                :            :             IERC20(s_duh).balanceOf(address(this)),</a>
 <a name="234"><span class="lineNum">     234 </span>                :            :             true</a>
 <a name="235"><span class="lineNum">     235 </span>                :            :         );</a>
-<a name="236"><span class="lineNum">     236 </span>                :<span class="lineCov">          2 :         __takeNextBlockNumbers(msg.sender);</span></a>
+<a name="236"><span class="lineNum">     236 </span>                :<span class="lineCov">          3 :         __takeNextBlockNumbers(msg.sender);</span></a>
 <a name="237"><span class="lineNum">     237 </span>                :            : </a>
-<a name="238"><span class="lineNum">     238 </span>                :<span class="lineCov">          2 :         emit BatchAutomationDone(msg.sender, accountNumbers, success);</span></a>
+<a name="238"><span class="lineNum">     238 </span>                :<span class="lineCov">          3 :         emit BatchAutomationDone(msg.sender, accountNumbers, success);</span></a>
 <a name="239"><span class="lineNum">     239 </span>                :            :     }</a>
 <a name="240"><span class="lineNum">     240 </span>                :            : </a>
 <a name="241"><span class="lineNum">     241 </span>                :            :     /** @dev Added nonReentrant and whenNotPaused third party modifiers. Only allowed callers</a>
@@ -363,13 +363,13 @@
 <a name="292"><span class="lineNum">     292 </span>                :            :     function setSequencerAddress(</a>
 <a name="293"><span class="lineNum">     293 </span>                :            :         address sequencerAddress</a>
 <a name="294"><span class="lineNum">     294 </span>                :            :     ) external override(IAutomationLayer) {</a>
-<a name="295"><span class="lineNum">     295 </span>                :<span class="lineCov">          8 :         __nonReentrant();</span></a>
-<a name="296"><span class="lineNum">     296 </span>                :<span class="lineCov">          8 :         __whenNotPaused();</span></a>
-<a name="297"><span class="lineNum">     297 </span>                :<span class="lineCov">          7 :         __onlyAllowed();</span></a>
+<a name="295"><span class="lineNum">     295 </span>                :<span class="lineCov">          9 :         __nonReentrant();</span></a>
+<a name="296"><span class="lineNum">     296 </span>                :<span class="lineCov">          9 :         __whenNotPaused();</span></a>
+<a name="297"><span class="lineNum">     297 </span>                :<span class="lineCov">          8 :         __onlyAllowed();</span></a>
 <a name="298"><span class="lineNum">     298 </span>                :            : </a>
-<a name="299"><span class="lineNum">     299 </span>                :<span class="lineCov">          6 :         s_sequencerAddress = sequencerAddress;</span></a>
+<a name="299"><span class="lineNum">     299 </span>                :<span class="lineCov">          7 :         s_sequencerAddress = sequencerAddress;</span></a>
 <a name="300"><span class="lineNum">     300 </span>                :            : </a>
-<a name="301"><span class="lineNum">     301 </span>                :<span class="lineCov">          6 :         emit SequencerAddressSet(msg.sender, sequencerAddress);</span></a>
+<a name="301"><span class="lineNum">     301 </span>                :<span class="lineCov">          7 :         emit SequencerAddressSet(msg.sender, sequencerAddress);</span></a>
 <a name="302"><span class="lineNum">     302 </span>                :            :     }</a>
 <a name="303"><span class="lineNum">     303 </span>                :            : </a>
 <a name="304"><span class="lineNum">     304 </span>                :            :     /** @dev Added nonReentrant and whenNotPaused third party modifiers. Only allowed callers</a>
@@ -433,10 +433,10 @@
 <a name="362"><span class="lineNum">     362 </span>                :            :         uint256 accountNumber,</a>
 <a name="363"><span class="lineNum">     363 </span>                :            :         bool revert_</a>
 <a name="364"><span class="lineNum">     364 </span>                :            :     ) private returns (bool) {</a>
-<a name="365"><span class="lineNum">     365 </span>                :<span class="lineCov">         11 :         Account memory account = s_accounts[accountNumber];</span></a>
+<a name="365"><span class="lineNum">     365 </span>                :<span class="lineCov">         16 :         Account memory account = s_accounts[accountNumber];</span></a>
 <a name="366"><span class="lineNum">     366 </span>                :            : </a>
-<a name="367"><span class="lineNum">     367 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchCov" title="Branch 1 was taken 11 times"> + </span>]:<span class="lineCov">         11 :         if (__isValidAccount(account.status)) {</span></a>
-<a name="368"><span class="lineNum">     368 </span>                :<span class="lineCov">         11 :             (bool success, ) = account.automatedContract.call(</span></a>
+<a name="367"><span class="lineNum">     367 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchCov" title="Branch 1 was taken 16 times"> + </span>]:<span class="lineCov">         16 :         if (__isValidAccount(account.status)) {</span></a>
+<a name="368"><span class="lineNum">     368 </span>                :<span class="lineCov">         16 :             (bool success, ) = account.automatedContract.call(</span></a>
 <a name="369"><span class="lineNum">     369 </span>                :            :                 abi.encodeWithSelector(</a>
 <a name="370"><span class="lineNum">     370 </span>                :            :                     IAutomatedContract(account.automatedContract)</a>
 <a name="371"><span class="lineNum">     371 </span>                :            :                         .trigger</a>
@@ -445,11 +445,11 @@
 <a name="374"><span class="lineNum">     374 </span>                :            :                 )</a>
 <a name="375"><span class="lineNum">     375 </span>                :            :             );</a>
 <a name="376"><span class="lineNum">     376 </span>                :            : </a>
-<a name="377"><span class="lineNum">     377 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchCov" title="Branch 1 was taken 11 times"> + </span>]:<span class="lineCov">         11 :             if (revert_ &amp;&amp; !success) {</span></a>
+<a name="377"><span class="lineNum">     377 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchCov" title="Branch 1 was taken 16 times"> + </span>]:<span class="lineCov">         16 :             if (revert_ &amp;&amp; !success) {</span></a>
 <a name="378"><span class="lineNum">     378 </span>                :<span class="lineNoCov">          0 :                 revert AutomationLayer__AutomationFailed();</span></a>
 <a name="379"><span class="lineNum">     379 </span>                :            :             }</a>
 <a name="380"><span class="lineNum">     380 </span>                :            : </a>
-<a name="381"><span class="lineNum">     381 </span>                :<span class="lineCov">         11 :             return success;</span></a>
+<a name="381"><span class="lineNum">     381 </span>                :<span class="lineCov">         16 :             return success;</span></a>
 <a name="382"><span class="lineNum">     382 </span>                :            :         }</a>
 <a name="383"><span class="lineNum">     383 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineNoCov">          0 :         if (revert_) {</span></a>
 <a name="384"><span class="lineNum">     384 </span>                :<span class="lineNoCov">          0 :             revert AutomationLayer__InvalidAccountNumber();</span></a>
@@ -461,14 +461,14 @@
 <a name="390"><span class="lineNum">     390 </span>                :            :      *  @param nodeAddress: the address of the node.</a>
 <a name="391"><span class="lineNum">     391 </span>                :            :      */</a>
 <a name="392"><span class="lineNum">     392 </span>                :            :     function __takeNextBlockNumbers(address nodeAddress) private {</a>
-<a name="393"><span class="lineNum">     393 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineCov">          5 :         if (s_sequencerAddress != address(0)) {</span></a>
-<a name="394"><span class="lineNum">     394 </span>                :<span class="lineCov">          4 :             INodeSequencer sequencer = INodeSequencer(s_sequencerAddress);</span></a>
-<a name="395"><span class="lineNum">     395 </span>                :<span class="lineCov">          4 :             uint256 nodeEndBlockNumber = sequencer</span></a>
+<a name="393"><span class="lineNum">     393 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">          7 :         if (s_sequencerAddress != address(0)) {</span></a>
+<a name="394"><span class="lineNum">     394 </span>                :<span class="lineCov">          6 :             INodeSequencer sequencer = INodeSequencer(s_sequencerAddress);</span></a>
+<a name="395"><span class="lineNum">     395 </span>                :<span class="lineCov">          6 :             uint256 nodeEndBlockNumber = sequencer</span></a>
 <a name="396"><span class="lineNum">     396 </span>                :            :                 .getNode(nodeAddress)</a>
 <a name="397"><span class="lineNum">     397 </span>                :            :                 .endBlockNumber;</a>
 <a name="398"><span class="lineNum">     398 </span>                :            : </a>
-<a name="399"><span class="lineNum">     399 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchNoExec" title="Branch 1 was not executed"> # </span>]:<span class="lineCov">          4 :             if (block.number == nodeEndBlockNumber) {</span></a>
-<a name="400"><span class="lineNum">     400 </span>                :<span class="lineNoCov">          0 :                 sequencer.takeNextBlockNumbers(nodeAddress);</span></a>
+<a name="399"><span class="lineNum">     399 </span>        [<span class="branchNoExec" title="Branch 0 was not executed"> # </span><span class="branchCov" title="Branch 1 was taken 2 times"> + </span>]:<span class="lineCov">          6 :             if (block.number == nodeEndBlockNumber) {</span></a>
+<a name="400"><span class="lineNum">     400 </span>                :<span class="lineCov">          2 :                 sequencer.takeNextBlockNumbers(nodeAddress);</span></a>
 <a name="401"><span class="lineNum">     401 </span>                :            :             }</a>
 <a name="402"><span class="lineNum">     402 </span>                :            :         }</a>
 <a name="403"><span class="lineNum">     403 </span>                :            :     }</a>
@@ -503,7 +503,7 @@
 <a name="432"><span class="lineNum">     432 </span>                :            :     function getAccount(</a>
 <a name="433"><span class="lineNum">     433 </span>                :            :         uint256 accountNumber</a>
 <a name="434"><span class="lineNum">     434 </span>                :            :     ) external view override(IAutomationLayer) returns (Account memory) {</a>
-<a name="435"><span class="lineNum">     435 </span>                :<span class="lineCov">         14 :         return s_accounts[accountNumber];</span></a>
+<a name="435"><span class="lineNum">     435 </span>                :<span class="lineCov">         18 :         return s_accounts[accountNumber];</span></a>
 <a name="436"><span class="lineNum">     436 </span>                :            :     }</a>
 <a name="437"><span class="lineNum">     437 </span>                :            : </a>
 <a name="438"><span class="lineNum">     438 </span>                :            :     /// @inheritdoc IAutomationLayer</a>
@@ -513,7 +513,7 @@
 <a name="442"><span class="lineNum">     442 </span>                :            :         override(IAutomationLayer)</a>
 <a name="443"><span class="lineNum">     443 </span>                :            :         returns (uint256)</a>
 <a name="444"><span class="lineNum">     444 </span>                :            :     {</a>
-<a name="445"><span class="lineNum">     445 </span>                :<span class="lineCov">         19 :         return s_nextAccountNumber;</span></a>
+<a name="445"><span class="lineNum">     445 </span>                :<span class="lineCov">         21 :         return s_nextAccountNumber;</span></a>
 <a name="446"><span class="lineNum">     446 </span>                :            :     }</a>
 <a name="447"><span class="lineNum">     447 </span>                :            : </a>
 <a name="448"><span class="lineNum">     448 </span>                :            :     /// @inheritdoc IAutomationLayer</a>
@@ -523,7 +523,7 @@
 <a name="452"><span class="lineNum">     452 </span>                :            :         override(IAutomationLayer)</a>
 <a name="453"><span class="lineNum">     453 </span>                :            :         returns (address)</a>
 <a name="454"><span class="lineNum">     454 </span>                :            :     {</a>
-<a name="455"><span class="lineNum">     455 </span>                :<span class="lineCov">         52 :         return s_duh;</span></a>
+<a name="455"><span class="lineNum">     455 </span>                :<span class="lineCov">         56 :         return s_duh;</span></a>
 <a name="456"><span class="lineNum">     456 </span>                :            :     }</a>
 <a name="457"><span class="lineNum">     457 </span>                :            : </a>
 <a name="458"><span class="lineNum">     458 </span>                :            :     /// @inheritdoc IAutomationLayer</a>
@@ -533,7 +533,7 @@
 <a name="462"><span class="lineNum">     462 </span>                :            :         override(IAutomationLayer)</a>
 <a name="463"><span class="lineNum">     463 </span>                :            :         returns (uint256)</a>
 <a name="464"><span class="lineNum">     464 </span>                :            :     {</a>
-<a name="465"><span class="lineNum">     465 </span>                :<span class="lineCov">         52 :         return s_minimumDuh;</span></a>
+<a name="465"><span class="lineNum">     465 </span>                :<span class="lineCov">         56 :         return s_minimumDuh;</span></a>
 <a name="466"><span class="lineNum">     466 </span>                :            :     }</a>
 <a name="467"><span class="lineNum">     467 </span>                :            : </a>
 <a name="468"><span class="lineNum">     468 </span>                :            :     /// @inheritdoc IAutomationLayer</a>
@@ -543,7 +543,7 @@
 <a name="472"><span class="lineNum">     472 </span>                :            :         override(IAutomationLayer)</a>
 <a name="473"><span class="lineNum">     473 </span>                :            :         returns (address)</a>
 <a name="474"><span class="lineNum">     474 </span>                :            :     {</a>
-<a name="475"><span class="lineNum">     475 </span>                :<span class="lineCov">          5 :         return s_sequencerAddress;</span></a>
+<a name="475"><span class="lineNum">     475 </span>                :<span class="lineCov">          4 :         return s_sequencerAddress;</span></a>
 <a name="476"><span class="lineNum">     476 </span>                :            :     }</a>
 <a name="477"><span class="lineNum">     477 </span>                :            : </a>
 <a name="478"><span class="lineNum">     478 </span>                :            :     /// @inheritdoc IAutomationLayer</a>
@@ -553,7 +553,7 @@
 <a name="482"><span class="lineNum">     482 </span>                :            :         override(IAutomationLayer)</a>
 <a name="483"><span class="lineNum">     483 </span>                :            :         returns (uint256)</a>
 <a name="484"><span class="lineNum">     484 </span>                :            :     {</a>
-<a name="485"><span class="lineNum">     485 </span>                :<span class="lineCov">         14 :         return s_automationFee;</span></a>
+<a name="485"><span class="lineNum">     485 </span>                :<span class="lineCov">         29 :         return s_automationFee;</span></a>
 <a name="486"><span class="lineNum">     486 </span>                :            :     }</a>
 <a name="487"><span class="lineNum">     487 </span>                :            : </a>
 <a name="488"><span class="lineNum">     488 </span>                :            :     /// @inheritdoc IAutomationLayer</a>
@@ -580,8 +580,8 @@
 <a name="509"><span class="lineNum">     509 </span>                :            :     function prospectPayment(</a>
 <a name="510"><span class="lineNum">     510 </span>                :            :         uint256 accountNumber</a>
 <a name="511"><span class="lineNum">     511 </span>                :            :     ) external view override(IAutomationLayer) returns (uint256) {</a>
-<a name="512"><span class="lineNum">     512 </span>                :<span class="lineNoCov">          0 :         Account memory account = s_accounts[accountNumber];</span></a>
-<a name="513"><span class="lineNum">     513 </span>                :<span class="lineNoCov">          0 :         return</span></a>
+<a name="512"><span class="lineNum">     512 </span>                :<span class="lineCov">          1 :         Account memory account = s_accounts[accountNumber];</span></a>
+<a name="513"><span class="lineNum">     513 </span>                :<span class="lineCov">          1 :         return</span></a>
 <a name="514"><span class="lineNum">     514 </span>                :            :             IAutomatedContract(account.automatedContract)</a>
 <a name="515"><span class="lineNum">     515 </span>                :            :                 .prospectAutomationPayment(account.id);</a>
 <a name="516"><span class="lineNum">     516 </span>                :            :     }</a>
@@ -590,10 +590,10 @@
 <a name="519"><span class="lineNum">     519 </span>                :            :     function prospectPaymentBatch(</a>
 <a name="520"><span class="lineNum">     520 </span>                :            :         uint256[] calldata accountNumbers</a>
 <a name="521"><span class="lineNum">     521 </span>                :            :     ) external view override(IAutomationLayer) returns (uint256 payment) {</a>
-<a name="522"><span class="lineNum">     522 </span>                :<span class="lineNoCov">          0 :         Account memory account;</span></a>
-<a name="523"><span class="lineNum">     523 </span>                :<span class="lineNoCov">          0 :         for (uint256 ii; ii &lt; accountNumbers.length; ++ii) {</span></a>
-<a name="524"><span class="lineNum">     524 </span>                :<span class="lineNoCov">          0 :             account = s_accounts[accountNumbers[ii]];</span></a>
-<a name="525"><span class="lineNum">     525 </span>                :<span class="lineNoCov">          0 :             payment += IAutomatedContract(account.automatedContract)</span></a>
+<a name="522"><span class="lineNum">     522 </span>                :<span class="lineCov">          1 :         Account memory account;</span></a>
+<a name="523"><span class="lineNum">     523 </span>                :<span class="lineCov">          1 :         for (uint256 ii; ii &lt; accountNumbers.length; ++ii) {</span></a>
+<a name="524"><span class="lineNum">     524 </span>                :<span class="lineCov">          4 :             account = s_accounts[accountNumbers[ii]];</span></a>
+<a name="525"><span class="lineNum">     525 </span>                :<span class="lineCov">          4 :             payment += IAutomatedContract(account.automatedContract)</span></a>
 <a name="526"><span class="lineNum">     526 </span>                :            :                 .prospectAutomationPayment(account.id);</a>
 <a name="527"><span class="lineNum">     527 </span>                :            :         }</a>
 <a name="528"><span class="lineNum">     528 </span>                :            :     }</a>
@@ -607,7 +607,7 @@
 <a name="536"><span class="lineNum">     536 </span>                :            :      *  @return bool true if account is valid, false otherwise.</a>
 <a name="537"><span class="lineNum">     537 </span>                :            :      */</a>
 <a name="538"><span class="lineNum">     538 </span>                :            :     function __isValidAccount(Status status) private pure returns (bool) {</a>
-<a name="539"><span class="lineNum">     539 </span>                :<span class="lineCov">         29 :         return status == Status.SET;</span></a>
+<a name="539"><span class="lineNum">     539 </span>                :<span class="lineCov">         34 :         return status == Status.SET;</span></a>
 <a name="540"><span class="lineNum">     540 </span>                :            :     }</a>
 <a name="541"><span class="lineNum">     541 </span>                :            : }</a>
 </pre>

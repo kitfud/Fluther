@@ -58,13 +58,6 @@ contract AutomationLayer is IAutomationLayer, Security {
         }
     }
 
-    /// @dev checks if caller is oracle.
-    function __onlyOracle() private view {
-        if (msg.sender != s_oracleAddress) {
-            revert AutomationLayer__CallerNotOracle();
-        }
-    }
-
     /// @dev checks if node has sufficient DUH tokens.
     function __hasSufficientTokens() private view {
         if (IERC20(s_duh).balanceOf(msg.sender) < s_minimumDuh) {
@@ -326,7 +319,7 @@ contract AutomationLayer is IAutomationLayer, Security {
     ) external override(IAutomationLayer) {
         __nonReentrant();
         __whenNotPaused();
-        __onlyOracle();
+        __onlyAllowed();
 
         s_automationFee = automationFee;
 

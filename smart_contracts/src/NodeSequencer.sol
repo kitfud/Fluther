@@ -79,7 +79,7 @@ contract NodeSequencer is INodeSequencer, Security {
      *  @param node: the address of the node.
      */
     function __checkNodeBlockNumberRange(address node) private view {
-        if (!(s_nodes[node].endBlockNumber < block.number)) {
+        if (s_nodes[node].endBlockNumber > block.number) {
             revert NodeSequencer__NodeCannotTakeBlockNumbers();
         }
     }
