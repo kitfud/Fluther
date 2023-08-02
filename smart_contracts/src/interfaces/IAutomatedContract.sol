@@ -32,11 +32,19 @@ interface IAutomatedContract {
     /** @notice triggers a recurring buy.
      *  @param id: recurring buy ID.
      */
-    function simpleAutomation(uint256 id) external;
+    function trigger(uint256 id) external;
 
     /** @notice checks if a recurring buy is ready to be triggered.
      *  @param id: recurring buy ID.
      *  @return boolean value that specifies if the recurring buy is ready to be triggered (true) or not (false)
      */
-    function checkSimpleAutomation(uint256 id) external view returns (bool);
+    function checkTrigger(uint256 id) external view returns (bool);
+
+    /** @notice calculates the payment prospect for automation.
+     *  @param recurringBuyId: ID of the recurring buy.
+     *  @return uint256 value for the payment.
+     */
+    function prospectAutomationPayment(
+        uint256 recurringBuyId
+    ) external view returns (uint256);
 }

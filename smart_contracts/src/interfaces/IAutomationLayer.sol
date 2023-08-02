@@ -39,6 +39,15 @@ interface IAutomationLayer {
     /// @dev error for when the contract is not accepting the creation of new accounts.
     error AutomationLayer__NotAccpetingNewAccounts();
 
+    /// @dev error for when the simple automation process fails.
+    error AutomationLayer__AutomationFailed();
+
+    /// @dev error for when given address is address(0).
+    error AutomationLayer__InvalidAddress();
+
+    /// @dev error for when there is no liquidity pair for given ERC20 tokens.
+    error AutomationLayer__NoLiquidityPair();
+
     /// -----------------------------------------------------------------------
     /// Type declarations (structs and enums)
     /// -----------------------------------------------------------------------
@@ -98,7 +107,7 @@ interface IAutomationLayer {
      *  @param user: user address.
      *  @param automatedContract: smart contract address that had a operation automated.
      */
-    event TransactionSuccess(
+    event AutomationDone(
         uint256 indexed accountNumber,
         address indexed user,
         address indexed automatedContract
@@ -140,15 +149,28 @@ interface IAutomationLayer {
         bool acceptingNewAccounts
     );
 
-    /** @dev event for when a new node is set.
+    /** @dev event for when a new address for the DUH token is set.
      *  @param caller: address of the function caller.
-     *  @param node: node address.
-     *  @param isNodeRegistered: value that specifies if node is registered (true) or not (false).
+     *  @param duh: new address for the DUH token.
      */
-    event NodeSet(
-        address indexed caller,
+    event DuhTokenSet(address indexed caller, address indexed duh);
+
+    /** @dev event for when a new value for the minimum DUH balance required to automate is set.
+     *  @param caller: address of the function caller.
+     *  @param minimumDuh: new value for the minimum balance of DUH.
+     */
+    event MinimumDuhSet(address indexed caller, uint256 minimumDuh);
+
+    /** @dev event for when simple automation in batch is done.
+     *  @param node: node address of the function caller.
+     *  @param accountNumbers: array of account numbers.
+     *  @param success: array of booleans that specificies if the simple automation for the account number
+     *  was successful (true) or not (false).
+     */
+    event BatchAutomationDone(
         address indexed node,
-        bool isNodeRegistered
+        uint256[] accountNumbers,
+        bool[] success
     );
 
     /// -----------------------------------------------------------------------
@@ -175,18 +197,27 @@ interface IAutomationLayer {
     /** @notice triggers a simple automation operation.
      *  @param accountNumber: number of the account.
      */
-    function simpleAutomation(uint256 accountNumber) external;
+    function triggerAutomation(uint256 accountNumber) external;
+
+    /** @notice perform simple automation in batch.
+     *  @param accountNumbers: array numbers of accounts.
+     */
+    function triggerBatchAutomation(uint256[] calldata accountNumbers) external;
 
     /** @notice withdraws the given amount to owner account.
      *  @param amount: amount to withdraw.
      */
     function withdraw(uint256 amount) external;
 
-    /** @notice pauses the smart contract so that any function won't work. */
-    function pause() external;
+    /** @notice sets new address for the DUH token.
+     *  @param duh: new address of DUH.
+     */
+    function setDuh(address duh) external;
 
-    /** @notice unpauses the smart contract so that every function will work. */
-    function unpause() external;
+    /** @notice sets new minimum DUH amount to automate.
+     *  @param minimumDuh: new minimum DUH amount to automate.
+     */
+    function setMinimumDuh(uint256 minimumDuh) external;
 
     /** @notice sets a new node sequencer address.
      *  @param sequencerAddress: address of the node sequencer.
@@ -209,17 +240,13 @@ interface IAutomationLayer {
      */
     function setAcceptingNewAccounts(bool acceptingNewAccounts) external;
 
-    /** @notice sets registry for given node address.
-     *  @param node: address of the node.
-     *  @param isNodeRegistered: true to set node as registered, false otherwise.
-     */
-    function setNode(address node, bool isNodeRegistered) external;
-
     /** @notice checks if given account number has an operation that can be triggered.
      *  @param accountNumber: number of the account.
+     *  @param node: node address.
      */
-    function checkSimpleAutomation(
-        uint256 accountNumber
+    function checkAutomation(
+        uint256 accountNumber,
+        address node
     ) external view returns (bool);
 
     /** @notice reads an entry of the accounts storage mapping.
@@ -229,12 +256,6 @@ interface IAutomationLayer {
     function getAccount(
         uint256 accountNumber
     ) external view returns (Account memory);
-
-    /** @notice gets if the given node address is registered in the automaiton contract.
-     *  @param node: node address.
-     *  @return bool that specifies if given address is a registered node (true) or not (false).
-     */
-    function getIsNodeRegistered(address node) external view returns (bool);
 
     /** @notice reads nextAccountNumber storage variable.
      *  @return uint256 current value of the nextAccountNumber storage variable.
@@ -249,7 +270,7 @@ interface IAutomationLayer {
     /** @notice reads the minimumDuh storage variable.
      *  @return uint256 value for the current minimumDuh.
      */
-    function getMinimumDug() external view returns (uint256);
+    function getMinimumDuh() external view returns (uint256);
 
     /** @notice reads the sequencerAddress storage variable.
      *  @return address value for the sequencerAddress.
@@ -271,4 +292,20 @@ interface IAutomationLayer {
      *  creation of new accounts (true) or not (false).
      */
     function getAcceptingNewAccounts() external view returns (bool);
+
+    /** @notice calculates a prospect for automation payment.
+     *  @param accountNumber: number of account.
+     *  @return uint256 value for the payment prospect.
+     */
+    function prospectPayment(
+        uint256 accountNumber
+    ) external view returns (uint256);
+
+    /** @notice calculates a prospect for automation payment in batch.
+     *  @param accountNumbers: array of numbers of accounts.
+     *  @return payment uint256 value for the payment prospect.
+     */
+    function prospectPaymentBatch(
+        uint256[] calldata accountNumbers
+    ) external view returns (uint256 payment);
 }
