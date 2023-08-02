@@ -21,6 +21,7 @@ contract DollarCostAverageTest is Test {
     address defaultRouter;
     address wrapNative;
     address signer;
+    address duhToken;
 
     address public user = makeAddr("user");
     address public PAYMENT_INTERFACE = makeAddr("userInterface");
@@ -80,10 +81,11 @@ contract DollarCostAverageTest is Test {
         config = deployer.config();
         defaultRouter = deployer.defaultRouter();
 
-        (address wNative, , , , , , , , uint256 deployerPk) = config
+        (address wNative, , address duh, , , , , , uint256 deployerPk) = config
             .activeNetworkConfig();
         wrapNative = wNative;
         signer = vm.addr(deployerPk);
+        duhToken = duh;
 
         vm.deal(user, INITAL_USER_FUNDS);
         if (block.chainid == 11155111) {
@@ -139,7 +141,12 @@ contract DollarCostAverageTest is Test {
                 .DollarCostAverage__InvalidDefaultRouterAddress
                 .selector
         );
-        new DollarCostAverage(defaultRouter_, automationLayer, wrapNative);
+        new DollarCostAverage(
+            defaultRouter_,
+            automationLayer,
+            wrapNative,
+            duhToken
+        );
         vm.stopBroadcast();
     }
 
@@ -153,7 +160,12 @@ contract DollarCostAverageTest is Test {
                 .DollarCostAverage__InvalidAutomationLayerAddress
                 .selector
         );
-        new DollarCostAverage(defaultRouter_, automationLayer, wrapNative);
+        new DollarCostAverage(
+            defaultRouter_,
+            automationLayer,
+            wrapNative,
+            duhToken
+        );
         vm.stopBroadcast();
     }
 
@@ -208,6 +220,7 @@ contract DollarCostAverageTest is Test {
         address[] memory path = new address[](2);
         path[0] = tokenToSpend;
         path[1] = tokenToBuy;
+        uint256 nextRecurringBuyId = dca.getNextRecurringBuyId();
 
         IDollarCostAverage.RecurringBuy memory buy = IDollarCostAverage
             .RecurringBuy(
@@ -221,11 +234,12 @@ contract DollarCostAverageTest is Test {
                 block.timestamp,
                 0,
                 path,
+                1,
                 IDollarCostAverage.Status.SET
             );
 
         vm.expectEmit(true, true, false, true, address(dca));
-        emit RecurringBuyCreated(0, user, buy);
+        emit RecurringBuyCreated(nextRecurringBuyId, user, buy);
 
         vm.prank(user);
         dca.createRecurringBuy(
@@ -427,24 +441,28 @@ contract DollarCostAverageTest is Test {
     }
 
     function testCancelRecurringPaymentRevertsIfInvalidRecurringBuyId() public {
+        uint256 recurringBuyId = dca.getNextRecurringBuyId() - 1;
+
         vm.prank(user);
         vm.expectRevert(
             IDollarCostAverage.DollarCostAverage__InvalidRecurringBuyId.selector
         );
-        dca.cancelRecurringPayment(0);
+        dca.cancelRecurringPayment(recurringBuyId);
     }
 
     function testCancelRecurringPaymentRevertsIfCallerNotSender()
         public
         createRecurringBuy(token1, token2, address(0))
     {
+        uint256 recurringBuyId = dca.getNextRecurringBuyId() - 1;
+
         vm.prank(address(1));
         vm.expectRevert(
             IDollarCostAverage
                 .DollarCostAverage__CallerNotRecurringBuySender
                 .selector
         );
-        dca.cancelRecurringPayment(0);
+        dca.cancelRecurringPayment(recurringBuyId);
     }
 
     function testCancelRecurringBuyRevertsIfContractPaused()
@@ -843,7 +861,7 @@ contract DollarCostAverageTest is Test {
     {
         uint256 nextRecurringBuyId = dca.getNextRecurringBuyId();
 
-        assertEq(nextRecurringBuyId, 1);
+        assertEq(nextRecurringBuyId, 2);
     }
 
     /// -----------------------------------------------------------------------
@@ -1045,7 +1063,7 @@ contract DollarCostAverageTest is Test {
         createRecurringBuy(token1, token2, address(0))
     {
         IDollarCostAverage.RecurringBuy[] memory buys = dca
-            .getRangeOfRecurringBuys(1, 3);
+            .getRangeOfRecurringBuys(2, 4);
 
         assertEq(buys.length, 3);
     }
@@ -1066,7 +1084,7 @@ contract DollarCostAverageTest is Test {
         vm.expectRevert(
             IDollarCostAverage.DollarCostAverage__InvalidIndexRange.selector
         );
-        dca.getRangeOfRecurringBuys(1, 5);
+        dca.getRangeOfRecurringBuys(2, 6);
     }
 
     /// -----------------------------------------------------------------------
@@ -1116,7 +1134,7 @@ contract DollarCostAverageTest is Test {
         vm.expectRevert(
             IDollarCostAverage.DollarCostAverage__InvalidIndexRange.selector
         );
-        dca.getValidRangeOfRecurringBuys(1, 7);
+        dca.getValidRangeOfRecurringBuys(2, 8);
     }
 
     /// -----------------------------------------------------------------------

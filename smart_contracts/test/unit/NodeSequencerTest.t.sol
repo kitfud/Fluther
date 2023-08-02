@@ -87,11 +87,12 @@ contract NodeSequencerTest is Test {
         duhToken = deployer.duh();
         timePeriodForNode = deployer.timePeriodForNode();
 
-        (address wNative, , , , , , , , uint256 deployerPk) = config
+        (address wNative, , address duh, , , , , , uint256 deployerPk) = config
             .activeNetworkConfig();
 
         signer = vm.addr(deployerPk);
         vm.deal(user, INITIAL_USER_FUNDS);
+        duhToken = address(duhToken) == address(0) ? Duh(duh) : duhToken;
 
         if (block.chainid == 11155111) {
             vm.prank(user);

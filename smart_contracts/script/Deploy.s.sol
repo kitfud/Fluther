@@ -9,10 +9,10 @@ import {HelperConfig} from "./HelperConfig.s.sol";
 import {Duh} from "../src/Duh.sol";
 
 contract Deploy is Script {
-    bool public constant DEPLOY_DUH = false;
-    bool public constant DEPLOY_DCA = false;
+    bool public constant DEPLOY_DUH = true;
+    bool public constant DEPLOY_DCA = true;
     bool public constant DEPLOY_AUTOMATION = true;
-    bool public constant DEPLOY_SEQUENCER = false;
+    bool public constant DEPLOY_SEQUENCER = true;
 
     AutomationLayer public automation;
     DollarCostAverage public dca;
@@ -70,7 +70,8 @@ contract Deploy is Script {
             dca = new DollarCostAverage(
                 defaultRouter,
                 address(automation),
-                wrapNative
+                wrapNative,
+                address(duh) == address(0) ? duhToken : address(duh)
             );
         }
         vm.stopBroadcast();
