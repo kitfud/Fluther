@@ -352,14 +352,15 @@ const action = (
   return (
     <>
       {/* {address?console.log(address):null} */}
-
       <Particles
         id="particles_stuff"
         options={particlesOptions}
         init={particlesInit}
       />
+    
       
       <ThemeProvider theme={theme}>
+    
         {/*
       HAD TO MOVE CONNECT WALLET BUTTON INSIDE GRID OR YOU WOULDN'T BE ABLE TO CLICK IT WITH TSPARTICLES BACKGROUND FOR SOME REASON.
 
