@@ -940,6 +940,9 @@ contract AutomationLayerTest is Test {
 
         uint256 autoFeeBefore = automation.getAutomationFee();
 
+        vm.prank(signer);
+        automation.setAllowed(oracleAddress, true);
+
         vm.prank(oracleAddress);
         automation.setAutomationFee(newAutoFee);
 
@@ -953,6 +956,9 @@ contract AutomationLayerTest is Test {
         address oracleAddress = automation.getOracleAddress();
         uint256 newAutoFee = 0.1 ether;
 
+        vm.prank(signer);
+        automation.setAllowed(oracleAddress, true);
+
         vm.prank(oracleAddress);
         vm.expectEmit(true, false, false, true, address(automation));
         emit AutomationFeeSet(oracleAddress, newAutoFee);
@@ -963,9 +969,7 @@ contract AutomationLayerTest is Test {
         uint256 newAutoFee = 0.1 ether;
 
         vm.prank(user);
-        vm.expectRevert(
-            IAutomationLayer.AutomationLayer__CallerNotOracle.selector
-        );
+        vm.expectRevert(Security.Security__NotAllowed.selector);
         automation.setAutomationFee(newAutoFee);
     }
 

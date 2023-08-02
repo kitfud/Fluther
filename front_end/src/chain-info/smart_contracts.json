@@ -16,7 +16,7 @@
     },
     "DollarCostAverage": {
         "address": {
-            "sepolia": "0xC4489B5A85d5DcDb8a9FE98725Dd7BB09EC0213C"
+            "sepolia": "0x33e6961eDc112C0213B70c17ad01AD6Ae9E09A96"
         },
         "abi": [
             {
@@ -33,7 +33,12 @@
                     },
                     {
                         "internalType": "address",
-                        "name": "_wrapNative",
+                        "name": "wrapNative",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "duh",
                         "type": "address"
                     }
                 ],
@@ -188,6 +193,25 @@
                         "type": "address"
                     },
                     {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "contractFeeShare",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "ContractFeeShareSet",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "caller",
+                        "type": "address"
+                    },
+                    {
                         "indexed": true,
                         "internalType": "address",
                         "name": "defaultRouter",
@@ -195,6 +219,44 @@
                     }
                 ],
                 "name": "DefaultRouterSet",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "caller",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "duh",
+                        "type": "address"
+                    }
+                ],
+                "name": "DuhTokenSet",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "caller",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "fee",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "FeeSet",
                 "type": "event"
             },
             {
@@ -341,6 +403,11 @@
                                 "type": "address[]"
                             },
                             {
+                                "internalType": "uint256",
+                                "name": "index",
+                                "type": "uint256"
+                            },
+                            {
                                 "internalType": "enum IDollarCostAverage.Status",
                                 "name": "status",
                                 "type": "uint8"
@@ -353,6 +420,25 @@
                     }
                 ],
                 "name": "RecurringBuyCreated",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "caller",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "slippagePercentage",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "SlippagePercentageSet",
                 "type": "event"
             },
             {
@@ -485,6 +571,19 @@
             },
             {
                 "inputs": [],
+                "name": "getContractFeeShare",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
                 "name": "getCurrentBlockTimestamp",
                 "outputs": [
                     {
@@ -504,6 +603,32 @@
                         "internalType": "address",
                         "name": "",
                         "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getDuh",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getFee",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
                     }
                 ],
                 "stateMutability": "view",
@@ -590,6 +715,11 @@
                                 "type": "address[]"
                             },
                             {
+                                "internalType": "uint256",
+                                "name": "index",
+                                "type": "uint256"
+                            },
+                            {
                                 "internalType": "enum IDollarCostAverage.Status",
                                 "name": "status",
                                 "type": "uint8"
@@ -666,6 +796,11 @@
                                 "type": "address[]"
                             },
                             {
+                                "internalType": "uint256",
+                                "name": "index",
+                                "type": "uint256"
+                            },
+                            {
                                 "internalType": "enum IDollarCostAverage.Status",
                                 "name": "status",
                                 "type": "uint8"
@@ -674,6 +809,38 @@
                         "internalType": "struct IDollarCostAverage.RecurringBuy",
                         "name": "",
                         "type": "tuple"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "sender",
+                        "type": "address"
+                    }
+                ],
+                "name": "getSenderToIds",
+                "outputs": [
+                    {
+                        "internalType": "uint256[]",
+                        "name": "",
+                        "type": "uint256[]"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getSlippagePercentage",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
                     }
                 ],
                 "stateMutability": "view",
@@ -745,6 +912,11 @@
                                 "internalType": "address[]",
                                 "name": "path",
                                 "type": "address[]"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "index",
+                                "type": "uint256"
                             },
                             {
                                 "internalType": "enum IDollarCostAverage.Status",
@@ -826,6 +998,25 @@
                 "type": "function"
             },
             {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "recurringBuyId",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "prospectAutomationPayment",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
                 "inputs": [],
                 "name": "renounceOwnership",
                 "outputs": [],
@@ -879,12 +1070,64 @@
             {
                 "inputs": [
                     {
+                        "internalType": "uint256",
+                        "name": "contractFeeShare",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "setContractFeeShare",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
                         "internalType": "address",
                         "name": "defaultRouter",
                         "type": "address"
                     }
                 ],
                 "name": "setDefaultRouter",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "duh",
+                        "type": "address"
+                    }
+                ],
+                "name": "setDuh",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "fee",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "setFee",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "slippagePercentage",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "setSlippagePercentage",
                 "outputs": [],
                 "stateMutability": "nonpayable",
                 "type": "function"
@@ -926,7 +1169,7 @@
     },
     "AutomationLayer": {
         "address": {
-            "sepolia": "0x4B5c46a52e5C15D6c5A0552DeB082500C680a497"
+            "sepolia": "0x5D2d865CE8E16aEaAe7671B0Ef5f0892301d1783"
         },
         "abi": [
             {
@@ -967,17 +1210,17 @@
             },
             {
                 "inputs": [],
-                "name": "AutomationLayer__CallerNotOracle",
-                "type": "error"
-            },
-            {
-                "inputs": [],
                 "name": "AutomationLayer__InvalidAccountNumber",
                 "type": "error"
             },
             {
                 "inputs": [],
                 "name": "AutomationLayer__InvalidAddress",
+                "type": "error"
+            },
+            {
+                "inputs": [],
+                "name": "AutomationLayer__NoLiquidityPair",
                 "type": "error"
             },
             {
@@ -998,11 +1241,6 @@
             {
                 "inputs": [],
                 "name": "AutomationLayer__OriginNotNode",
-                "type": "error"
-            },
-            {
-                "inputs": [],
-                "name": "AutomationLayer__UserDoesNotHaveEnoughBalanceAndOrAllowance",
                 "type": "error"
             },
             {
@@ -1574,6 +1812,44 @@
                 "type": "function"
             },
             {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "accountNumber",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "prospectPayment",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256[]",
+                        "name": "accountNumbers",
+                        "type": "uint256[]"
+                    }
+                ],
+                "name": "prospectPaymentBatch",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "payment",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
                 "inputs": [],
                 "name": "renounceOwnership",
                 "outputs": [],
@@ -1739,7 +2015,7 @@
     },
     "NodeSequencer": {
         "address": {
-            "sepolia": "0x8723b2188EAf6dDBAa5f9648003935a979d477b4"
+            "sepolia": "0x2823f28093621E7bDD357C02cd60EB0AAa4D0076"
         },
         "abi": [
             {
