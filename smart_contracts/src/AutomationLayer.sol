@@ -15,21 +15,16 @@ pragma solidity 0.8.19;
 import {IAutomationLayer} from "./interfaces/IAutomationLayer.sol";
 import {INodeSequencer} from "./interfaces/INodeSequencer.sol";
 import {IAutomatedContract} from "./interfaces/IAutomatedContract.sol";
+import {IDEXRouter} from "./interfaces/IDEXRouter.sol";
+import {IDEXFactory} from "./interfaces/IDEXFactory.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {Pausable} from "@openzeppelin/contracts/security/Pausable.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import {Security} from "./Security.sol";
 
 /// -----------------------------------------------------------------------
 /// Contract
 /// -----------------------------------------------------------------------
 
-contract AutomationLayer is
-    IAutomationLayer,
-    Ownable,
-    Pausable,
-    ReentrancyGuard
-{
+contract AutomationLayer is IAutomationLayer, Security {
     /// -----------------------------------------------------------------------
     /// Storage variables
     /// -----------------------------------------------------------------------
@@ -45,22 +40,14 @@ contract AutomationLayer is
     bool private s_acceptingNewAccounts;
 
     // mappings and arrays
-    mapping(uint256 accountNumber => Account) private s_accounts;
+    mapping(uint256 /* accountNumber */ => Account /* info */)
+        private s_accounts;
 
     /* solhint-enable */
 
     /// -----------------------------------------------------------------------
     /// Modifiers (or functions as modifiers)
     /// -----------------------------------------------------------------------
-
-    /// @dev Uses the nonReentrant modifier. This way reduces smart contract size.
-    function __nonReentrant() private nonReentrant {}
-
-    /// @dev Uses the whenNotPaused modifier. This way reduces smart contract size.
-    function __whenNotPaused() private view whenNotPaused {}
-
-    /// @dev Uses the onlyOwner modifier. This way reduces smart contract size.
-    function __onlyOwner() private view onlyOwner {}
 
     /** @dev validates if a account is valid
      *  @param status: the status of the account
@@ -71,23 +58,19 @@ contract AutomationLayer is
         }
     }
 
-    /// @dev checks if caller is oracle.
-    function __onlyOracle() private view {
-        if (msg.sender != s_oracleAddress) {
-            revert AutomationLayer__CallerNotOracle();
-        }
-    }
-
     /// @dev checks if node has sufficient DUH tokens.
     function __hasSufficientTokens() private view {
-        if (!INodeSequencer(s_sequencerAddress).hasSufficientTokens()) {
+        if (IERC20(s_duh).balanceOf(msg.sender) < s_minimumDuh) {
             revert AutomationLayer__NotEnoughtTokens();
         }
     }
 
     /// @dev checks if transaction origin is from an allowed node.
     function __isCurrentNode() private view {
-        if (tx.origin != INodeSequencer(s_sequencerAddress).getCurrentNode()) {
+        if (
+            s_sequencerAddress != address(0) &&
+            !INodeSequencer(s_sequencerAddress).isCurrentNode(msg.sender)
+        ) {
             revert AutomationLayer__OriginNotNode();
         }
     }
@@ -108,7 +91,7 @@ contract AutomationLayer is
         address sequencerAddress,
         uint256 automationFee,
         address oracleAddress
-    ) {
+    ) Security(msg.sender) {
         s_duh = duh;
         s_minimumDuh = minimumDuh;
         s_sequencerAddress = sequencerAddress;
@@ -134,6 +117,9 @@ contract AutomationLayer is
         __whenNotPaused();
         if (!s_acceptingNewAccounts) {
             revert AutomationLayer__NotAccpetingNewAccounts();
+        }
+        if (user == address(0) || contractAddress == address(0)) {
+            revert AutomationLayer__InvalidAddress();
         }
 
         uint256 accountNumber = s_nextAccountNumber;
@@ -189,7 +175,7 @@ contract AutomationLayer is
      *  given account number is not valid.
      *  @inheritdoc IAutomationLayer
      */
-    function simpleAutomation(
+    function triggerAutomation(
         uint256 accountNumber
     ) external override(IAutomationLayer) {
         __nonReentrant();
@@ -199,15 +185,17 @@ contract AutomationLayer is
 
         Account memory account = s_accounts[accountNumber];
 
-        __performSimpleAutomation(accountNumber, true);
-        // Transfer the tokens
-        /*  require(
-            IERC20(duh).transferFrom(account.account, tx.origin, automationFee),
-            "Fee transfer failed."
+        __performAutomation(accountNumber, true);
+        __transferERC20(
+            s_duh,
+            address(this),
+            msg.sender,
+            IERC20(s_duh).balanceOf(address(this)),
+            true
         );
-        */
+        __takeNextBlockNumbers(msg.sender);
 
-        emit TransactionSuccess(
+        emit AutomationDone(
             accountNumber,
             account.user,
             account.automatedContract
@@ -218,7 +206,7 @@ contract AutomationLayer is
      *  node does not have enough DUH balance or if it is not an allowed node.
      *  @inheritdoc IAutomationLayer
      */
-    function simpleAutomationBatch(
+    function triggerBatchAutomation(
         uint256[] calldata accountNumbers
     ) external override(IAutomationLayer) {
         __nonReentrant();
@@ -228,58 +216,54 @@ contract AutomationLayer is
 
         bool[] memory success = new bool[](accountNumbers.length);
         for (uint256 ii = 0; ii < accountNumbers.length; ++ii) {
-            success[ii] = __performSimpleAutomation(accountNumbers[ii], false);
+            success[ii] = __performAutomation(accountNumbers[ii], false);
         }
 
-        emit BatchSimpleAutomationDone(msg.sender, accountNumbers, success);
+        __transferERC20(
+            s_duh,
+            address(this),
+            msg.sender,
+            IERC20(s_duh).balanceOf(address(this)),
+            true
+        );
+        __takeNextBlockNumbers(msg.sender);
+
+        emit BatchAutomationDone(msg.sender, accountNumbers, success);
     }
 
-    /** @dev Added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
+    /** @dev Added nonReentrant and whenNotPaused third party modifiers. Only allowed callers
+     *  can call this function.
      *  @inheritdoc IAutomationLayer
      */
     function withdraw(uint256 amount) external override(IAutomationLayer) {
         __nonReentrant();
         __whenNotPaused();
-        __onlyOwner();
-        amount;
+        __onlyAllowed();
         //transferFrom(address(this), owner, amount)
 
         emit Withdrawn(owner(), amount);
     }
 
-    /** @dev Added onlyOwner and nonReentrant third party modifiers. Calls third party pause internal function
-     *  @inheritdoc IAutomationLayer
-     */
-    function pause() external override(IAutomationLayer) {
-        __nonReentrant();
-
-        __onlyOwner();
-
-        _pause();
-    }
-
-    /** @dev Added onlyOwner and nonReentrant third party modifiers. Calls third party unpause internal function
-     *  @inheritdoc IAutomationLayer
-     */
-    function unpause() external override(IAutomationLayer) {
-        __nonReentrant();
-        __onlyOwner();
-
-        _unpause();
-    }
-
-    /** @dev Added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
+    /** @dev Added nonReentrant and whenNotPaused third party modifiers. Only allowed callers
+     *  can call this function.
      *  @inheritdoc IAutomationLayer
      */
     function setDuh(address duh) external override(IAutomationLayer) {
         __nonReentrant();
         __whenNotPaused();
-        __onlyOwner();
+        __onlyAllowed();
+
+        if (duh == address(0)) {
+            revert AutomationLayer__InvalidAddress();
+        }
 
         s_duh = duh;
+
+        emit DuhTokenSet(msg.sender, duh);
     }
 
-    /** @dev Added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
+    /** @dev Added nonReentrant and whenNotPaused third party modifiers. Only allowed callers
+     *  can call this function.
      *  @inheritdoc IAutomationLayer
      */
     function setMinimumDuh(
@@ -287,12 +271,15 @@ contract AutomationLayer is
     ) external override(IAutomationLayer) {
         __nonReentrant();
         __whenNotPaused();
-        __onlyOwner();
+        __onlyAllowed();
 
         s_minimumDuh = minimumDuh;
+
+        emit MinimumDuhSet(msg.sender, minimumDuh);
     }
 
-    /** @dev Added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
+    /** @dev Added nonReentrant and whenNotPaused third party modifiers. Only allowed callers
+     *  can call this function.
      *  @inheritdoc IAutomationLayer
      */
     function setSequencerAddress(
@@ -300,14 +287,15 @@ contract AutomationLayer is
     ) external override(IAutomationLayer) {
         __nonReentrant();
         __whenNotPaused();
-        __onlyOwner();
+        __onlyAllowed();
 
         s_sequencerAddress = sequencerAddress;
 
         emit SequencerAddressSet(msg.sender, sequencerAddress);
     }
 
-    /** @dev Added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
+    /** @dev Added nonReentrant and whenNotPaused third party modifiers. Only allowed callers
+     *  can call this function.
      *  @inheritdoc IAutomationLayer
      */
     function setOracleAddress(
@@ -315,7 +303,7 @@ contract AutomationLayer is
     ) external override(IAutomationLayer) {
         __nonReentrant();
         __whenNotPaused();
-        __onlyOwner();
+        __onlyAllowed();
 
         s_oracleAddress = oracleAddress;
 
@@ -331,14 +319,15 @@ contract AutomationLayer is
     ) external override(IAutomationLayer) {
         __nonReentrant();
         __whenNotPaused();
-        __onlyOracle();
+        __onlyAllowed();
 
         s_automationFee = automationFee;
 
         emit AutomationFeeSet(msg.sender, automationFee);
     }
 
-    /** @dev Added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
+    /** @dev Added nonReentrant and whenNotPaused third party modifiers. Only allowed callers
+     *  can call this function.
      *  @inheritdoc IAutomationLayer
      */
     function setAcceptingNewAccounts(
@@ -346,9 +335,11 @@ contract AutomationLayer is
     ) external override(IAutomationLayer) {
         __nonReentrant();
         __whenNotPaused();
-        __onlyOwner();
+        __onlyAllowed();
 
         s_acceptingNewAccounts = acceptingNewAccounts;
+
+        emit AcceptingAccountsSet(msg.sender, acceptingNewAccounts);
     }
 
     /// -----------------------------------------------------------------------
@@ -360,7 +351,7 @@ contract AutomationLayer is
      *  @param revert_: true to revert, false otherwise.
      *  @return bool that specifies if it was successful (true) or not (false), if it does not revert.
      */
-    function __performSimpleAutomation(
+    function __performAutomation(
         uint256 accountNumber,
         bool revert_
     ) private returns (bool) {
@@ -370,14 +361,14 @@ contract AutomationLayer is
             (bool success, ) = account.automatedContract.call(
                 abi.encodeWithSelector(
                     IAutomatedContract(account.automatedContract)
-                        .simpleAutomation
+                        .trigger
                         .selector,
                     account.id
                 )
             );
 
             if (revert_ && !success) {
-                revert AutomationLayer__SimpleAutomationFailed();
+                revert AutomationLayer__AutomationFailed();
             }
 
             return success;
@@ -388,20 +379,44 @@ contract AutomationLayer is
         return false;
     }
 
+    /** @dev Assign next available range of block numbers to current node
+     *  @param nodeAddress: the address of the node.
+     */
+    function __takeNextBlockNumbers(address nodeAddress) private {
+        if (s_sequencerAddress != address(0)) {
+            INodeSequencer sequencer = INodeSequencer(s_sequencerAddress);
+            uint256 nodeEndBlockNumber = sequencer
+                .getNode(nodeAddress)
+                .endBlockNumber;
+
+            if (block.number == nodeEndBlockNumber) {
+                sequencer.takeNextBlockNumbers(nodeAddress);
+            }
+        }
+    }
+
     /// -----------------------------------------------------------------------
     /// External view functions
     /// -----------------------------------------------------------------------
 
     /// @inheritdoc IAutomationLayer
-    function checkSimpleAutomation(
-        uint256 accountNumber
+    function checkAutomation(
+        uint256 accountNumber,
+        address node
     ) external view override(IAutomationLayer) returns (bool) {
         Account memory account = s_accounts[accountNumber];
 
         __validateAccountNumber(account.status);
 
+        bool isNextNode = true;
+        if (s_sequencerAddress != address(0)) {
+            isNextNode = INodeSequencer(s_sequencerAddress).isCurrentNode(node);
+        }
+
         return
-            IAutomatedContract(account.automatedContract).checkSimpleAutomation(
+            isNextNode &&
+            !(IERC20(s_duh).balanceOf(node) < s_minimumDuh) &&
+            IAutomatedContract(account.automatedContract).checkTrigger(
                 account.id
             );
     }
@@ -481,6 +496,28 @@ contract AutomationLayer is
         returns (bool)
     {
         return s_acceptingNewAccounts;
+    }
+
+    /// @inheritdoc IAutomationLayer
+    function prospectPayment(
+        uint256 accountNumber
+    ) external view override(IAutomationLayer) returns (uint256) {
+        Account memory account = s_accounts[accountNumber];
+        return
+            IAutomatedContract(account.automatedContract)
+                .prospectAutomationPayment(account.id);
+    }
+
+    /// @inheritdoc IAutomationLayer
+    function prospectPaymentBatch(
+        uint256[] calldata accountNumbers
+    ) external view override(IAutomationLayer) returns (uint256 payment) {
+        Account memory account;
+        for (uint256 ii; ii < accountNumbers.length; ++ii) {
+            account = s_accounts[accountNumbers[ii]];
+            payment += IAutomatedContract(account.automatedContract)
+                .prospectAutomationPayment(account.id);
+        }
     }
 
     /// -----------------------------------------------------------------------

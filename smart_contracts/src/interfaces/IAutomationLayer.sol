@@ -27,9 +27,6 @@ interface IAutomationLayer {
     /// @dev error for when an invalid account number is provided
     error AutomationLayer__InvalidAccountNumber();
 
-    /// @dev error for when the caller is not the oracle contract.
-    error AutomationLayer__CallerNotOracle();
-
     /// @dev error for when node does not have enough tokens to trigger an operation.
     error AutomationLayer__NotEnoughtTokens();
 
@@ -40,7 +37,13 @@ interface IAutomationLayer {
     error AutomationLayer__NotAccpetingNewAccounts();
 
     /// @dev error for when the simple automation process fails.
-    error AutomationLayer__SimpleAutomationFailed();
+    error AutomationLayer__AutomationFailed();
+
+    /// @dev error for when given address is address(0).
+    error AutomationLayer__InvalidAddress();
+
+    /// @dev error for when there is no liquidity pair for given ERC20 tokens.
+    error AutomationLayer__NoLiquidityPair();
 
     /// -----------------------------------------------------------------------
     /// Type declarations (structs and enums)
@@ -101,7 +104,7 @@ interface IAutomationLayer {
      *  @param user: user address.
      *  @param automatedContract: smart contract address that had a operation automated.
      */
-    event TransactionSuccess(
+    event AutomationDone(
         uint256 indexed accountNumber,
         address indexed user,
         address indexed automatedContract
@@ -161,7 +164,7 @@ interface IAutomationLayer {
      *  @param success: array of booleans that specificies if the simple automation for the account number
      *  was successful (true) or not (false).
      */
-    event BatchSimpleAutomationDone(
+    event BatchAutomationDone(
         address indexed node,
         uint256[] accountNumbers,
         bool[] success
@@ -191,23 +194,17 @@ interface IAutomationLayer {
     /** @notice triggers a simple automation operation.
      *  @param accountNumber: number of the account.
      */
-    function simpleAutomation(uint256 accountNumber) external;
+    function triggerAutomation(uint256 accountNumber) external;
 
     /** @notice perform simple automation in batch.
      *  @param accountNumbers: array numbers of accounts.
      */
-    function simpleAutomationBatch(uint256[] calldata accountNumbers) external;
+    function triggerBatchAutomation(uint256[] calldata accountNumbers) external;
 
     /** @notice withdraws the given amount to owner account.
      *  @param amount: amount to withdraw.
      */
     function withdraw(uint256 amount) external;
-
-    /** @notice pauses the smart contract so that any function won't work. */
-    function pause() external;
-
-    /** @notice unpauses the smart contract so that every function will work. */
-    function unpause() external;
 
     /** @notice sets new address for the DUH token.
      *  @param duh: new address of DUH.
@@ -242,9 +239,11 @@ interface IAutomationLayer {
 
     /** @notice checks if given account number has an operation that can be triggered.
      *  @param accountNumber: number of the account.
+     *  @param node: node address.
      */
-    function checkSimpleAutomation(
-        uint256 accountNumber
+    function checkAutomation(
+        uint256 accountNumber,
+        address node
     ) external view returns (bool);
 
     /** @notice reads an entry of the accounts storage mapping.
@@ -290,4 +289,20 @@ interface IAutomationLayer {
      *  creation of new accounts (true) or not (false).
      */
     function getAcceptingNewAccounts() external view returns (bool);
+
+    /** @notice calculates a prospect for automation payment.
+     *  @param accountNumber: number of account.
+     *  @return uint256 value for the payment prospect.
+     */
+    function prospectPayment(
+        uint256 accountNumber
+    ) external view returns (uint256);
+
+    /** @notice calculates a prospect for automation payment in batch.
+     *  @param accountNumbers: array of numbers of accounts.
+     *  @return payment uint256 value for the payment prospect.
+     */
+    function prospectPaymentBatch(
+        uint256[] calldata accountNumbers
+    ) external view returns (uint256 payment);
 }

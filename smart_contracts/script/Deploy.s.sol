@@ -1,18 +1,32 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
+/** @author @EWCunha
+ *  @title Script to deploy smart contracts
+ */
+
 import {Script} from "forge-std/Script.sol";
 import {AutomationLayer} from "../src/AutomationLayer.sol";
 import {DollarCostAverage} from "../src/DollarCostAverage.sol";
+import {NodeSequencer} from "../src/NodeSequencer.sol";
 import {HelperConfig} from "./HelperConfig.s.sol";
+import {Duh} from "../src/Duh.sol";
 
 contract Deploy is Script {
+    bool public constant DEPLOY_DUH = true;
+    bool public constant DEPLOY_DCA = true;
+    bool public constant DEPLOY_AUTOMATION = true;
+    bool public constant DEPLOY_SEQUENCER = true;
+
     AutomationLayer public automation;
     DollarCostAverage public dca;
+    NodeSequencer public sequencer;
     HelperConfig public config;
+    Duh public duh;
     address public token1;
     address public token2;
     address public defaultRouter;
+    uint256 public timePeriodForNode;
 
     function run() public {
         config = new HelperConfig();
@@ -21,7 +35,6 @@ contract Deploy is Script {
             address defaultRouter_,
             address duhToken,
             uint256 minimumDuh,
-            address sequencerAddress,
             uint256 automationFee,
             address oracleAddress,
             address token1_,
@@ -32,21 +45,41 @@ contract Deploy is Script {
         token1 = token1_;
         token2 = token2_;
         defaultRouter = defaultRouter_;
+        duh = Duh(duhToken);
 
         vm.startBroadcast(deployerKey);
-        automation = new AutomationLayer(
-            duhToken,
-            minimumDuh,
-            sequencerAddress,
-            automationFee,
-            oracleAddress
-        );
+        if (DEPLOY_DUH) {
+            duh = new Duh();
+            duhToken = address(duh);
+        }
 
-        dca = new DollarCostAverage(
-            defaultRouter,
-            address(automation),
-            wrapNative
-        );
+        if (DEPLOY_AUTOMATION) {
+            automation = new AutomationLayer(
+                duhToken,
+                minimumDuh,
+                address(0),
+                automationFee,
+                oracleAddress
+            );
+        }
+
+        if (DEPLOY_SEQUENCER) {
+            timePeriodForNode = 1 days;
+            sequencer = new NodeSequencer(
+                timePeriodForNode,
+                address(automation)
+            );
+            automation.setSequencerAddress(address(sequencer));
+        }
+
+        if (DEPLOY_DCA) {
+            dca = new DollarCostAverage(
+                defaultRouter,
+                address(automation),
+                wrapNative,
+                duhToken
+            );
+        }
         vm.stopBroadcast();
     }
 }

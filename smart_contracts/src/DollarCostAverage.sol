@@ -14,60 +14,46 @@ pragma solidity 0.8.19;
 
 import {IDollarCostAverage} from "./interfaces/IDollarCostAverage.sol";
 import {IAutomatedContract} from "./interfaces/IAutomatedContract.sol";
-import {IUniswapV2Router02} from "./interfaces/IUniswapV2Router02.sol";
+import {IDEXRouter} from "./interfaces/IDEXRouter.sol";
+import {IDEXFactory} from "./interfaces/IDEXFactory.sol";
 import {IAutomationLayer} from "./interfaces/IAutomationLayer.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {Pausable} from "@openzeppelin/contracts/security/Pausable.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import {Security} from "./Security.sol";
 
 /// -----------------------------------------------------------------------
 /// Contract
 /// -----------------------------------------------------------------------
 
-contract DollarCostAverage is
-    IDollarCostAverage,
-    IAutomatedContract,
-    Ownable,
-    Pausable,
-    ReentrancyGuard
-{
+contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
     /// -----------------------------------------------------------------------
     /// Storage variables
     /// -----------------------------------------------------------------------
 
     /* solhint-disable */
     // base types
-    uint256 private s_nextRecurringBuyId;
+    uint256 private s_nextRecurringBuyId = 1;
     address private s_defaultRouter;
     IAutomationLayer private s_automationLayer;
     bool private s_acceptingNewRecurringBuys;
-    address private immutable wrapNative;
+    address private immutable i_wrapNative;
+    uint256 private s_fee = 100; // over 10000
+    uint256 private s_contractFeeShare = 5000; // over 10000
+    uint256 private s_slippagePercentage = 100; // over 10000
+    address private s_duh;
 
     // mappings and arrays
-    mapping(uint256 recurringBuyId => RecurringBuy data)
+    mapping(uint256 /* recurringBuyId */ => RecurringBuy /* data */)
         private s_recurringBuys;
+    mapping(address /* sender */ => uint256[] /* ids */) private s_senderToIds;
 
     // constants
-    uint256 private constant FEE = 100; // over 10000
     uint256 private constant PRECISION = 10000;
-    uint256 private constant CONTRACT_FEE_SHARE = 5000; // over 10000
-    uint256 private SLIPPAGE_PERCENTAGE = 100; // over 10000
 
     /* solhint-enable */
 
     /// -----------------------------------------------------------------------
     /// Modifiers (or functions as modifiers)
     /// -----------------------------------------------------------------------
-
-    /// @dev Uses the nonReentrant modifier. This way reduces smart contract size.
-    function __nonReentrant() private nonReentrant {}
-
-    /// @dev Uses the whenNotPaused modifier. This way reduces smart contract size.
-    function __whenNotPaused() private view whenNotPaused {}
-
-    /// @dev Uses the onlyOwner modifier. This way reduces smart contract size.
-    function __onlyOwner() private view onlyOwner {}
 
     /** @dev Checks if this contract has enough allowance to perform the transfer of funds for the recurring buy automation.
      *  It reverts if allowance is not enough.
@@ -94,8 +80,10 @@ contract DollarCostAverage is
         uint256 endRecBuyId
     ) private view {
         if (
-            !(startRecBuyId < endRecBuyId) &&
-            !(endRecBuyId < s_nextRecurringBuyId)
+            !(startRecBuyId < endRecBuyId) ||
+            !(endRecBuyId < s_nextRecurringBuyId) ||
+            startRecBuyId == 0 ||
+            endRecBuyId == 0
         ) {
             revert DollarCostAverage__InvalidIndexRange();
         }
@@ -108,13 +96,15 @@ contract DollarCostAverage is
     /** @notice constructor logic.
      *  @param defaultRouter: default DEX router address.
      *  @param automationLayerAddress: address for the automation layer smart contract.
-     *  @param _wrapNative: ERC20 smart contract address for the wrapped version of the native blockchain coin.
+     *  @param wrapNative: ERC20 smart contract address for the wrapped version of the native blockchain coin.
+     *  @param duh: ERC20 smart contract address the DUH token.
      */
     constructor(
         address defaultRouter,
         address automationLayerAddress,
-        address _wrapNative
-    ) {
+        address wrapNative,
+        address duh
+    ) Security(msg.sender) {
         if (defaultRouter == address(0)) {
             revert DollarCostAverage__InvalidDefaultRouterAddress();
         }
@@ -125,7 +115,8 @@ contract DollarCostAverage is
         s_defaultRouter = defaultRouter;
         s_automationLayer = IAutomationLayer(automationLayerAddress);
         s_acceptingNewRecurringBuys = true;
-        wrapNative = _wrapNative;
+        i_wrapNative = wrapNative;
+        s_duh = duh;
     }
 
     /// -----------------------------------------------------------------------
@@ -162,6 +153,13 @@ contract DollarCostAverage is
             revert DollarCostAverage__InvalidTimeInterval();
         }
 
+        uint256[] storage recurringBuyIds = s_senderToIds[msg.sender];
+        if (recurringBuyIds.length == 0) {
+            recurringBuyIds.push(0);
+        }
+
+        address router = dexRouter == address(0) ? s_defaultRouter : dexRouter;
+        address[] memory path = __checkPairs(router, tokenToSpend, tokenToBuy);
         uint256 nextRecurringBuyId = s_nextRecurringBuyId;
         uint256 accountNumber = s_automationLayer.createAccount(
             nextRecurringBuyId,
@@ -169,6 +167,7 @@ contract DollarCostAverage is
             address(this)
         );
 
+        recurringBuyIds.push(nextRecurringBuyId);
         RecurringBuy memory buy = RecurringBuy(
             msg.sender,
             amountToSpend,
@@ -176,9 +175,11 @@ contract DollarCostAverage is
             tokenToBuy,
             timeIntervalInSeconds,
             paymentInterface,
-            dexRouter == address(0) ? s_defaultRouter : dexRouter,
+            router,
             block.timestamp,
             accountNumber,
+            path,
+            recurringBuyIds.length - 1,
             Status.SET
         );
 
@@ -212,20 +213,29 @@ contract DollarCostAverage is
         buy.status = Status.CANCELLED;
         s_automationLayer.cancelAccount(buy.accountNumber);
 
+        // removing the ID from the array
+        uint256[] storage ids = s_senderToIds[msg.sender];
+        uint256 indexToRemove = buy.index;
+        uint256 lastId = ids[ids.length - 1];
+        ids[indexToRemove] = lastId;
+        s_recurringBuys[lastId].index = indexToRemove;
+        ids.pop();
+
         emit RecurringBuyCancelled(recurringBuyId, buy.sender);
     }
 
     /** @dev added nonReentrant and whenNotPaused third party modifiers. The given recurring buy ID
      *  must be valid. It reverts if recurring buy is not valid, or if current block timestamp haven't reached
      *  payment due, or if ERC20 transferFrom function doesn't work.
-     *  @inheritdoc IDollarCostAverage
+     *  @inheritdoc IAutomatedContract
      */
-    function transferFunds(
+    function trigger(
         uint256 recurringBuyId
-    ) public override(IDollarCostAverage) {
+    ) public override(IAutomatedContract) {
         __nonReentrant();
         __whenNotPaused();
 
+        // initial checks
         RecurringBuy storage buy = s_recurringBuys[recurringBuyId];
         if (buy.status != Status.SET || buy.paymentDue > block.timestamp) {
             revert DollarCostAverage__InvalidRecurringBuy();
@@ -233,63 +243,94 @@ contract DollarCostAverage is
 
         __haveEnoughAllowance(buy.tokenToSpend, buy.sender, buy.amountToSpend);
 
+        // updating payment due
         buy.paymentDue += buy.timeIntervalInSeconds;
-        uint256 fee = (buy.amountToSpend * FEE) / PRECISION;
-        uint256 buyAmount = buy.amountToSpend - fee;
-        uint256 contractFee = (fee * CONTRACT_FEE_SHARE) / PRECISION;
 
+        // calculating fees
+        (
+            uint256 paymentInterfaceFee,
+            uint256 protocolFee,
+            uint256 buyAmount
+        ) = __calculateFees(buy.amountToSpend);
+
+        // Transfering from user to this address
+        __transferERC20(
+            buy.tokenToSpend,
+            buy.sender,
+            address(this),
+            buyAmount + protocolFee,
+            true
+        );
+
+        // payment interface fee
         if (buy.paymentInterface != address(0)) {
             __transferERC20(
                 buy.tokenToSpend,
                 buy.sender,
                 buy.paymentInterface,
-                fee - contractFee
+                paymentInterfaceFee,
+                true
             );
         }
 
-        __transferERC20(buy.tokenToSpend, buy.sender, owner(), contractFee);
-        __approveERC20(buy.tokenToSpend, buy.dexRouter, buyAmount);
+        // automation node payment
+        uint256 feeFromAutomationLayer = s_automationLayer.getAutomationFee();
+        if (msg.sender != buy.sender && feeFromAutomationLayer > 0) {
+            // building path
+            address[] memory pathPayment = __checkPairs(
+                s_defaultRouter,
+                buy.tokenToSpend,
+                s_duh
+            );
 
-        address[] memory path;
-        if (buy.tokenToSpend == wrapNative || buy.tokenToBuy == wrapNative) {
-            path = new address[](2);
-            path[0] = buy.tokenToSpend;
-            path[1] = buy.tokenToBuy;
-        } else {
-            path = new address[](3);
-            path[0] = buy.tokenToSpend;
-            path[1] = wrapNative;
-            path[2] = buy.tokenToBuy;
+            // fees calculation
+            uint256 automationFee = (protocolFee * feeFromAutomationLayer) /
+                PRECISION;
+            protocolFee -= automationFee;
+            uint256 payment = __prospectPayment(automationFee, pathPayment);
+
+            // swap process
+            __approveERC20(buy.tokenToSpend, s_defaultRouter, payment);
+            __swap(
+                payment,
+                payment,
+                IDEXRouter(s_defaultRouter),
+                pathPayment,
+                msg.sender
+            );
         }
 
-        IUniswapV2Router02 dexRouter = IUniswapV2Router02(buy.dexRouter);
-        uint256[] memory amountsOut = dexRouter.getAmountsOut(buyAmount, path);
-        uint256 amountOutMin = (amountsOut[amountsOut.length - 1] *
-            SLIPPAGE_PERCENTAGE) / PRECISION;
+        // protocol fee
+        __transferERC20(
+            buy.tokenToSpend,
+            address(this),
+            address(s_automationLayer),
+            protocolFee,
+            true
+        );
 
-        __transferERC20(buy.tokenToSpend, buy.sender, address(this), buyAmount);
+        // approving DEX router
+        __approveERC20(buy.tokenToSpend, buy.dexRouter, buyAmount);
 
-        uint256[] memory amounts = dexRouter.swapExactTokensForTokens(
+        // swap process
+        IDEXRouter dexRouter = IDEXRouter(buy.dexRouter);
+        uint256[] memory amountsOut = dexRouter.getAmountsOut(
             buyAmount,
-            amountOutMin,
-            path,
-            buy.sender,
-            block.timestamp
+            buy.path
+        );
+        uint256[] memory amounts = __swap(
+            buyAmount,
+            amountsOut[amountsOut.length - 1],
+            dexRouter,
+            buy.path,
+            buy.sender
         );
 
         emit PaymentTransferred(recurringBuyId, buy.sender, amounts);
     }
 
-    /** @dev calls transferFunds public function
-     *  @inheritdoc IAutomatedContract
-     */
-    function simpleAutomation(
-        uint256 recurringBuyId
-    ) external override(IAutomatedContract) {
-        transferFunds(recurringBuyId);
-    }
-
-    /** @dev added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
+    /** @dev added nonReentrant and whenNotPaused third party modifiers.
+     *  Only allowed addresses can call this function.
      *  @inheritdoc IDollarCostAverage
      */
     function setAutomationLayer(
@@ -297,7 +338,7 @@ contract DollarCostAverage is
     ) external override(IDollarCostAverage) {
         __nonReentrant();
         __whenNotPaused();
-        __onlyOwner();
+        __onlyAllowed();
 
         if (automationLayerAddress == address(0)) {
             revert DollarCostAverage__InvalidAutomationLayerAddress();
@@ -308,7 +349,8 @@ contract DollarCostAverage is
         emit AutomationLayerSet(msg.sender, automationLayerAddress);
     }
 
-    /** @dev added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
+    /** @dev added nonReentrant and whenNotPaused third party modifiers.
+     *  Only allowed addresses can call this function.
      *  @inheritdoc IDollarCostAverage
      */
     function setDefaultRouter(
@@ -316,7 +358,7 @@ contract DollarCostAverage is
     ) external override(IDollarCostAverage) {
         __nonReentrant();
         __whenNotPaused();
-        __onlyOwner();
+        __onlyAllowed();
 
         if (defaultRouter == address(0)) {
             revert DollarCostAverage__InvalidDefaultRouterAddress();
@@ -327,7 +369,8 @@ contract DollarCostAverage is
         emit DefaultRouterSet(msg.sender, defaultRouter);
     }
 
-    /** @dev added nonReentrant, whenNotPaused, and onlyOwner third party modifiers.
+    /** @dev added nonReentrant and whenNotPaused third party modifiers.
+     *  Only allowed addresses can call this function.
      *  @inheritdoc IDollarCostAverage
      */
     function setAcceptingNewRecurringBuys(
@@ -335,79 +378,107 @@ contract DollarCostAverage is
     ) external override(IDollarCostAverage) {
         __nonReentrant();
         __whenNotPaused();
-        __onlyOwner();
+        __onlyAllowed();
 
         s_acceptingNewRecurringBuys = acceptingNewRecurringBuys;
 
         emit AcceptingRecurringBuysSet(msg.sender, acceptingNewRecurringBuys);
     }
 
-    /** @dev added onlyOwner third party modifier. Calls third party pause internal function
+    /** @dev added nonReentrant and whenNotPaused third party modifiers.
+     *  Only allowed addresses can call this function.
      *  @inheritdoc IDollarCostAverage
      */
-    function pause() external override(IDollarCostAverage) {
+    function setFee(uint256 fee) external override(IDollarCostAverage) {
         __nonReentrant();
-        __onlyOwner();
+        __whenNotPaused();
+        __onlyAllowed();
 
-        _pause();
+        s_fee = fee;
+
+        emit FeeSet(msg.sender, fee);
     }
 
-    /** @dev added onlyOwner third party modifier. Calls third party unpause internal function
+    /** @dev added nonReentrant and whenNotPaused third party modifiers.
+     *  Only allowed addresses can call this function.
      *  @inheritdoc IDollarCostAverage
      */
-    function unpause() external override(IDollarCostAverage) {
+    function setContractFeeShare(
+        uint256 contractFeeShare
+    ) external override(IDollarCostAverage) {
         __nonReentrant();
-        __onlyOwner();
+        __whenNotPaused();
+        __onlyAllowed();
 
-        _unpause();
+        s_contractFeeShare = contractFeeShare;
+
+        emit ContractFeeShareSet(msg.sender, contractFeeShare);
+    }
+
+    /** @dev added nonReentrant and whenNotPaused third party modifiers.
+     *  Only allowed addresses can call this function.
+     *  @inheritdoc IDollarCostAverage
+     */
+    function setSlippagePercentage(
+        uint256 slippagePercentage
+    ) external override(IDollarCostAverage) {
+        __nonReentrant();
+        __whenNotPaused();
+        __onlyAllowed();
+
+        s_slippagePercentage = slippagePercentage;
+
+        emit SlippagePercentageSet(msg.sender, slippagePercentage);
+    }
+
+    /** @dev Added nonReentrant and whenNotPaused third party modifiers. Only allowed callers
+     *  can call this function.
+     *  @inheritdoc IDollarCostAverage
+     */
+    function setDuh(address duh) external override(IDollarCostAverage) {
+        __nonReentrant();
+        __whenNotPaused();
+        __onlyAllowed();
+
+        if (duh == address(0)) {
+            revert DollarCostAverage__InvalidTokenAddresses();
+        }
+
+        s_duh = duh;
+
+        emit DuhTokenSet(msg.sender, duh);
     }
 
     /// -----------------------------------------------------------------------
-    /// Internal and private state-change functions
+    /// Internal state-change functions
     /// -----------------------------------------------------------------------
 
-    /** @dev Performs transfer of ERC20 tokens using transferFrom function. The way this function does the
-     *  transfers is safer because it works when the ERC20 transferFrom returns or does not return any value.
-     *  @dev It reverts if the transfer was not successful (i.e. reverted) or if returned value is false.
-     *  @param token: ERC20 token smart contract address to transfer.
-     *  @param from: address from which tokens will be transferred.
-     *  @param to: address to which tokens will be transferred.
-     *  @param value: amount of ERC20 tokens to transfer.
+    /** @dev performs the swap for the given path of tokens.
+     *  @param buyAmount: amount left to buy.
+     *  @param amountOut: expected amount out after swap.
+     *  @param dexRouter: DEX router interface instance used to perform the swap.
+     *  @param path: token addresses swap path.
+     *  @param to: recipient address that will receive the swap output.
+     *  @return uint256 array with the swap amounts.
      */
-    function __transferERC20(
-        address token,
-        address from,
-        address to,
-        uint256 value
-    ) private {
-        (bool success, bytes memory data) = token.call(
-            abi.encodeWithSelector(
-                IERC20(token).transferFrom.selector,
-                from,
-                to,
-                value
-            )
+    function __swap(
+        uint256 buyAmount,
+        uint256 amountOut,
+        IDEXRouter dexRouter,
+        address[] memory path,
+        address to
+    ) private returns (uint256[] memory) {
+        uint256 amountOutMin = (amountOut * s_slippagePercentage) / PRECISION;
+
+        uint256[] memory amounts = dexRouter.swapExactTokensForTokens(
+            buyAmount,
+            amountOutMin,
+            path,
+            to,
+            block.timestamp
         );
 
-        if (!success || (data.length != 0 && !abi.decode(data, (bool)))) {
-            revert DollarCostAverage__TokenTransferFailed();
-        }
-    }
-
-    /** @dev Approves the specific amount as allowance to the given address of the given token
-     *  @dev It reverts if the approve is not sucessfull (i.e. reverted) or if returned value is false.
-     *  @param token: ERC20 token smart contract address to approve.
-     *  @param to: address to which tokens will be approved.
-     *  @param amount: amount to be approved.
-     */
-    function __approveERC20(address token, address to, uint256 amount) private {
-        (bool success, bytes memory data) = token.call(
-            abi.encodeWithSelector(IERC20(token).approve.selector, to, amount)
-        );
-
-        if (!success || (data.length != 0 && !abi.decode(data, (bool)))) {
-            revert DollarCostAverage__TokenApprovalFailed();
-        }
+        return amounts;
     }
 
     /// -----------------------------------------------------------------------
@@ -445,7 +516,7 @@ contract DollarCostAverage is
     }
 
     /// @inheritdoc IAutomatedContract
-    function checkSimpleAutomation(
+    function checkTrigger(
         uint256 recurringBuyId
     ) external view override(IAutomatedContract) returns (bool) {
         return isRecurringBuyValid(recurringBuyId);
@@ -485,7 +556,7 @@ contract DollarCostAverage is
         override(IDollarCostAverage)
         returns (address)
     {
-        return wrapNative;
+        return i_wrapNative;
     }
 
     /// @inheritdoc IDollarCostAverage
@@ -556,11 +627,78 @@ contract DollarCostAverage is
     }
 
     /// @inheritdoc IDollarCostAverage
+    function getFee()
+        external
+        view
+        override(IDollarCostAverage)
+        returns (uint256)
+    {
+        return s_fee;
+    }
+
+    /// @inheritdoc IDollarCostAverage
+    function getContractFeeShare()
+        external
+        view
+        override(IDollarCostAverage)
+        returns (uint256)
+    {
+        return s_contractFeeShare;
+    }
+
+    /// @inheritdoc IDollarCostAverage
+    function getSlippagePercentage()
+        external
+        view
+        override(IDollarCostAverage)
+        returns (uint256)
+    {
+        return s_slippagePercentage;
+    }
+
+    /// @inheritdoc IDollarCostAverage
+    function getDuh()
+        external
+        view
+        override(IDollarCostAverage)
+        returns (address)
+    {
+        return s_duh;
+    }
+
+    /// @inheritdoc IDollarCostAverage
+    function getSenderToIds(
+        address sender
+    ) external view override(IDollarCostAverage) returns (uint256[] memory) {
+        return s_senderToIds[sender];
+    }
+
+    /// @inheritdoc IDollarCostAverage
     function isRecurringBuyValid(
         uint256 recurringBuyId
     ) public view override(IDollarCostAverage) returns (bool) {
         RecurringBuy memory buy = s_recurringBuys[recurringBuyId];
         return __validateRecurringBuy(buy);
+    }
+
+    /// @inheritdoc IAutomatedContract
+    function prospectAutomationPayment(
+        uint256 recurringBuyId
+    ) external view override(IAutomatedContract) returns (uint256) {
+        RecurringBuy memory buy = s_recurringBuys[recurringBuyId];
+
+        (, uint256 protocolFee, ) = __calculateFees(buy.amountToSpend);
+        address[] memory path = __checkPairs(
+            s_defaultRouter,
+            buy.tokenToSpend,
+            s_duh
+        );
+        uint256 automationPayment = (protocolFee *
+            s_automationLayer.getAutomationFee()) / PRECISION;
+
+        uint256 payment = __prospectPayment(automationPayment, path);
+
+        return payment;
     }
 
     /// -----------------------------------------------------------------------
@@ -582,5 +720,80 @@ contract DollarCostAverage is
                 recBuy.sender,
                 address(this)
             ) < recBuy.amountToSpend); // 4. Has this smart contract enough allowance?
+    }
+
+    /** @dev checks the liquidity for given tokens.
+     *  @param router: address of the DEX router.
+     *  @param token1: ERC20 token address.
+     *  @param token2: ERC20 token address.
+     *  @return path address array for the right path of swap.
+     */
+    function __checkPairs(
+        address router,
+        address token1,
+        address token2
+    ) private view returns (address[] memory) {
+        IDEXFactory factory = IDEXFactory(IDEXRouter(router).factory());
+
+        if (factory.getPair(token1, token2) == address(0)) {
+            address wrapNative = i_wrapNative;
+            address pair1AndWrapped = factory.getPair(token1, wrapNative);
+            address pair2AndWrapped = factory.getPair(token2, wrapNative);
+
+            if (
+                pair1AndWrapped == address(0) || pair2AndWrapped == address(0)
+            ) {
+                revert DollarCostAverage__NoLiquidityPair();
+            }
+
+            address[] memory path = new address[](3);
+            path[0] = token1;
+            path[1] = wrapNative;
+            path[2] = token2;
+
+            return path;
+        } else {
+            address[] memory path = new address[](2);
+            path[0] = token1;
+            path[1] = token2;
+
+            return path;
+        }
+    }
+
+    /** @dev calculates the fees.
+     *  @param amount: amount to be spend in the swap.
+     *  @return paymentInterfaceFee uint256 value for the fee of the payment interface.
+     *  @return protocolFee uint256 value for the protocol fee.
+     *  @return buyAmount amount left to buy.
+     */
+    function __calculateFees(
+        uint256 amount
+    )
+        private
+        view
+        returns (
+            uint256 paymentInterfaceFee,
+            uint256 protocolFee,
+            uint256 buyAmount
+        )
+    {
+        uint256 fee = (amount * s_fee) / PRECISION;
+        protocolFee = (fee * s_contractFeeShare) / PRECISION;
+        buyAmount = amount - fee;
+        paymentInterfaceFee = fee - protocolFee;
+    }
+
+    function __prospectPayment(
+        uint256 automationFee,
+        address[] memory path
+    ) private view returns (uint256) {
+        IDEXRouter dexRouter = IDEXRouter(s_defaultRouter);
+        uint256[] memory amountsOut = dexRouter.getAmountsOut(
+            automationFee,
+            path
+        );
+
+        return amountsOut[amountsOut.length - 1];
     }
 }

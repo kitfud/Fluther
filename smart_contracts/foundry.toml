@@ -5,9 +5,23 @@ libs = ["lib"]
 remappings = [
     "@openzeppelin/contracts=lib/openzeppelin-contracts/contracts",
     "@uniswap/contracts=lib/v2-periphery/contracts",
+    "@devops=lib/foundry-devops/src",
 ]
 optimizer = true
 optimezer_runs = 1000
 # via_ir = true
+# ffi = true
+
+[rpc_endpoints]
+sepolia = "${SEPOLIA_RPC_URL}"
+
+[etherscan]
+sepolia = { key = "${ETHERSCAN_API_KEY}" }
+
+[invariant]
+runs = 500
+depth = 200
+fail_on_revert = false
+
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
