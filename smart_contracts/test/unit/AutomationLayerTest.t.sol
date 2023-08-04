@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
+/** @author @EWCunha
+ *  @title AutomationLayer smart contract unit test
+ */
+
 import {Test, console} from "forge-std/Test.sol";
 import {Deploy} from "../../script/Deploy.s.sol";
 import {DeployMocks} from "../../script/DeployMocks.s.sol";
