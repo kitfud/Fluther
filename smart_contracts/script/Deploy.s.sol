@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
+/** @author @EWCunha
+ *  @title Script to deploy smart contracts
+ */
+
 import {Script} from "forge-std/Script.sol";
 import {AutomationLayer} from "../src/AutomationLayer.sol";
 import {DollarCostAverage} from "../src/DollarCostAverage.sol";
@@ -9,7 +13,7 @@ import {HelperConfig} from "./HelperConfig.s.sol";
 import {Duh} from "../src/Duh.sol";
 
 contract Deploy is Script {
-    bool public constant DEPLOY_DUH = false;
+    bool public constant DEPLOY_DUH = true;
     bool public constant DEPLOY_DCA = true;
     bool public constant DEPLOY_AUTOMATION = true;
     bool public constant DEPLOY_SEQUENCER = true;

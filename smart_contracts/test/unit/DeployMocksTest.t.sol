@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
+/** @author @EWCunha
+ *  @title DeployMock script unit test
+ */
+
 import {Test} from "forge-std/Test.sol";
 import {DeployMocks} from "../../script/DeployMocks.s.sol";
 

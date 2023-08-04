@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
+/** @author @EWCunha
+ *  @title script to deploy mock smart contracts.
+ */
+
 import {Script} from "forge-std/Script.sol";
 import {WETHMock} from "../test/mocks/WETHMock.sol";
 import {UNIMock} from "../test/mocks/UNIMock.sol";
