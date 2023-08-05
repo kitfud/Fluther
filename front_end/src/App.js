@@ -29,6 +29,7 @@ import Particles from "react-particles"
 import { loadFull } from "tsparticles";
 import particlesOptions from "./particlesConfig.json";
 import zIndex from '@mui/material/styles/zIndex';
+import LinearProgress from '@mui/material/LinearProgress';
 
 const theme = createTheme({
   palette: {
@@ -502,9 +503,15 @@ const action = (
               //opacity: 0.9,
             }}
           >
+            <Box width='100%'
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            >
             <Typography
               color='#8c42fa'
               component="h1"
+            
               sx={{
                 fontSize: 20,
                 fontWeight: 700,
@@ -513,6 +520,8 @@ const action = (
             >
                 Create Dollar Cost Average
             </Typography>
+            </Box>
+           
 
               {!spendingApproved?
             <Box display="flex"
@@ -542,7 +551,12 @@ const action = (
               >
               </TextField>:(<>
                 <Box sx={{marginBottom:'20px'}} component="div">
-                  {delayRender?null:
+                  {delayRender?  <Box sx={{ width: '100%' }}>
+      <LinearProgress/>
+      <Box backgroundColor="lightBlue">
+        <Typography>Allowance Approved. Values Will Update Shortly.</Typography>
+      </Box> 
+    </Box>:
                   <Button onClick={updateAllowance} variant="contained" color="warning">Update {allowance} Spending Limit</Button>
 }
                 </Box>
