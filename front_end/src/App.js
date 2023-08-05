@@ -110,6 +110,8 @@ function App() {
   const [unicolor,setUniColor] = useState('black')
   const [allowance, setAllowance] = useState(null)
 
+  const [delayRender, setDelayRender] = useState(false)
+const [previousAllowance, setPreviousAllowance] = useState(null)
 
   const address = useAddress();
 
@@ -150,7 +152,18 @@ function App() {
   },[signer,erc20contract])
 
   useEffect(()=>{
+   
+
     if(allowance && typeof(allowance)=="number"){
+
+      if(delayRender==true){
+        if(previousAllowance==allowance){
+          setDelayRender(false)
+        }
+        if(previousAllowance!=allowance){
+         setDelayRender(false)
+        }
+      }
      console.log('allowance',allowance)
      if(allowance>=100){
       setSpendingApproved(true)
@@ -160,6 +173,7 @@ function App() {
       setSpendingApproved(false)
       setDisabledTextFeild(false)
      }
+     setPreviousAllowance(allowance)
     }
   },[allowance])
 
@@ -269,10 +283,13 @@ return ()=>clearTimeout(colorChange)
   }
 
   const checkAllowance = async ()=>{
+ 
  if(address && erc20contract){
     let allowanceAmount = await erc20contract.allowance(address,smartContracts.DollarCostAverage.address.sepolia)
     let convertedAllowance = parseFloat(allowanceAmount.toString())/10**18
+  
     setAllowance(convertedAllowance)
+   
     return convertedAllowance
  }
     
@@ -280,6 +297,11 @@ return ()=>clearTimeout(colorChange)
 
   const approveSpending = async()=>{
     console.log(amount)
+    if(delayRender==true){
+      if(amount==allowance){
+        setDelayRender(false)
+      }
+    }
     if(parseInt(amount)<100){
       console.log(amount)
       alert("need to approve amount 100 or more")
@@ -292,6 +314,8 @@ return ()=>clearTimeout(colorChange)
       await erc20contract.connect(signer).approve(smartContracts.DollarCostAverage.address.sepolia,ethers.utils.parseEther(amount))
       setSpendingApproved(true)
       setDisabledTextFeild(true)
+   
+      
      
     }
     catch(err){
@@ -304,6 +328,7 @@ return ()=>clearTimeout(colorChange)
   const updateAllowance = ()=>{
     setSpendingApproved(false)
     setDisabledTextFeild(false)
+    setDelayRender(true)
   }
 
   const submitAgreement = async () => {
@@ -517,7 +542,9 @@ const action = (
               >
               </TextField>:(<>
                 <Box sx={{marginBottom:'20px'}} component="div">
-                  <Button onClick={updateAllowance} variant="contained" color="warning">Update Spending Limit</Button>
+                  {delayRender?null:
+                  <Button onClick={updateAllowance} variant="contained" color="warning">Update {allowance} Spending Limit</Button>
+}
                 </Box>
                 </>)
 }
