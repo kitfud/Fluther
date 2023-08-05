@@ -108,8 +108,11 @@ function App() {
   const [openSnackbar,setOpenSnackBar] = useState(false)
 
   const [unicolor,setUniColor] = useState('black')
+  const [allowance, setAllowance] = useState(null)
+
 
   const address = useAddress();
+
 
   //address below is deployment to Polygon mainnet
   //const dollarCostAddress = '0x519DdbffEA597980B19F254892dEc703613e8775'
@@ -126,10 +129,39 @@ function App() {
   },[])
 
   useEffect(() => {
+    console.log("load")
     if(!dataload){
     updateEthers()
     }
+    
   },[])
+
+  useEffect(()=>{
+    console.log('scheckAllowance')
+    checkAllowance()
+  },[address,wethbalance])
+
+  useEffect(()=>{
+    let balanceCheck
+    if(signer && erc20contract && address){
+    balanceCheck= setInterval(()=>{checkAllowance()},1000)
+    }
+    return ()=>clearInterval(balanceCheck)
+  },[signer,erc20contract])
+
+  useEffect(()=>{
+    if(allowance && typeof(allowance)=="number"){
+     console.log('allowance',allowance)
+     if(allowance>=100){
+      setSpendingApproved(true)
+      setDisabledTextFeild(true)
+     }
+     else{
+      setSpendingApproved(false)
+      setDisabledTextFeild(false)
+     }
+    }
+  },[allowance])
 
   useEffect(() => {
     // console.log("token",wethtoken)
@@ -164,6 +196,8 @@ function App() {
       }
     }
   },[provider])
+
+
 
 
   useEffect(() => {
@@ -234,27 +268,46 @@ return ()=>clearTimeout(colorChange)
       }
   }
 
+  const checkAllowance = async ()=>{
+ if(address && erc20contract){
+    let allowanceAmount = await erc20contract.allowance(address,smartContracts.DollarCostAverage.address.sepolia)
+    let convertedAllowance = parseFloat(allowanceAmount.toString())/10**18
+    setAllowance(convertedAllowance)
+    return convertedAllowance
+ }
+    
+  }
+
   const approveSpending = async()=>{
+    console.log(amount)
+    if(parseInt(amount)<100){
+      console.log(amount)
+      alert("need to approve amount 100 or more")
+      return
+    }
     // console.log("amount",amount)
     // console.log(erc20contract)
     try{
- 
-
       //first contract object made from token to spend erc20contract
       await erc20contract.connect(signer).approve(smartContracts.DollarCostAverage.address.sepolia,ethers.utils.parseEther(amount))
-
-      //this contract object must be made from the DUH token 
-      await duhcontract.connect(signer).approve(smartContracts.AutomationLayer.address.sepolia,ethers.utils.parseEther(amount))
       setSpendingApproved(true)
       setDisabledTextFeild(true)
+     
     }
     catch(err){
       console.log(err)
       setSpendingApproved(false)
     }
+   
+  }
+
+  const updateAllowance = ()=>{
+    setSpendingApproved(false)
+    setDisabledTextFeild(false)
   }
 
   const submitAgreement = async () => {
+  
     let data = {
       "user": address,
       "amount": amount,
@@ -349,6 +402,8 @@ const action = (
   </React.Fragment>
 );
 
+
+
   return (
     <>
       {/* {address?console.log(address):null} */}
@@ -431,8 +486,16 @@ const action = (
                 padding: 2
               }}
             >
-                Create Dollar Cost Average:
+                Create Dollar Cost Average
             </Typography>
+
+              {!spendingApproved?
+            <Box display="flex"
+              alignItems="center"
+              justifyContent="center">
+              <Typography padding={'2px'}>Current Spending Limit:{allowance}</Typography>
+            </Box>:null
+}
 
             {/* TOTAL AMOUNT BOX FIELD */}  
             <Box
@@ -440,21 +503,29 @@ const action = (
               alignItems="center"
               justifyContent="center"
             >
+              {!spendingApproved?
               <TextField
                 sx={{
                   width: "80%"
                 }}
+         
                 onChange={ (e) => setAmount(e.target.value) }
                 id="filled-basic"
                 label="Total amount"
                 variant="filled"
                 disabled = {disableText}
               >
-              </TextField>
+              </TextField>:(<>
+                <Box sx={{marginBottom:'20px'}} component="div">
+                  <Button onClick={updateAllowance} variant="contained" color="warning">Update Spending Limit</Button>
+                </Box>
+                </>)
+}
             </Box>
 
             {/* TOKEN 1 BOX FIELD */}
             <Box 
+         
               display="flex"
               alignItems="center"
               justifyContent="center"
@@ -472,7 +543,7 @@ const action = (
                 
               >
                 <InputLabel>
-                  Tokens you own
+                  Token to Spend
                 </InputLabel>
                 <Select
                   id="filled-basic"
@@ -480,7 +551,6 @@ const action = (
                   variant="filled"
                   onChange={ (e) => setToken1(e.target.value) }
                   value={token1}
-                  disabled = {disableText}
                   sx={{
                     width:"100%"
                   }}
@@ -533,6 +603,7 @@ const action = (
               (
                 <>
                   {/* INTERVAL AMOUNT BOX FIELD */}  
+                  
                   <Box 
                     display="flex"
                     alignItems="center"
@@ -541,7 +612,7 @@ const action = (
                     <TextField
                       onChange={ (e) => setIntervalAmount(e.target.value) }
                       id="filled-basic"
-                      label="Interval spend amount"
+                      label="Amount to Spend"
                       variant="filled"
                       sx={{
                         width: "80%"
@@ -562,7 +633,7 @@ const action = (
                       }}
                     >
                       <InputLabel>
-                        Tokens you want
+                        Tokens To Buy
                       </InputLabel>
                       <Select
                         id="filled-basic"

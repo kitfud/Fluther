@@ -54,7 +54,7 @@ const [processing, setProcessing] = useState(false)
 
     const loggingData = async()=>{
     const data = await logEventData("RecurringBuyCreated",[], provider)
-    console.log("data",data)
+  
     setData(data)
     }
 
@@ -71,7 +71,7 @@ const [processing, setProcessing] = useState(false)
 
     useEffect(()=>{
     if(data != undefined){
-    console.log("data",data)
+
     filterData(data)
 }
     },[data])
@@ -110,21 +110,20 @@ const [processing, setProcessing] = useState(false)
         //console.log("cancelled",cancelledContracts)
         setCanceledIds(cancelledContracts)
         //filter to only records specific to user
-        console.log("userData",userData.buy)
+      
        let result =[] 
        for(let i = 0; i<userData.length; i++){
        if (userData[i][1]==address&& userData[i].buy){
         result.push(userData[i])
        }
        }
-console.log("result",result)
+
        let tableResult = []
        result.forEach((element)=>{
         // console.log("buy",element.buy)
         // console.log("timeIntervalSeconds",element.buy.timeIntervalInSeconds.toNumber())
       
-        console.log("tokenToBuy",element.buy.tokenToBuy)
-        console.log("token to spend",element.buy.tokenToSpend)
+  
         // console.log(element.recBuyId.toNumber())
         
         // console.log("amount",ethers.utils.formatEther(element.buy[1]))
