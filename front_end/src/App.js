@@ -243,8 +243,7 @@ return ()=>clearTimeout(colorChange)
       //first contract object made from token to spend erc20contract
       await erc20contract.connect(signer).approve(smartContracts.DollarCostAverage.address.sepolia,ethers.utils.parseEther(amount))
 
-      //this contract object must be made from the DUH token 
-      await duhcontract.connect(signer).approve(smartContracts.AutomationLayer.address.sepolia,ethers.utils.parseEther(amount))
+   
       setSpendingApproved(true)
       setDisabledTextFeild(true)
     }
