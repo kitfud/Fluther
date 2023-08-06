@@ -216,7 +216,7 @@ const [previousAllowance, setPreviousAllowance] = useState(null)
 
 
   useEffect(() => {
-    if(amount !== "" && token1 !== "" & token2 !=="" & interval !== "" & intervalAmount !== "") {
+    if(token1 !== "" & token2 !=="" & interval !== "" & intervalAmount !== "") {
       setContractParams(true)
     }
     else {
