@@ -275,7 +275,7 @@ const [processing, setProcessing] = useState(false)
     <Slide direction="right" in="true" mountOnEnter>
     <Card sx={{marginTop:'20px',padding:'40px'}}>
         <Box>
-        <div>Current Dollar Cost Average Contracts</div>
+
         </Box>
         <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="Current Dollar Cost Average">
