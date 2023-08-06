@@ -1,4 +1,11 @@
 {
+    "PriceFeed":{
+        "address":{
+            "sepolia":{
+                "ETHUSD":"0xD46A6bC8a7219AE21E2f9DaF93eEce945fdBA623"
+            }     
+        }
+    },
     "Liquidity": {
         "address": {
             "sepolia": "0xD3Ce19025A1762fAf5F013D052cAF6721ca6C1CF"
