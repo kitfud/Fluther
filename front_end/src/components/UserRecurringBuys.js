@@ -1,6 +1,6 @@
 import React, { isValidElement } from 'react'
 import { useEffect,useState } from 'react'
-import {Typography,Snackbar,CircularProgress,Button,Card,Box,Paper,Table, TableBody,TableCell,TableContainer,TableHead,TableRow } from '@mui/material'
+import {Typography,Snackbar,CircularProgress,Button,Card,Box,Paper,Table, TableBody,TableCell,TableContainer,TableHead,TableRow, Slide } from '@mui/material'
 import { ethers } from 'ethers'
 import DollarCost from '../chain-info/smart_contracts.json'
 
@@ -272,6 +272,7 @@ const [processing, setProcessing] = useState(false)
     <>
    {
     !processing?
+    <Slide direction="right" in="true" mountOnEnter>
     <Card sx={{marginTop:'20px',padding:'40px'}}>
         <Box>
         <div>Current Dollar Cost Average Contracts</div>
@@ -315,7 +316,7 @@ const [processing, setProcessing] = useState(false)
 
 
 
-    </Card>:<Box display="flex"
+    </Card></Slide>:<Box display="flex"
                 alignItems="center"
                 justifyContent="center" 
                 sx={{marginTop:'20px'}}> <CircularProgress/></Box>

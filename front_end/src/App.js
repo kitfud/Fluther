@@ -12,7 +12,7 @@ import {Snackbar,
   Card, 
   Button, 
   Paper,
-  InputLabel, MenuItem, FormControl, Select,TableContainer,Table,TableHead,TableRow,TableCell,TableBody, Icon} from "@mui/material";
+  InputLabel, MenuItem, FormControl, Select,TableContainer,Table,TableHead,TableRow,TableCell,TableBody, Icon, Slide} from "@mui/material";
 
 import ABI from './chain-info/erc20ABI.json'
 import ERC20Address from './chain-info/smart_contracts.json'
@@ -473,25 +473,28 @@ const action = (
           style={{ minHeight: '100vh' }}
         >
           {/* CONNECT WALLET BUTTON */}
-        <Box 
-          sx={{
-            marginBottom:'10px',
-            marginTop:'4vh',
-            zIndex: 10,
-          }}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <ConnectWallet 
-            dropdownPosition={{
-              side: "top",
-              align: "center",
-            }}
-          />
-        </Box>
+          <Slide direction="down" in="true" mountOnEnter>
+            <Box 
+              sx={{
+                marginBottom:'10px',
+                marginTop:'4vh',
+                zIndex: 10,
+              }}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <ConnectWallet 
+                dropdownPosition={{
+                  side: "top",
+                  align: "center",
+                }}
+              />
+            </Box>
+        </Slide>
 
           {/* MAIN CARD */}
+          <Slide direction="left" in="true" mountOnEnter>
           <Card 
             variant="outlined"
             sx={{ 
@@ -773,7 +776,7 @@ const action = (
                 }}>
               </Box>
             }    
-          </Card> 
+          </Card></Slide>
           
           {
           wethbalance!==null && address !== null?
@@ -788,37 +791,39 @@ const action = (
               
               }}
             >
-              <TableContainer sx={{borderRadius:2, marginTop:'10px'}} component={Paper}>
-              <Table aria-label="coin table">
-                <TableHead sx={{backgroundColor:"lightyellow"}}>
-                <TableRow>
-                  <TableCell align="left" >ICON</TableCell>
-                  <TableCell align="left" >COINS</TableCell>
-                  <TableCell align="left" >WALLET AMOUNT</TableCell>
-                </TableRow>
-                </TableHead>
-                <TableBody>
-                  <TableRow>
-                    <TableCell>
-                      <Icon sx={{width: "50px", height: "50px", borderRadius: "50%"}}>
-                        <img src={WETHicon} height="50px" width="50px"/>
-                      </Icon>
-                    </TableCell>
-                    <TableCell><Typography>WETH</Typography></TableCell>
-                    <TableCell><Typography>{wethbalance}</Typography></TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <Icon sx={{width: "50px", height: "50px", borderRadius: "50%"}}>
-                        <img src={UNIicon} width="50px" height="50px"/>
-                      </Icon>
-                    </TableCell>
-                  <TableCell><Typography>UNI</Typography></TableCell>
-                  <TableCell><Typography color={unicolor}>{unibalance}</Typography></TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </TableContainer> 
+              <Slide direction="right" in="true" mountOnEnter>
+                <TableContainer sx={{borderRadius:2, marginTop:'10px'}} component={Paper}>
+                  <Table aria-label="coin table">
+                    <TableHead sx={{backgroundColor:"lightyellow"}}>
+                    <TableRow>
+                      <TableCell align="left" >ICON</TableCell>
+                      <TableCell align="left" >COINS</TableCell>
+                      <TableCell align="left" >WALLET AMOUNT</TableCell>
+                    </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell>
+                          <Icon sx={{width: "50px", height: "50px", borderRadius: "50%"}}>
+                            <img src={WETHicon} height="50px" width="50px"/>
+                          </Icon>
+                        </TableCell>
+                        <TableCell><Typography>WETH</Typography></TableCell>
+                        <TableCell><Typography>{wethbalance}</Typography></TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>
+                          <Icon sx={{width: "50px", height: "50px", borderRadius: "50%"}}>
+                            <img src={UNIicon} width="50px" height="50px"/>
+                          </Icon>
+                        </TableCell>
+                      <TableCell><Typography>UNI</Typography></TableCell>
+                      <TableCell><Typography color={unicolor}>{unibalance}</Typography></TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Slide> 
             </Box>
           </>:null
           }
