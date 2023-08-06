@@ -150,7 +150,7 @@ const [previousAllowance, setPreviousAllowance] = useState(null)
     balanceCheck= setInterval(()=>{checkAllowance()},1000)
     }
     return ()=>clearInterval(balanceCheck)
-  },[signer,erc20contract])
+  },[signer,erc20contract,allowance])
 
   useEffect(()=>{
    
@@ -286,9 +286,10 @@ return ()=>clearTimeout(colorChange)
   const checkAllowance = async ()=>{
  
  if(address && erc20contract){
+
     let allowanceAmount = await erc20contract.allowance(address,smartContracts.DollarCostAverage.address.sepolia)
     let convertedAllowance = parseFloat(allowanceAmount.toString())/10**18
-  
+    console.log("Checking Allowance: "+ convertedAllowance)
     setAllowance(convertedAllowance)
    
     return convertedAllowance
@@ -314,10 +315,7 @@ return ()=>clearTimeout(colorChange)
       //first contract object made from token to spend erc20contract
       await erc20contract.connect(signer).approve(smartContracts.DollarCostAverage.address.sepolia,ethers.utils.parseEther(amount))
       setSpendingApproved(true)
-      setDisabledTextFeild(true)
-   
-      
-     
+      setDisabledTextFeild(true)  
     }
     catch(err){
       console.log(err)
