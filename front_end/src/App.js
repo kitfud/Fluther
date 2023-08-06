@@ -15,6 +15,7 @@ import {Snackbar,
   Zoom,
   FormControlLabel,
   Switch,
+  Modal,
   InputLabel, MenuItem, FormControl, Select,TableContainer,Table,TableHead,TableRow,TableCell,TableBody, Icon, Slide} from "@mui/material";
 
 import ABI from './chain-info/erc20ABI.json'
@@ -33,8 +34,13 @@ import UNIicon from './img/UNIicon.jpg'
 import Particles from "react-particles"
 import { loadFull } from "tsparticles";
 import particlesOptions from "./particlesConfig.json";
-import zIndex from '@mui/material/styles/zIndex';
 import LinearProgress from '@mui/material/LinearProgress';
+
+import {LineChart,Line, CartesianGrid,XAxis,YAxis,Label,Tooltip} from 'recharts'
+import EthDater from 'ethereum-block-by-date'
+
+
+
 
 const theme = createTheme({
   palette: {
@@ -86,6 +92,18 @@ const theme = createTheme({
   }
 })
 
+const modalStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
+
 function App() {
   const [amount, setAmount] = useState("")
   const [token1,setToken1] = useState("")
@@ -126,6 +144,35 @@ const [thresholdETHtransaction, setThresholdETHTransaction] = useState(null)
 const [amountError, setAmountError] = useState(false)
 
 const [checked, setChecked] = useState(false);
+
+const [open, setOpen] = useState(false);
+const [dater,setDater] = useState(null)
+
+const handleModalOpen = () => setOpen(true);
+const handleModalClose = () => setOpen(false);
+
+const [tokenChangeData, setTokenChangeData] = useState([])
+
+
+
+const renderChart = ( 
+  <LineChart width={400} height={400} data={tokenChangeData}  margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+    <Line type="monotone" dataKey="amount" stroke="#8884d8" />
+    <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+    <XAxis dataKey="date" />
+    <YAxis >
+      <Label  style={{
+             textAnchor: "left",
+             fontSize: "100%",
+             fill: "black"
+         }}
+      angle={270} 
+      />
+    </YAxis>
+    <Tooltip/>
+  </LineChart>
+  )
+
 
 const handleChange = () => {
   setChecked((prev) => !prev);
@@ -506,6 +553,101 @@ else{
 }
 }
 
+const handleIconClick = ()=>{
+  console.log("Icon click")
+  // handleModalOpen()
+  const dater = new EthDater(
+    provider // Ethers provider, required.
+);
+setDater(dater)
+
+// console.log(getPreviousDaysDate(0))
+// console.log(getPreviousDaysDate(8))
+
+
+
+}
+
+const [blocks,setBlocks] = useState(null)
+const [tokenQuantityBlocks,setTokenQuantityBlocks] = useState(null)
+
+useEffect(()=>{
+  if(tokenQuantityBlocks!=null){
+  let tokenChangeData = []
+  let counter = 0
+  blocks.forEach((element)=>{
+    counter++
+    let dataFrame = {}
+    let convertDate = new Date(element.date)
+    console.log(typeof(convertDate))
+    dataFrame["date"] = convertDate.getMonth() + "/"+ convertDate.getDate()
+    dataFrame["amount"] = tokenQuantityBlocks[blocks.indexOf(element)]
+    tokenChangeData.push(dataFrame)
+    if(counter==9){
+      console.log("TOKEN CHANGE",tokenChangeData)
+      setTokenChangeData(tokenChangeData)
+      handleModalOpen(true)
+    }
+  })
+  // console.log("blocks",blocks)
+  // console.log("tokenQuantity",tokenQuantityBlocks)
+  }
+},[tokenQuantityBlocks])
+
+
+useEffect(()=>{
+if(dater){
+getBlockForDates()
+}
+},[dater])
+useEffect(()=>{
+if(blocks){
+  console.log(blocks)
+  getTokenQuantityPerBlock(unitoken,blocks)
+}
+},[blocks])
+
+function getTokenQuantityPerBlock(token,blocks){
+let items = []
+let counter = 0
+blocks.forEach((item)=>{
+  token.balanceOf(address,{blockTag:item.block}).then((res)=>{
+    console.log(`index: ${blocks.indexOf(item)}:`,parseFloat(res.toString())/10**18)
+    items[blocks.indexOf(item)]=parseFloat(res.toString())/10**18
+    counter++
+    if(counter == 9){
+      // console.log("items",items)
+      setTokenQuantityBlocks(items)
+    }
+  })
+})
+
+
+
+}
+
+async function getBlockForDates (){
+  let present = getPreviousDaysDate(0)
+  let back = getPreviousDaysDate(8)
+
+  let blocks = await dater.getEvery(
+    'days', // Period, required. Valid value: years, quarters, months, weeks, days, hours, minutes
+    back, // Start date, required. Any valid moment.js value: string, milliseconds, Date() object, moment() object.
+    present, // End date, required. Any valid moment.js value: string, milliseconds, Date() object, moment() object.
+    1, // Duration, optional, integer. By default 1.
+    true, // Block after, optional. Search for the nearest block before or after the given date. By default true.
+    false // Refresh boundaries, optional. Recheck the latest block before request. By default false.
+    );
+  setBlocks(blocks)
+  console.log("blocks",blocks)
+}
+
+function getPreviousDaysDate(dayBack){
+  const now = new Date()
+  return new Date(now.getTime() - dayBack * 24 * 60 * 60 * 1000).toJSON();
+}
+
+
 
   return (
     <>
@@ -518,6 +660,20 @@ else{
     
       
       <ThemeProvider theme={theme}>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box  sx={modalStyle}>
+        <Typography position="absolute" top="20px"sx={{positon:'absolute',top:'20px'}}>UNI</Typography>
+        {renderChart}
+        <Typography sx={{position:'relative',left:'50px'}}>Date</Typography>
+        </Box>
+     
+        
+      </Modal>
     
 
         <Grid container
@@ -861,8 +1017,8 @@ else{
                     <TableBody>
                       <TableRow>
                         <TableCell>
-                          <Icon sx={{width: "50px", height: "50px", borderRadius: "50%"}}>
-                            <img src={ETHicon} height="50px" width="50px"/>
+                          <Icon  sx={{width: "50px", height: "50px", borderRadius: "50%"}}>
+                            <img  src={ETHicon} height="50px" width="50px"/>
                           </Icon>
                         </TableCell>
                         <TableCell><Typography>ETH</Typography></TableCell>
@@ -879,9 +1035,16 @@ else{
                       </TableRow>
                       <TableRow>
                         <TableCell>
-                          <Icon sx={{width: "50px", height: "50px", borderRadius: "50%"}}>
-                            <img src={UNIicon} width="50px" height="50px"/>
+                        <div class="tooltip">
+                         <Icon onClick = {handleIconClick} sx={{width: "50px", height: "50px", borderRadius: "50%"}}>
+                            <img class='highlight' src={UNIicon} width="50px" height="50px"/>
                           </Icon>
+                          
+                    <span class="tooltiptext">Click For Data</span>
+                          </div>
+                       
+                        
+                         
                         </TableCell>
                       <TableCell><Typography>UNI</Typography></TableCell>
                       <TableCell><Typography color={unicolor}>{unibalance}</Typography></TableCell>
