@@ -177,6 +177,12 @@ const getCurrentExchangePrice = async()=>{
 }
 
   useEffect(()=>{
+    if(ethbalance){
+      console.log("ethbalance: ", parseFloat(ethbalance.toString())/10**18)
+    }
+  },[ethbalance])
+
+  useEffect(()=>{
     console.log('scheckAllowance')
     checkAllowance()
   },[address,wethbalance])
@@ -309,6 +315,13 @@ return ()=>clearTimeout(colorChange)
   }
 
   const checkTokenBalance = async ()=>{
+
+    if(provider !== null && address !== null && address !== undefined){
+      const ethbal = await provider.getBalance(address);
+      let valueToNumber = parseFloat(ethbal.toString())
+      let valueConverted = valueToNumber/10**18
+      setEthBalance(valueConverted)
+    }
 
     if(wethtoken!==null && address !==null && address!== undefined){
     // console.log("address",address)
@@ -853,7 +866,7 @@ else{
                           </Icon>
                         </TableCell>
                         <TableCell><Typography>ETH</Typography></TableCell>
-                        <TableCell><Typography>placeholder</Typography></TableCell>
+                        <TableCell><Typography>{ethbalance}</Typography></TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell>
