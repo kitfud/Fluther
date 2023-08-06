@@ -26,6 +26,7 @@ import {ethers} from 'ethers'
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import UserRecurringBuys from './components/UserRecurringBuys';
+import ETHicon from './img/ETH.png'
 import WETHicon from './img/wETH.png'
 import UNIicon from './img/UNIicon.jpg'
 
@@ -106,6 +107,7 @@ function App() {
   const [wethtoken,setWEth] = useState(null)
   const [unitoken,setUNI] = useState(null)
 
+  const [ethbalance, setEthBalance] = useState(null)
   const [wethbalance,setWEthBalance] = useState(null)
   const [unibalance,setUniBalance] = useState(null)
   const [processing, setProcessing] = useState(false)
@@ -844,6 +846,15 @@ else{
                     </TableRow>
                     </TableHead>
                     <TableBody>
+                      <TableRow>
+                        <TableCell>
+                          <Icon sx={{width: "50px", height: "50px", borderRadius: "50%"}}>
+                            <img src={ETHicon} height="50px" width="50px"/>
+                          </Icon>
+                        </TableCell>
+                        <TableCell><Typography>ETH</Typography></TableCell>
+                        <TableCell><Typography>placeholder</Typography></TableCell>
+                      </TableRow>
                       <TableRow>
                         <TableCell>
                           <Icon sx={{width: "50px", height: "50px", borderRadius: "50%"}}>
