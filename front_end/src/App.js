@@ -15,6 +15,7 @@ import {Snackbar,
   InputLabel, MenuItem, FormControl, Select,TableContainer,Table,TableHead,TableRow,TableCell,TableBody, Icon, Slide} from "@mui/material";
 
 import ABI from './chain-info/erc20ABI.json'
+import PriceFeedABI from './chain-info/pricefeedABI.json'
 import ERC20Address from './chain-info/smart_contracts.json'
 import smartContracts from './chain-info/smart_contracts.json'
 import {ethers} from 'ethers'
@@ -96,6 +97,7 @@ function App() {
   const [dollarCostAverageContract,setDollarCostAverageContract] = useState(null)
   const [disableText, setDisabledTextFeild] = useState(false)
   const [duhcontract, setDuhContract] = useState(null)
+  const [pricefeedcontract,setPriceFeedContract] = useState(null)
 
 
   const [wethtoken,setWEth] = useState(null)
@@ -108,11 +110,16 @@ function App() {
 
   const [openSnackbar,setOpenSnackBar] = useState(false)
 
-  const [unicolor,setUniColor] = useState('black')
-  const [allowance, setAllowance] = useState(null)
+const [unicolor,setUniColor] = useState('black')
+const [allowance, setAllowance] = useState(null)
 
-  const [delayRender, setDelayRender] = useState(false)
+const [delayRender, setDelayRender] = useState(false)
 const [previousAllowance, setPreviousAllowance] = useState(null)
+const [exchangeprice, setExchangePrice] = useState(null)
+
+const [thresholdETHtransaction, setThresholdETHTransaction] = useState(null)
+const [amountError, setAmountError] = useState(false)
+
 
   const address = useAddress();
 
@@ -138,6 +145,26 @@ const [previousAllowance, setPreviousAllowance] = useState(null)
     }
     
   },[])
+
+  useEffect(()=>{
+if(pricefeedcontract){
+getCurrentExchangePrice()
+}
+  },[pricefeedcontract])
+
+
+useEffect(()=>{
+if(exchangeprice){
+  let decimalsRemovedRate= exchangeprice.toNumber()/10**8
+  setThresholdETHTransaction(20/decimalsRemovedRate)
+}
+  },[exchangeprice])
+
+
+const getCurrentExchangePrice = async()=>{
+  let result = await pricefeedcontract.getLatestData()
+  setExchangePrice(result)
+}
 
   useEffect(()=>{
     console.log('scheckAllowance')
@@ -201,6 +228,12 @@ const [previousAllowance, setPreviousAllowance] = useState(null)
     if(provider !== null){
       //setting contract to approve spending amount, wEth in this case
       try{
+
+
+//price feed contract object is made below
+      setPriceFeedContract(new ethers.Contract(smartContracts.PriceFeed.address.sepolia.ETHUSD,PriceFeedABI.sepolia,provider))  
+
+//core contract objects for dollar cost averaging made below
       setErc20Contract(new ethers.Contract(smartContracts.WETHMock.address.sepolia,ABI,provider))
       setDuhContract(new ethers.Contract(smartContracts.Duh.address.sepolia,ABI,provider))
       setWEth(new ethers.Contract(smartContracts.WETHMock.address.sepolia,ABI,provider))
@@ -289,7 +322,7 @@ return ()=>clearTimeout(colorChange)
 
     let allowanceAmount = await erc20contract.allowance(address,smartContracts.DollarCostAverage.address.sepolia)
     let convertedAllowance = parseFloat(allowanceAmount.toString())/10**18
-    console.log("Checking Allowance: "+ convertedAllowance)
+
     setAllowance(convertedAllowance)
    
     return convertedAllowance
@@ -426,6 +459,29 @@ const action = (
   </React.Fragment>
 );
 
+const handleIntervalSpendCheck= (e)=>{
+  console.log(thresholdETHtransaction)
+const reg = new RegExp(/^[0-9]+([.][0-9]+)?$/);
+const emptyString = new RegExp(/^$/);
+
+//check to make sure only number passes and also not empty strings
+
+if(reg.test(e.target.value) || emptyString.test(e.target.value)){
+
+  if(parseFloat(e.target.value)>=thresholdETHtransaction){
+  setAmountError(false)
+  setIntervalAmount(e.target.value)
+  }
+  else{
+    setIntervalAmount("")
+    setAmountError(true)
+  }
+}
+else{
+  setIntervalAmount("")
+  setAmountError(true)
+}
+}
 
 
   return (
@@ -440,30 +496,6 @@ const action = (
       
       <ThemeProvider theme={theme}>
     
-        {/*
-      HAD TO MOVE CONNECT WALLET BUTTON INSIDE GRID OR YOU WOULDN'T BE ABLE TO CLICK IT WITH TSPARTICLES BACKGROUND FOR SOME REASON.
-
-        CONNECT WALLET BUTTON
-
-        <Box 
-          sx={{
-            marginBottom:'10px',
-            marginTop:'4vh',
-            zIndex: 10,
-            backgroundColor: "red",
-          }}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-        >
-          <ConnectWallet 
-            dropdownPosition={{
-              side: "top",
-              align: "center",
-            }}
-          />
-        </Box>
-        */}
 
         <Grid container
           spacing={0}
@@ -652,7 +684,9 @@ const action = (
                     justifyContent="center"
                   >
                     <TextField
-                      onChange={ (e) => setIntervalAmount(e.target.value) }
+                      onChange={ (e) => handleIntervalSpendCheck(e) }
+                      error = {amountError}
+                      helperText={amountError?'spending does not meet threshold amount':''}
                       id="filled-basic"
                       label="Amount to Spend"
                       variant="filled"
