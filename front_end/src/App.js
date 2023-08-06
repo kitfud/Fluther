@@ -12,6 +12,9 @@ import {Snackbar,
   Card, 
   Button, 
   Paper,
+  Zoom,
+  FormControlLabel,
+  Switch,
   InputLabel, MenuItem, FormControl, Select,TableContainer,Table,TableHead,TableRow,TableCell,TableBody, Icon, Slide} from "@mui/material";
 
 import ABI from './chain-info/erc20ABI.json'
@@ -120,6 +123,11 @@ const [exchangeprice, setExchangePrice] = useState(null)
 const [thresholdETHtransaction, setThresholdETHTransaction] = useState(null)
 const [amountError, setAmountError] = useState(false)
 
+const [checked, setChecked] = useState(false);
+
+const handleChange = () => {
+  setChecked((prev) => !prev);
+};
 
   const address = useAddress();
 
@@ -875,9 +883,19 @@ else{
           <Typography color="black">Success! Click for Transaction:${txHash} on Etherscan</Typography>
         </a>
         </Snackbar>
-
-        <UserRecurringBuys signer={signer} contract={dollarCostAverageContract} provider={provider} address={address}/>
-       
+        <Box >
+        <FormControlLabel 
+        sx={{color:'white'}}
+        control={<Switch checked={checked} onChange={handleChange} />}
+        label="Display User Agreements"
+      />
+        </Box>
+     
+      <Zoom in={checked}>
+      <Box>
+      <UserRecurringBuys signer={signer} contract={dollarCostAverageContract} provider={provider} address={address}/> 
+      </Box>
+       </Zoom>
        
         </Grid>      
       </ThemeProvider>
