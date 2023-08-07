@@ -53,8 +53,9 @@ const [processing, setProcessing] = useState(false)
     useEffect(()=>{
 
     const loggingData = async()=>{
+    console.log("RECURRING BUY MADE")
     const data = await logEventData("RecurringBuyCreated",[], provider)
-  
+    console.log("data",data)
     setData(data)
     }
 
@@ -79,6 +80,7 @@ const [processing, setProcessing] = useState(false)
 
 
     const filterData = (data)=>{
+      console.log("PASSED TO FILTER DATA", data)
         // console.log(data)
         // console.log("data",data[16][0])
 
@@ -89,21 +91,21 @@ const [processing, setProcessing] = useState(false)
         data.forEach((element)=>{
             //the cancel event array is length 2 and the admin stuff does not start witha  string when
             //llooking at data
-            if(typeof(element[0])!='string'& element.length==3){
+            if(typeof(element[0])!='string'& element.length==2){
                 userData.push(element)
             }
            
         })
 
         
-            data.forEach((element)=>{
-                //event structure for canclled events in length 2 and only take sender from address
-                if(typeof(element[0])!='string'& element.length==2 &element.sender==address){
-                //filter and convert big number to javascript integer
-                    cancelledContracts.push(element.recBuyId.toNumber())
-                }
+            // data.forEach((element)=>{
+            //     //event structure for canclled events in length 2 and only take sender from address
+            //     if(typeof(element[0])!='string'& element.length==2 &element.sender==address){
+            //     //filter and convert big number to javascript integer
+            //         cancelledContracts.push(element.recBuyId.toNumber())
+            //     }
                
-            })
+            // })
            
        
 
@@ -112,6 +114,7 @@ const [processing, setProcessing] = useState(false)
         //filter to only records specific to user
       
        let result =[] 
+       console.log("userDATA",userData)
        for(let i = 0; i<userData.length; i++){
        if (userData[i][1]==address&& userData[i].buy){
         result.push(userData[i])
@@ -120,6 +123,7 @@ const [processing, setProcessing] = useState(false)
 
        let tableResult = []
        result.forEach((element)=>{
+        console.log("RESULT FILTER", result)
         // console.log("buy",element.buy)
         // console.log("timeIntervalSeconds",element.buy.timeIntervalInSeconds.toNumber())
       
@@ -152,6 +156,7 @@ const [processing, setProcessing] = useState(false)
         // let filterABI = ["event RecurringBuyCreated ( uint256 recBuyId,address sender, tuple buy)"]
         // console.log(DollarCost.DollarCostAverage.abi)
         let filterABI = DollarCost.DollarCostAverage.abi
+        console.log("filter",filterABI)
         let iface = new ethers.utils.Interface(filterABI)
 
         // console.log(iface)
@@ -167,6 +172,7 @@ const [processing, setProcessing] = useState(false)
             let events = logs.map((log)=>{
                 return iface.parseLog(log).args
             })
+            console.log("events",events)
             setData(events)
             
         }).catch(function(err){
