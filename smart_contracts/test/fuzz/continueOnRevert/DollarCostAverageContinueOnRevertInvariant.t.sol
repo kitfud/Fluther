@@ -52,8 +52,11 @@ contract DollarCostAverageContinueOnRevertInvariant is StdInvariant, Test {
         ) = config.activeNetworkConfig();
         signer = vm.addr(deployerPk);
 
-        vm.prank(signer);
+        vm.startPrank(signer);
         automation.setSequencerAddress(address(0));
+        dca.setAllowedERC20s(weth_, true);
+        dca.setAllowedERC20s(uni_, true);
+        vm.stopPrank();
 
         weth = ERC20Mock(weth_);
         uni = ERC20Mock(uni_);
@@ -107,6 +110,11 @@ contract DollarCostAverageContinueOnRevertInvariant is StdInvariant, Test {
 
     function invariant_senderCannotSetDuh() public {
         assertEq(dca.getDuh(), duhToken);
+    }
+
+    function invariant_senderCannotSetAllowedERC20s() public {
+        assertTrue(dca.getAllowedERC20s(address(weth)));
+        assertTrue(dca.getAllowedERC20s(address(uni)));
     }
 
     function invariant_contractBalanceShouldBe0() public {

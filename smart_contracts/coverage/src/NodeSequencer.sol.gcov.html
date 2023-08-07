@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-08-02 15:30:18</td>
+            <td class="headerValue">2023-08-07 10:21:37</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">25</td>
@@ -209,8 +209,8 @@
 <a name="138"><span class="lineNum">     138 </span>                :<span class="lineCov">         39 :         __checkNodeStatus(msg.sender, false);</span></a>
 <a name="139"><span class="lineNum">     139 </span>                :<span class="lineCov">         38 :         __onlyEOA();</span></a>
 <a name="140"><span class="lineNum">     140 </span>                :            : </a>
-<a name="141"><span class="lineNum">     141 </span>                :<span class="lineCov">         37 :         uint256 startBlockNumber;</span></a>
-<a name="142"><span class="lineNum">     142 </span>                :<span class="lineCov">         37 :         uint256 endBlockNumber;</span></a>
+<a name="141"><span class="lineNum">     141 </span>                :<span class="lineCov">         37 :         uint256 startBlockNumber = 0;</span></a>
+<a name="142"><span class="lineNum">     142 </span>                :<span class="lineCov">         37 :         uint256 endBlockNumber = 0;</span></a>
 <a name="143"><span class="lineNum">     143 </span>        [<span class="branchCov" title="Branch 0 was taken 4 times"> + </span><span class="branchCov" title="Branch 1 was taken 29 times"> + </span>]:<span class="lineCov">         37 :         if (__hasDuhFunds(msg.sender)) {</span></a>
 <a name="144"><span class="lineNum">     144 </span>                :<span class="lineCov">         33 :             startBlockNumber = s_startBlockNumber;</span></a>
 <a name="145"><span class="lineNum">     145 </span>                :<span class="lineCov">         33 :             startBlockNumber = startBlockNumber == block.number</span></a>
@@ -450,7 +450,7 @@
 <a name="379"><span class="lineNum">     379 </span>                :            :         uint256 endBlockNumber,</a>
 <a name="380"><span class="lineNum">     380 </span>                :            :         address node</a>
 <a name="381"><span class="lineNum">     381 </span>                :            :     ) private returns (uint256, uint256) {</a>
-<a name="382"><span class="lineNum">     382 </span>                :<span class="lineCov">          3 :         uint256 takenStartBlockNumber;</span></a>
+<a name="382"><span class="lineNum">     382 </span>                :<span class="lineCov">          3 :         uint256 takenStartBlockNumber = 0;</span></a>
 <a name="383"><span class="lineNum">     383 </span>                :<span class="lineCov">          3 :         for (uint256 ii = startBlockNumber; ii &lt; endBlockNumber + 1; ++ii) {</span></a>
 <a name="384"><span class="lineNum">     384 </span>        [<span class="branchCov" title="Branch 0 was taken 3 times"> + </span><span class="branchCov" title="Branch 1 was taken 17282 times"> + </span>]:<span class="lineCov">      17283 :             if (s_blockNumberToNode[ii] == address(0)) {</span></a>
 <a name="385"><span class="lineNum">     385 </span>                :<span class="lineCov">      17282 :                 s_blockNumberToNode[ii] = node;</span></a>

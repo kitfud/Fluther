@@ -155,6 +155,12 @@ contract AutomationLayerTest is Test {
         ERC20Mock(token1).mint(defaultRouter, INITAL_DEX_ERC20_FUNDS);
         ERC20Mock(token2).mint(defaultRouter, INITAL_DEX_ERC20_FUNDS);
         ERC20Mock(token1).mint(user, INITAL_USER_ERC20_FUNDS);
+
+        vm.startPrank(signer);
+        dca.setAllowedERC20s(token1, true);
+        dca.setAllowedERC20s(token2, true);
+        dca.setAllowedERC20s(wNative, true);
+        vm.stopPrank();
     }
 
     /// -----------------------------------------------------------------------

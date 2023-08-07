@@ -146,6 +146,13 @@ contract DollarCostAverageContinueOnRevertHandler is Test {
         dca.setSlippagePercentage(slippagePercentage);
     }
 
+    function setAllowedERC20s(address token, bool isAllowed) public {
+        vm.assume(token != address(0));
+
+        vm.prank(msg.sender);
+        dca.setAllowedERC20s(token, isAllowed);
+    }
+
     function setDuh(address duh) public {
         vm.assume(duh != address(0));
 

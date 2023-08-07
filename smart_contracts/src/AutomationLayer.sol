@@ -389,7 +389,7 @@ contract AutomationLayer is IAutomationLayer, Security {
                 .getNode(nodeAddress)
                 .endBlockNumber;
 
-            if (block.number == nodeEndBlockNumber) {
+            if (!(block.number < nodeEndBlockNumber)) {
                 sequencer.takeNextBlockNumbers(nodeAddress);
             }
         }

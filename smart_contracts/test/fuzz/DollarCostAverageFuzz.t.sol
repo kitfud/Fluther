@@ -113,6 +113,13 @@ contract DollarCostAverageFuzz is Test {
         ERC20Mock(token1).mint(defaultRouter, INITAL_DEX_ERC20_FUNDS);
         ERC20Mock(token2).mint(defaultRouter, INITAL_DEX_ERC20_FUNDS);
         ERC20Mock(token1).mint(user, INITAL_USER_ERC20_FUNDS);
+
+        vm.startPrank(signer);
+        dca.setAllowedERC20s(token1, true);
+        dca.setAllowedERC20s(token2, true);
+        dca.setAllowedERC20s(wrapNative, true);
+        dca.setAllowedERC20s(address(anotherToken), true);
+        vm.stopPrank();
     }
 
     /// -----------------------------------------------------------------------
@@ -129,7 +136,13 @@ contract DollarCostAverageFuzz is Test {
         vm.assume(amountToSpend > 0);
         vm.assume(tokenToSpend != address(0));
         vm.assume(tokenToBuy != address(0));
+        vm.assume(tokenToBuy != tokenToSpend);
         timeIntervalInSeconds = bound(timeIntervalInSeconds, 1, 365 days);
+
+        vm.startPrank(signer);
+        dca.setAllowedERC20s(tokenToSpend, true);
+        dca.setAllowedERC20s(tokenToBuy, true);
+        vm.stopPrank();
 
         vm.prank(msg.sender);
         dca.createRecurringBuy(
@@ -460,6 +473,54 @@ contract DollarCostAverageFuzz is Test {
     }
 
     /// -----------------------------------------------------------------------
+    /// Test for: setAllowedERC20s
+    /// -----------------------------------------------------------------------
+
+    function testSetAllowedERC20sSuccess(address token, bool isAllowed) public {
+        vm.assume(token != address(0));
+
+        vm.prank(signer);
+        dca.setAllowedERC20s(token, isAllowed);
+
+        bool allowedAfter = dca.getAllowedERC20s(token);
+
+        assertEq(allowedAfter, isAllowed);
+    }
+
+    function testSetAllowedERC20sRevertsIfCallerNotAllowed(
+        address token,
+        bool isAllowed
+    ) public {
+        vm.assume(token != address(0));
+        vm.assume(msg.sender != signer);
+
+        vm.prank(msg.sender);
+        vm.expectRevert(Security.Security__NotAllowed.selector);
+        dca.setAllowedERC20s(token, isAllowed);
+    }
+
+    function testSetAllowedERC20sRevertsIfContractPaused(
+        address token,
+        bool isAllowed
+    ) public {
+        vm.assume(token != address(0));
+
+        vm.startPrank(signer);
+        dca.pause();
+        vm.expectRevert("Pausable: paused");
+        dca.setAllowedERC20s(token, isAllowed);
+        vm.stopPrank();
+    }
+
+    /// -----------------------------------------------------------------------
+    /// Test for: getAllowedERC20s
+    /// -----------------------------------------------------------------------
+
+    function testGetAllowedERC20s(address token) public view {
+        dca.getAllowedERC20s(token);
+    }
+
+    /// -----------------------------------------------------------------------
     /// Test for: checkTrigger
     /// -----------------------------------------------------------------------
 
@@ -481,5 +542,206 @@ contract DollarCostAverageFuzz is Test {
 
     function testProspectAutomationPayment(uint256 recurringBuyId) public view {
         dca.prospectAutomationPayment(recurringBuyId);
+    }
+
+    /// -----------------------------------------------------------------------
+    /// Test for: getRangeOfRecurringBuys
+    /// -----------------------------------------------------------------------
+
+    modifier createRecurringBuy() {
+        vm.prank(msg.sender);
+        dca.createRecurringBuy(
+            1 ether,
+            token1,
+            token2,
+            2 minutes,
+            address(0),
+            defaultRouter
+        );
+        _;
+    }
+
+    function testGetRangeOfRecurringBuysSuccess(
+        uint256 startRecBuyId,
+        uint256 endRecBuyId
+    )
+        public
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+    {
+        endRecBuyId = bound(endRecBuyId, 1, dca.getNextRecurringBuyId() - 1);
+        startRecBuyId = bound(startRecBuyId, 1, endRecBuyId);
+
+        dca.getRangeOfRecurringBuys(startRecBuyId, endRecBuyId);
+    }
+
+    function testGetRangeOfRecurringBuysRevertsPath1(
+        uint256 startRecBuyId,
+        uint256 endRecBuyId
+    )
+        public
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+    {
+        vm.assume(endRecBuyId != 0);
+        vm.assume(startRecBuyId > endRecBuyId);
+
+        vm.expectRevert(
+            IDollarCostAverage.DollarCostAverage__InvalidIndexRange.selector
+        );
+        dca.getRangeOfRecurringBuys(startRecBuyId, endRecBuyId);
+    }
+
+    function testGetRangeOfRecurringBuysRevertsPath2(
+        uint256 startRecBuyId,
+        uint256 endRecBuyId
+    )
+        public
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+    {
+        vm.assume(startRecBuyId != 0);
+        vm.assume(endRecBuyId >= dca.getNextRecurringBuyId());
+
+        vm.expectRevert(
+            IDollarCostAverage.DollarCostAverage__InvalidIndexRange.selector
+        );
+        dca.getRangeOfRecurringBuys(startRecBuyId, endRecBuyId);
+    }
+
+    function testGetRangeOfRecurringBuysRevertsPath3(
+        uint256 startRecBuyId,
+        uint256 endRecBuyId
+    )
+        public
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+    {
+        vm.assume(startRecBuyId == 0);
+
+        vm.expectRevert(
+            IDollarCostAverage.DollarCostAverage__InvalidIndexRange.selector
+        );
+        dca.getRangeOfRecurringBuys(startRecBuyId, endRecBuyId);
+    }
+
+    function testGetRangeOfRecurringBuysRevertsPath4(
+        uint256 startRecBuyId,
+        uint256 endRecBuyId
+    )
+        public
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+    {
+        vm.assume(endRecBuyId == 0);
+
+        vm.expectRevert(
+            IDollarCostAverage.DollarCostAverage__InvalidIndexRange.selector
+        );
+        dca.getRangeOfRecurringBuys(startRecBuyId, endRecBuyId);
+    }
+
+    /// -----------------------------------------------------------------------
+    /// Test for: getValidRangeOfRecurringBuys
+    /// -----------------------------------------------------------------------
+
+    function testGetValidRangeOfRecurringBuysSuccess(
+        uint256 startRecBuyId,
+        uint256 endRecBuyId
+    )
+        public
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+    {
+        endRecBuyId = bound(endRecBuyId, 1, dca.getNextRecurringBuyId() - 1);
+        startRecBuyId = bound(startRecBuyId, 1, endRecBuyId);
+
+        dca.getValidRangeOfRecurringBuys(startRecBuyId, endRecBuyId);
+    }
+
+    function testGetValidRangeOfRecurringBuysRevertsPath1(
+        uint256 startRecBuyId,
+        uint256 endRecBuyId
+    )
+        public
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+    {
+        vm.assume(endRecBuyId != 0);
+        vm.assume(startRecBuyId > endRecBuyId);
+
+        vm.expectRevert(
+            IDollarCostAverage.DollarCostAverage__InvalidIndexRange.selector
+        );
+        dca.getValidRangeOfRecurringBuys(startRecBuyId, endRecBuyId);
+    }
+
+    function testGetValidRangeOfRecurringBuysRevertsPath2(
+        uint256 startRecBuyId,
+        uint256 endRecBuyId
+    )
+        public
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+    {
+        vm.assume(startRecBuyId != 0);
+        vm.assume(endRecBuyId >= dca.getNextRecurringBuyId());
+
+        vm.expectRevert(
+            IDollarCostAverage.DollarCostAverage__InvalidIndexRange.selector
+        );
+        dca.getValidRangeOfRecurringBuys(startRecBuyId, endRecBuyId);
+    }
+
+    function testGetValidRangeOfRecurringBuysRevertsPath3(
+        uint256 startRecBuyId,
+        uint256 endRecBuyId
+    )
+        public
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+    {
+        vm.assume(startRecBuyId == 0);
+
+        vm.expectRevert(
+            IDollarCostAverage.DollarCostAverage__InvalidIndexRange.selector
+        );
+        dca.getValidRangeOfRecurringBuys(startRecBuyId, endRecBuyId);
+    }
+
+    function testGetValidRangeOfRecurringBuysRevertsPath4(
+        uint256 startRecBuyId,
+        uint256 endRecBuyId
+    )
+        public
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+    {
+        vm.assume(endRecBuyId == 0);
+
+        vm.expectRevert(
+            IDollarCostAverage.DollarCostAverage__InvalidIndexRange.selector
+        );
+        dca.getValidRangeOfRecurringBuys(startRecBuyId, endRecBuyId);
     }
 }

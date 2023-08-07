@@ -198,6 +198,17 @@ contract DollarCostAverageFailOnRevertHandler is Test {
         dca.setDuh(duh);
     }
 
+    function setAllowedERC20s(uint256 tokenSeed) public {
+        (address token, ) = __getTokens(tokenSeed);
+
+        if (!dca.getAllowed(msg.sender)) {
+            return;
+        }
+
+        vm.prank(msg.sender);
+        dca.setAllowedERC20s(token, false);
+    }
+
     function pause() public {
         if (!dca.getAllowed(msg.sender)) {
             return;
