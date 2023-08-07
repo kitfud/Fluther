@@ -197,7 +197,6 @@ const handleChange = () => {
   },[])
 
   useEffect(() => {
-    console.log("load")
     if(!dataload){
     updateEthers()
     }
@@ -224,14 +223,9 @@ const getCurrentExchangePrice = async()=>{
   setExchangePrice(result)
 }
 
-  useEffect(()=>{
-    if(ethbalance){
-      console.log("ethbalance: ", parseFloat(ethbalance.toString())/10**18)
-    }
-  },[ethbalance])
+
 
   useEffect(()=>{
-    console.log('scheckAllowance')
     checkAllowance()
   },[address,wethbalance])
 
@@ -256,7 +250,7 @@ const getCurrentExchangePrice = async()=>{
          setDelayRender(false)
         }
       }
-     console.log('allowance',allowance)
+     
      if(allowance>=100){
       setSpendingApproved(true)
       setDisabledTextFeild(true)

@@ -2,7 +2,6 @@ import React, { isValidElement } from 'react'
 import { useEffect,useState } from 'react'
 import {Typography,Snackbar,CircularProgress,Button,Card,Box,Paper,Table, TableBody,TableCell,TableContainer,TableHead,TableRow, Slide } from '@mui/material'
 import { ethers } from 'ethers'
-import DollarCost from '../chain-info/smart_contracts.json'
 
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
@@ -11,8 +10,6 @@ import smartContracts from '../chain-info/smart_contracts.json'
 
 const UserRecurringBuys = ({signer,contract,provider,address}) => {
 
-    // console.log(DollarCost.DollarCostAverage.address.sepolia)
-// console.log("address",address)
 const [data, setData] = useState(null)
 const [tabledata,setTableData] = useState(null)
 const [processing, setProcessing] = useState(false)
@@ -21,13 +18,15 @@ const [processing, setProcessing] = useState(false)
   const [txHash, setTxHash] = useState(null)
   const [canceledIds,setCanceledIds] = useState(null)
  
+  const [buyIds,setBuyIds] = useState(null)
+  const [buyIdStructs,setBuyIdStructs] = useState(null)
 
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
-    window.location.reload(false);
+    window.location.reload()
     setOpenSnackBar(false);
     
   };
@@ -51,134 +50,79 @@ const [processing, setProcessing] = useState(false)
   );
 
     useEffect(()=>{
-
-    const loggingData = async()=>{
-    console.log("RECURRING BUY MADE")
-    const data = await logEventData("RecurringBuyCreated",[], provider)
-    console.log("data",data)
-    setData(data)
-    }
-
     if(provider!=null){
     try{
-    loggingData()  
+    logUserData()  
     }
     catch(err){
-        console.log(err)
+    console.log(err)
     }
     }
-
     },[provider,address])
 
     useEffect(()=>{
-    if(data != undefined){
-
-    filterData(data)
+    if(buyIdStructs){
+    filterData(buyIdStructs)
 }
-    },[data])
+    },[buyIdStructs])
 
 
 
-    const filterData = (data)=>{
-      console.log("PASSED TO FILTER DATA", data)
-        // console.log(data)
-        // console.log("data",data[16][0])
-
-        //takes off records which don't relate to events,setup of contracts and admin
-        let userData = []
-        let cancelledContracts = []
-
-        data.forEach((element)=>{
-            //the cancel event array is length 2 and the admin stuff does not start witha  string when
-            //llooking at data
-            if(typeof(element[0])!='string'& element.length==2){
-                userData.push(element)
-            }
-           
-        })
-
-        
-            // data.forEach((element)=>{
-            //     //event structure for canclled events in length 2 and only take sender from address
-            //     if(typeof(element[0])!='string'& element.length==2 &element.sender==address){
-            //     //filter and convert big number to javascript integer
-            //         cancelledContracts.push(element.recBuyId.toNumber())
-            //     }
-               
-            // })
-           
-       
-
-        //console.log("cancelled",cancelledContracts)
-        setCanceledIds(cancelledContracts)
-        //filter to only records specific to user
-      
-       let result =[] 
-       console.log("userDATA",userData)
-       for(let i = 0; i<userData.length; i++){
-       if (userData[i][1]==address&& userData[i].buy){
-        result.push(userData[i])
-       }
-       }
-
-       let tableResult = []
-       result.forEach((element)=>{
-        console.log("RESULT FILTER", result)
-        // console.log("buy",element.buy)
-        // console.log("timeIntervalSeconds",element.buy.timeIntervalInSeconds.toNumber())
-      
-  
-        // console.log(element.recBuyId.toNumber())
-        
-        // console.log("amount",ethers.utils.formatEther(element.buy[1]))
-       
-        let tdata = {
-            "buyId":element.recBuyId.toNumber(),
-            "tokenToSpend":element.buy.tokenToSpend,
-            "tokenToBuy":element.buy.tokenToBuy,
-            "timeInterval":element.buy.timeIntervalInSeconds.toNumber(),
-            "amount":ethers.utils.formatEther(element.buy[1])
+    const filterData = ()=>{
+      if(buyIdStructs){
+      console.log("Buy ID Structs", buyIdStructs)
+      }
+      let tableResult = []
+     
+      buyIdStructs.forEach((element)=>{
+       let tdata = {
+            "buyId":element.index.toNumber(),
+            "tokenToSpend":element.tokenToSpend,
+            "tokenToBuy":element.tokenToBuy,
+            "timeInterval":element.timeIntervalInSeconds.toNumber(),
+            "amount":ethers.utils.formatEther(element.amountToSpend)
         }
         tableResult.push(tdata)
-    
-       })
-    //    console.log("tableresult",tableResult)
+      })
+    // console.log("tableresult",tableResult)
     setTableData(tableResult)
     }
 
 
+
+    useEffect(()=>{
+      if(buyIds){
+        logBuyStructs()
+      }
+    },[buyIds])
+
+    const logBuyStructs = async ()=>{
+      let buyStructs = await contract.getRecurringBuyFromIds(buyIds)
+      console.log("Buy STRUCTS", buyStructs)
+      setBuyIdStructs(buyStructs)
+    }
+
+    const logUserData = async () => {
+     if(address){
+      
+      let buyIds = await contract.getSenderToIds(address)
+      let buyIdsAdjusted = []
     
-    const logEventData = async (eventName, filters = [], provider, setterFunction = undefined) => {
+      let counter = 0
 
-        // console.log("eventName",eventName)
-        // console.log("provider",provider)
-        // console.log("filters",filters)
-        // let filterABI = ["event RecurringBuyCreated ( uint256 recBuyId,address sender, tuple buy)"]
-        // console.log(DollarCost.DollarCostAverage.abi)
-        let filterABI = DollarCost.DollarCostAverage.abi
-        console.log("filter",filterABI)
-        let iface = new ethers.utils.Interface(filterABI)
+     buyIds.forEach((el)=>{
+      counter++
+      let numId = el.toNumber()
+      if(numId !=0){
+        buyIdsAdjusted.push(el.toNumber())
+      }
+      if (counter == buyIds.length){
 
-        // console.log(iface)
+        setBuyIds(buyIdsAdjusted)
 
-        let dollarCostAddress = DollarCost.DollarCostAverage.address.sepolia
-        // console.log(dollarCostAddress)
-        let filter = {
-            address: dollarCostAddress,
-            fromBlock:0,     
         }
-        let logPromise = provider.getLogs(filter)
-        logPromise.then(function(logs){
-            let events = logs.map((log)=>{
-                return iface.parseLog(log).args
-            })
-            console.log("events",events)
-            setData(events)
-            
-        }).catch(function(err){
-            console.log(err);
-        });
-
+     })
+     }
     }
 
     const handleCancel = async (id)=>{
@@ -229,13 +173,7 @@ const [processing, setProcessing] = useState(false)
         }
       }
     
- const removeCancelledContracts = (tableData) =>{
-    // console.log('tableData',tableData)
-    // console.log("cancelled",canceledIds)
-    let refinedData = tableData.filter(element=>!canceledIds.includes(element.buyId))
-    // console.log("refined",refinedData)
-    return refinedData
- }
+
 
  const translateToken = (row)=>{
     let translatedData = {}
@@ -296,24 +234,25 @@ const [processing, setProcessing] = useState(false)
           </TableRow>
         </TableHead>
         <TableBody sx={{backgroundColor: "#ebecff"}}>
-          {tabledata?(removeCancelledContracts(tabledata).map((row) => {
+          {tabledata?(tabledata.map((row) => {
             // let swap = {"tokenToBuy":"UNI","tokenToSpend":"WETH"}
             // console.log("row",row)
             let swap = translateToken(row)
             let time = translateTime(row)
+            let index = tabledata.indexOf(row)
             
             return(
             <TableRow
-              key={row.buyId}
+              key={buyIds[index]}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
           
-              <TableCell align="right">{row.buyId}</TableCell>
+              <TableCell align="right">{buyIds[index]}</TableCell>
               <TableCell align="right">{swap.tokenToSpend}</TableCell>
               <TableCell align="right">{swap.tokenToBuy}</TableCell>
               <TableCell align="right">{row.amount}</TableCell>
               <TableCell align="right">{time.timeInterval}</TableCell>
-              <TableCell><Button onClick={()=>handleCancel(row.buyId)} variant='contained' color="error">Cancel</Button></TableCell>
+              <TableCell><Button onClick={()=>handleCancel(buyIds[index])} variant='contained' color="error">Cancel</Button></TableCell>
             </TableRow>)
           })):<div></div>}
         </TableBody>
