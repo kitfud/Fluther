@@ -273,13 +273,13 @@ const [processing, setProcessing] = useState(false)
    {
     !processing?
     <Slide direction="right" in="true" mountOnEnter>
-    <Card sx={{marginTop:'20px',padding:'40px'}}>
+    <Card sx={{marginTop:'20px', marginBottom: "20px", padding:'0px', border:2, borderColor:"#e842fa"}}>
         <Box>
 
         </Box>
         <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="Current Dollar Cost Average">
-        <TableHead sx={{backgroundColor:"lightyellow"}}>
+      <Table sx={{ minWidth: 650, }} aria-label="Current Dollar Cost Average">
+        <TableHead sx={{backgroundColor:"#a7aeff"}}>
           <TableRow>
             <TableCell>buyId</TableCell>
             <TableCell align="right">Token To Spend</TableCell>
@@ -289,7 +289,7 @@ const [processing, setProcessing] = useState(false)
             <TableCell align="right"></TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
+        <TableBody sx={{backgroundColor: "#ebecff"}}>
           {tabledata?(removeCancelledContracts(tabledata).map((row) => {
             // let swap = {"tokenToBuy":"UNI","tokenToSpend":"WETH"}
             // console.log("row",row)
