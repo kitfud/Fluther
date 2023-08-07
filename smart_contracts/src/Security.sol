@@ -67,8 +67,8 @@ contract Security is Ownable, Pausable, ReentrancyGuard {
     /// @dev Uses the whenNotPaused modifier. This way reduces smart contract size.
     function __whenNotPaused() internal view whenNotPaused {}
 
-    /// @dev Uses the onlyOwner modifier. This way reduces smart contract size.
-    function __onlyOwner() internal view onlyOwner {}
+    // /// @dev Uses the onlyOwner modifier. This way reduces smart contract size.
+    // function __onlyOwner() internal view onlyOwner {}
 
     /// @dev Only allowed addresses can call function.
     function __onlyAllowed() internal view {

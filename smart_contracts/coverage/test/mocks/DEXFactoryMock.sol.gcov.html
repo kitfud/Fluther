@@ -4,7 +4,7 @@
 
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <title>LCOV - lcov.info - test/mocks/DEXFactoryMock.sol</title>
+  <title>LCOV - lcov_filtered.info - test/mocks/DEXFactoryMock.sol</title>
   <link rel="stylesheet" type="text/css" href="../../gcov.css">
 </head>
 
@@ -28,7 +28,7 @@
           </tr>
           <tr>
             <td class="headerItem">Test:</td>
-            <td class="headerValue">lcov.info</td>
+            <td class="headerValue">lcov_filtered.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
             <td class="headerCovTableEntry">3</td>
@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-08-02 15:30:18</td>
+            <td class="headerValue">2023-08-07 09:24:37</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">1</td>
@@ -49,9 +49,9 @@
             <td></td>
             <td></td>
             <td class="headerItem">Branches:</td>
-            <td class="headerCovTableEntry">2</td>
-            <td class="headerCovTableEntry">2</td>
-            <td class="headerCovTableEntryHi">100.0 %</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntry">0</td>
+            <td class="headerCovTableEntryHi">-</td>
           </tr>
           <tr><td><img src="../../glass.png" width=3 height=3 alt=""></td></tr>
         </table>
@@ -87,12 +87,12 @@
 <a name="16"><span class="lineNum">      16 </span>                :            :         address token1_,</a>
 <a name="17"><span class="lineNum">      17 </span>                :            :         address token2_</a>
 <a name="18"><span class="lineNum">      18 </span>                :            :     ) external view returns (address) {</a>
-<a name="19"><span class="lineNum">      19 </span>        [<span class="branchCov" title="Branch 0 was taken 171 times"> + </span><span class="branchCov" title="Branch 1 was taken 26 times"> + </span>]:            :         if (</a>
-<a name="20"><span class="lineNum">      20 </span>                :<span class="lineCov">        197 :             ((token1_ == token1 || token1_ == token2) &amp;&amp;</span></a>
+<a name="19"><span class="lineNum">      19 </span>                :            :         if (</a>
+<a name="20"><span class="lineNum">      20 </span>                :<span class="lineCov">        204 :             ((token1_ == token1 || token1_ == token2) &amp;&amp;</span></a>
 <a name="21"><span class="lineNum">      21 </span>                :            :                 (token2_ == token1 || token2_ == token2)) ||</a>
 <a name="22"><span class="lineNum">      22 </span>                :            :             (token1_ == wNative || token2_ == wNative)</a>
 <a name="23"><span class="lineNum">      23 </span>                :            :         ) {</a>
-<a name="24"><span class="lineNum">      24 </span>                :<span class="lineCov">        171 :             return msg.sender;</span></a>
+<a name="24"><span class="lineNum">      24 </span>                :<span class="lineCov">        178 :             return msg.sender;</span></a>
 <a name="25"><span class="lineNum">      25 </span>                :            :         }</a>
 <a name="26"><span class="lineNum">      26 </span>                :            : </a>
 <a name="27"><span class="lineNum">      27 </span>                :<span class="lineCov">         26 :         return address(0);</span></a>
