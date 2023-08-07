@@ -1,4 +1,4 @@
-import React, { isValidElement } from 'react'
+import React from 'react'
 import { useEffect,useState } from 'react'
 import {Typography,Snackbar,CircularProgress,Button,Card,Box,Paper,Table, TableBody,TableCell,TableContainer,TableHead,TableRow, Slide } from '@mui/material'
 import { ethers } from 'ethers'
@@ -10,13 +10,13 @@ import smartContracts from '../chain-info/smart_contracts.json'
 
 const UserRecurringBuys = ({signer,contract,provider,address}) => {
 
-const [data, setData] = useState(null)
+
 const [tabledata,setTableData] = useState(null)
 const [processing, setProcessing] = useState(false)
 
   const [openSnackbar,setOpenSnackBar] = useState(false)
   const [txHash, setTxHash] = useState(null)
-  const [canceledIds,setCanceledIds] = useState(null)
+
  
   const [buyIds,setBuyIds] = useState(null)
   const [buyIdStructs,setBuyIdStructs] = useState(null)
@@ -216,7 +216,7 @@ const [processing, setProcessing] = useState(false)
     <>
    {
     !processing?
-    <Slide direction="right" in="true" mountOnEnter>
+    <Slide direction="right" in={true} mountOnEnter>
     <Card sx={{marginTop:'20px', marginBottom: "20px", padding:'0px', border:2, borderColor:"#e842fa"}}>
         <Box>
 
@@ -235,8 +235,7 @@ const [processing, setProcessing] = useState(false)
         </TableHead>
         <TableBody sx={{backgroundColor: "#ebecff"}}>
           {tabledata?(tabledata.map((row) => {
-            // let swap = {"tokenToBuy":"UNI","tokenToSpend":"WETH"}
-            // console.log("row",row)
+       
             let swap = translateToken(row)
             let time = translateTime(row)
             let index = tabledata.indexOf(row)
@@ -254,7 +253,7 @@ const [processing, setProcessing] = useState(false)
               <TableCell align="right">{time.timeInterval}</TableCell>
               <TableCell><Button onClick={()=>handleCancel(buyIds[index])} variant='contained' color="error">Cancel</Button></TableCell>
             </TableRow>)
-          })):<div></div>}
+          })):null}
         </TableBody>
       </Table>
     </TableContainer>
