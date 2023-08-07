@@ -9,7 +9,7 @@ remappings = [
 ]
 optimizer = true
 optimezer_runs = 1000
-match_path = "test/unit/*"
+# match_path = "test/unit/*"
 # via_ir = true
 # ffi = true
 

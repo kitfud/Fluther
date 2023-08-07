@@ -513,7 +513,7 @@ contract AutomationLayer is IAutomationLayer, Security {
         uint256[] calldata accountNumbers
     ) external view override(IAutomationLayer) returns (uint256 payment) {
         Account memory account;
-        for (uint256 ii; ii < accountNumbers.length; ++ii) {
+        for (uint256 ii = 0; ii < accountNumbers.length; ++ii) {
             account = s_accounts[accountNumbers[ii]];
             payment += IAutomatedContract(account.automatedContract)
                 .prospectAutomationPayment(account.id);

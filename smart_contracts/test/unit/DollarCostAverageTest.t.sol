@@ -1988,4 +1988,48 @@ contract DollarCostAverageTest is Test {
 
         assertEq(isValid, false);
     }
+
+    /// -----------------------------------------------------------------------
+    /// Test for: getRecurringBuyFromIds
+    /// -----------------------------------------------------------------------
+
+    function testGetRecurringBuyFromIds()
+        public
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+    {
+        uint256[] memory recBuyIds = new uint256[](5);
+        recBuyIds[0] = 1;
+        recBuyIds[1] = 2;
+        recBuyIds[2] = 3;
+        recBuyIds[3] = 4;
+        recBuyIds[4] = 5;
+        IDollarCostAverage.RecurringBuy[] memory recBuys = dca
+            .getRecurringBuyFromIds(recBuyIds);
+
+        assertEq(recBuys.length, 5);
+        assertEq(
+            uint8(recBuys[0].status),
+            uint8(IDollarCostAverage.Status.SET)
+        );
+        assertEq(
+            uint8(recBuys[1].status),
+            uint8(IDollarCostAverage.Status.SET)
+        );
+        assertEq(
+            uint8(recBuys[2].status),
+            uint8(IDollarCostAverage.Status.SET)
+        );
+        assertEq(
+            uint8(recBuys[3].status),
+            uint8(IDollarCostAverage.Status.SET)
+        );
+        assertEq(
+            uint8(recBuys[4].status),
+            uint8(IDollarCostAverage.Status.SET)
+        );
+    }
 }
