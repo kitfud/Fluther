@@ -45,11 +45,11 @@ import EthDater from 'ethereum-block-by-date'
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#ec1520',
+      main: '#5d00d4',
       //previously yellow #ece115
     },
     secondary: {
-      main:'#42fae8'
+      main:'#a7aeff'
       // main: '#15ece1',
     },
   },
@@ -59,10 +59,11 @@ const theme = createTheme({
 
   components: {
     // Name of the component 
+    
     MuiTextField: {
       styleOverrides: {
         root: {
-          backgroundColor: 'teal',
+          backgroundColor: '#ebecff',
         },
       },
       inputProps:{
@@ -72,7 +73,7 @@ const theme = createTheme({
     MuiFormControl: {
       styleOverrides: {
         root: {
-          backgroundColor: 'teal'
+          backgroundColor: '#ebecff'
         },
       },
     },
@@ -81,11 +82,11 @@ const theme = createTheme({
         // Name of the slot
         root: {
           // Some CSS
-          borderColor: "green",
+          borderColor: "#e842fa",
           borderRadius: 30,
           position: "relative",
           zIndex: 0,
-          raised:true
+          raised:true,
         },
       },
     },
@@ -721,7 +722,7 @@ function getPreviousDaysDate(dayBack){
             justifyContent="center"
             >
             <Typography
-              color='#8c42fa'
+              color='#bf00e8'
               component="h1"
             
               sx={{
@@ -749,31 +750,37 @@ function getPreviousDaysDate(dayBack){
               alignItems="center"
               justifyContent="center"
             >
-              {!spendingApproved?
-              <TextField
-                sx={{
-                  width: "80%"
-                }}
-         
-                onChange={ (e) => setAmount(e.target.value) }
-                id="filled-basic"
-                label="Total amount"
-                variant="filled"
-                disabled = {disableText}
-              >
-              </TextField>:(<>
+              { !spendingApproved
+              ?
+                <TextField
+                  sx={{
+                    width: "80%"
+                  }}
+                  onChange={ (e) => setAmount(e.target.value) }
+                  id="filled-basic"
+                  label="Total amount"
+                  variant="filled"
+                  disabled = {disableText}
+                >
+                </TextField>
+              :
+              (
+              <>
                 <Box sx={{marginBottom:'20px'}} component="div">
-                  {delayRender?  <Box sx={{ width: '100%' }}>
-      <LinearProgress/>
-      <Box backgroundColor="lightBlue">
-        <Typography>Allowance Approved. Values Will Update Shortly.</Typography>
-      </Box> 
-    </Box>:
-                  <Button onClick={updateAllowance} variant="contained" color="warning">Update {allowance} Spending Limit</Button>
-}
+                  { delayRender
+                    ?  
+                      <Box sx={{ width: '100%' }}>
+                        <LinearProgress/>
+                        <Box backgroundColor="lightBlue">
+                          <Typography>Allowance Approved. Values Will Update Shortly.</Typography>
+                        </Box> 
+                      </Box>
+                    :
+                      <Button onClick={updateAllowance} variant="contained" color="warning">Update {allowance} Spending Limit</Button>
+                  }
                 </Box>
-                </>)
-}
+              </>)
+              }
             </Box>
 
             {/* TOKEN 1 BOX FIELD */}
@@ -966,7 +973,7 @@ function getPreviousDaysDate(dayBack){
                 <Button
                   onClick={submitAgreement}
                   variant="contained"
-                  color="warning"
+                  color="success"
                 >
                   Submit Agreement
                 </Button>
@@ -1005,24 +1012,24 @@ function getPreviousDaysDate(dayBack){
               }}
             >
               <Slide direction="right" in="true" mountOnEnter>
-                <TableContainer sx={{borderRadius:2, marginTop:'10px'}} component={Paper}>
+                <TableContainer sx={{border: 2,borderColor: "#e842fa",borderRadius:5, marginTop:'10px',}} component={Paper}>
                   <Table aria-label="coin table">
-                    <TableHead sx={{backgroundColor:"lightyellow"}}>
+                    <TableHead sx={{backgroundColor:"#a7aeff",}}>
                     <TableRow>
-                      <TableCell align="left" >ICON</TableCell>
-                      <TableCell align="left" >COINS</TableCell>
-                      <TableCell align="left" >WALLET AMOUNT</TableCell>
+                      <TableCell align="left" ><Typography fontWeight="700" color="#bf00e8">ICON</Typography></TableCell>
+                      <TableCell align="left" ><Typography fontWeight="700" color="#bf00e8">COINS</Typography></TableCell>
+                      <TableCell align="left" ><Typography fontWeight="700" color="#bf00e8">WALLET AMOUNT</Typography></TableCell>
                     </TableRow>
                     </TableHead>
-                    <TableBody>
+                    <TableBody sx={{backgroundColor: "#ebecff"}}>
                       <TableRow>
                         <TableCell>
                           <Icon  sx={{width: "50px", height: "50px", borderRadius: "50%"}}>
                             <img  src={ETHicon} height="50px" width="50px"/>
                           </Icon>
                         </TableCell>
-                        <TableCell><Typography>ETH</Typography></TableCell>
-                        <TableCell><Typography>{ethbalance}</Typography></TableCell>
+                        <TableCell><Typography fontWeight="600">ETH</Typography></TableCell>
+                        <TableCell><Typography fontWeight="600">{ethbalance}</Typography></TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell>
@@ -1030,8 +1037,8 @@ function getPreviousDaysDate(dayBack){
                             <img src={WETHicon} height="50px" width="50px"/>
                           </Icon>
                         </TableCell>
-                        <TableCell><Typography>WETH</Typography></TableCell>
-                        <TableCell><Typography>{wethbalance}</Typography></TableCell>
+                        <TableCell><Typography fontWeight="600">WETH</Typography></TableCell>
+                        <TableCell><Typography fontWeight="600">{wethbalance}</Typography></TableCell>
                       </TableRow>
                       <TableRow>
                         <TableCell>
@@ -1046,8 +1053,8 @@ function getPreviousDaysDate(dayBack){
                         
                          
                         </TableCell>
-                      <TableCell><Typography>UNI</Typography></TableCell>
-                      <TableCell><Typography color={unicolor}>{unibalance}</Typography></TableCell>
+                      <TableCell><Typography fontWeight="600">UNI</Typography></TableCell>
+                      <TableCell><Typography fontWeight="600" color={unicolor}>{unibalance}</Typography></TableCell>
                       </TableRow>
                     </TableBody>
                   </Table>
@@ -1072,7 +1079,7 @@ function getPreviousDaysDate(dayBack){
         </Snackbar>
         <Box >
         <FormControlLabel 
-        sx={{color:'white'}}
+        sx={{color:'#e000f8'}}
         control={<Switch checked={checked} onChange={handleChange} />}
         label="Display User Agreements"
       />
