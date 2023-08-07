@@ -648,6 +648,11 @@ function getPreviousDaysDate(dayBack){
   return new Date(now.getTime() - dayBack * 24 * 60 * 60 * 1000).toJSON();
 }
 
+function handleReturn(event){
+  setDelayRender(false)
+  setSpendingApproved(true)
+}
+
 
 
   return (
@@ -737,10 +742,27 @@ function getPreviousDaysDate(dayBack){
            
 
               {!spendingApproved?
-            <Box display="flex"
+            <Box
               alignItems="center"
               justifyContent="center">
-              <Typography padding={'2px'}>Current Spending Limit:{allowance}</Typography>
+                {
+                allowance>=100?
+                <Box component="div" display="block">
+                <Button variant="contained" onClick={handleReturn} >Return To Dollar Coast Average Maker</Button>
+                </Box>:null
+                }
+               <Box    alignItems="center"
+              justifyContent="center" display="flex">
+               <Typography padding={'2px'}  color='#bf00e8'
+              component="h1"
+            
+              sx={{
+                fontSize: 10,
+                fontWeight: 700,
+                padding: 2
+              }}>Current Spending Limit:{allowance}</Typography>
+               </Box>
+           
             </Box>:null
 }
 
