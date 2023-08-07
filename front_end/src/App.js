@@ -20,7 +20,6 @@ import {Snackbar,
 
 import ABI from './chain-info/erc20ABI.json'
 import PriceFeedABI from './chain-info/pricefeedABI.json'
-import ERC20Address from './chain-info/smart_contracts.json'
 import smartContracts from './chain-info/smart_contracts.json'
 import {ethers} from 'ethers'
 
@@ -305,7 +304,6 @@ const getCurrentExchangePrice = async()=>{
 
 
 
-
   useEffect(() => {
     if(token1 !== "" & token2 !=="" & interval !== "" & intervalAmount !== "") {
       setContractParams(true)
@@ -345,9 +343,6 @@ return ()=>clearTimeout(colorChange)
     let tempSigner = await tempProvider.getSigner();
     setSigner(tempSigner);
     setDataLoad(true)
-
-    // console.log(smartContracts.smartContracts.address.sepolia)
-    // console.log(smartContracts.smartContracts.abi)
 
     let dollaAverageAddress = smartContracts.DollarCostAverage.address.sepolia
     let dollaAverageAbi = smartContracts.DollarCostAverage.abi
@@ -407,8 +402,7 @@ return ()=>clearTimeout(colorChange)
       alert("need to approve amount 100 or more")
       return
     }
-    // console.log("amount",amount)
-    // console.log(erc20contract)
+  
     try{
       //first contract object made from token to spend erc20contract
       await erc20contract.connect(signer).approve(smartContracts.DollarCostAverage.address.sepolia,ethers.utils.parseEther(amount))
@@ -438,8 +432,7 @@ return ()=>clearTimeout(colorChange)
       "interval": interval,
       "intervalAmount": intervalAmount,
     }
-    // console.log(JSON.stringify(data))
-
+ 
   
 
 const input = intervalAmount;
@@ -458,7 +451,7 @@ const amountInterval = ethers.utils.parseUnits(input)
 })
 
   let tx = await dollarCostAverageContract.connect(signer).createRecurringBuy(amountInterval,token1,token2,interval,'0x0000000000000000000000000000000000000000',quickSwapRouterAddress)
-  // console.log(JSON.stringify(tx))
+
 
   let hash = tx.hash
   setTxHash(hash.toString())
@@ -555,11 +548,6 @@ const handleIconClick = ()=>{
     provider // Ethers provider, required.
 );
 setDater(dater)
-
-// console.log(getPreviousDaysDate(0))
-// console.log(getPreviousDaysDate(8))
-
-
 
 }
 
@@ -684,7 +672,7 @@ function handleReturn(event){
           style={{ minHeight: '100vh' }}
         >
           {/* CONNECT WALLET BUTTON */}
-          <Slide direction="down" in="true" mountOnEnter>
+          <Slide direction="down" in={true} mountOnEnter>
             <Box 
               sx={{
                 marginBottom:'10px',
@@ -705,7 +693,7 @@ function handleReturn(event){
         </Slide>
 
           {/* MAIN CARD */}
-          <Slide direction="left" in="true" mountOnEnter>
+          <Slide direction="left" in={true} mountOnEnter>
           <Card 
             variant="outlined"
             sx={{ 
@@ -1027,7 +1015,7 @@ function handleReturn(event){
               
               }}
             >
-              <Slide direction="right" in="true" mountOnEnter>
+              <Slide direction="right" in={true} mountOnEnter>
                 <TableContainer sx={{border: 2,borderColor: "#e842fa",borderRadius:5, marginTop:'10px',}} component={Paper}>
                   <Table aria-label="coin table">
                     <TableHead sx={{backgroundColor:"#a7aeff",}}>
@@ -1058,13 +1046,13 @@ function handleReturn(event){
                       </TableRow>
                       <TableRow>
                         <TableCell>
-                        <div class="tooltip">
+                        <Box className="tooltip">
                          <Icon onClick = {handleIconClick} sx={{width: "50px", height: "50px", borderRadius: "50%"}}>
-                            <img class='highlight' src={UNIicon} width="50px" height="50px"/>
+                            <img className='highlight' src={UNIicon} width="50px" height="50px"/>
                           </Icon>
                           
-                    <span class="tooltiptext">Click For Data</span>
-                          </div>
+                    <span className="tooltiptext">Click For Data</span>
+                          </Box>
                        
                         
                          
