@@ -748,7 +748,7 @@ function handleReturn(event){
                 {
                 allowance>=100?
                 <Box component="div" display="block">
-                <Button variant="contained" onClick={handleReturn} >Return To Dollar Coast Average Maker</Button>
+                <Button variant="contained" onClick={handleReturn} >Return To Dollar Cost Average Maker</Button>
                 </Box>:null
                 }
                <Box    alignItems="center"
