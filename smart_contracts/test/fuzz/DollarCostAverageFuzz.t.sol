@@ -744,4 +744,21 @@ contract DollarCostAverageFuzz is Test {
         );
         dca.getValidRangeOfRecurringBuys(startRecBuyId, endRecBuyId);
     }
+
+    /// -----------------------------------------------------------------------
+    /// Test for: getRecurringBuyFromIds
+    /// -----------------------------------------------------------------------
+
+    function testGetRecurringBuyFromIds(
+        uint256[] memory recBuyIds
+    )
+        public
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+        createRecurringBuy
+    {
+        vm.assume(recBuyIds.length < 5);
+        dca.getRecurringBuyFromIds(recBuyIds);
+    }
 }

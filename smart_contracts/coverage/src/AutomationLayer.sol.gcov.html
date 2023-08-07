@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-08-07 10:21:37</td>
+            <td class="headerValue">2023-08-07 13:57:31</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">28</td>
@@ -184,18 +184,18 @@
 <a name="113"><span class="lineNum">     113 </span>                :            :         address user,</a>
 <a name="114"><span class="lineNum">     114 </span>                :            :         address contractAddress</a>
 <a name="115"><span class="lineNum">     115 </span>                :            :     ) external override(IAutomationLayer) returns (uint256) {</a>
-<a name="116"><span class="lineNum">     116 </span>                :<span class="lineCov">        137 :         __nonReentrant();</span></a>
-<a name="117"><span class="lineNum">     117 </span>                :<span class="lineCov">        137 :         __whenNotPaused();</span></a>
-<a name="118"><span class="lineNum">     118 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 135 times"> + </span>]:<span class="lineCov">        136 :         if (!s_acceptingNewAccounts) {</span></a>
+<a name="116"><span class="lineNum">     116 </span>                :<span class="lineCov">        142 :         __nonReentrant();</span></a>
+<a name="117"><span class="lineNum">     117 </span>                :<span class="lineCov">        142 :         __whenNotPaused();</span></a>
+<a name="118"><span class="lineNum">     118 </span>        [<span class="branchCov" title="Branch 0 was taken 1 time"> + </span><span class="branchCov" title="Branch 1 was taken 140 times"> + </span>]:<span class="lineCov">        141 :         if (!s_acceptingNewAccounts) {</span></a>
 <a name="119"><span class="lineNum">     119 </span>                :<span class="lineCov">          1 :             revert AutomationLayer__NotAccpetingNewAccounts();</span></a>
 <a name="120"><span class="lineNum">     120 </span>                :            :         }</a>
-<a name="121"><span class="lineNum">     121 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 133 times"> + </span>]:<span class="lineCov">        135 :         if (user == address(0) || contractAddress == address(0)) {</span></a>
+<a name="121"><span class="lineNum">     121 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 138 times"> + </span>]:<span class="lineCov">        140 :         if (user == address(0) || contractAddress == address(0)) {</span></a>
 <a name="122"><span class="lineNum">     122 </span>                :<span class="lineCov">          2 :             revert AutomationLayer__InvalidAddress();</span></a>
 <a name="123"><span class="lineNum">     123 </span>                :            :         }</a>
 <a name="124"><span class="lineNum">     124 </span>                :            : </a>
-<a name="125"><span class="lineNum">     125 </span>                :<span class="lineCov">        133 :         uint256 accountNumber = s_nextAccountNumber;</span></a>
+<a name="125"><span class="lineNum">     125 </span>                :<span class="lineCov">        138 :         uint256 accountNumber = s_nextAccountNumber;</span></a>
 <a name="126"><span class="lineNum">     126 </span>                :            : </a>
-<a name="127"><span class="lineNum">     127 </span>                :<span class="lineCov">        133 :         s_accounts[accountNumber] = Account(</span></a>
+<a name="127"><span class="lineNum">     127 </span>                :<span class="lineCov">        138 :         s_accounts[accountNumber] = Account(</span></a>
 <a name="128"><span class="lineNum">     128 </span>                :            :             user,</a>
 <a name="129"><span class="lineNum">     129 </span>                :            :             contractAddress,</a>
 <a name="130"><span class="lineNum">     130 </span>                :            :             id,</a>
@@ -203,12 +203,12 @@
 <a name="132"><span class="lineNum">     132 </span>                :            :         );</a>
 <a name="133"><span class="lineNum">     133 </span>                :            : </a>
 <a name="134"><span class="lineNum">     134 </span>                :            :         unchecked {</a>
-<a name="135"><span class="lineNum">     135 </span>                :<span class="lineCov">        133 :             ++s_nextAccountNumber;</span></a>
+<a name="135"><span class="lineNum">     135 </span>                :<span class="lineCov">        138 :             ++s_nextAccountNumber;</span></a>
 <a name="136"><span class="lineNum">     136 </span>                :            :         }</a>
 <a name="137"><span class="lineNum">     137 </span>                :            : </a>
-<a name="138"><span class="lineNum">     138 </span>                :<span class="lineCov">        133 :         emit AccountCreated(user, contractAddress, id);</span></a>
+<a name="138"><span class="lineNum">     138 </span>                :<span class="lineCov">        138 :         emit AccountCreated(user, contractAddress, id);</span></a>
 <a name="139"><span class="lineNum">     139 </span>                :            : </a>
-<a name="140"><span class="lineNum">     140 </span>                :<span class="lineCov">        133 :         return accountNumber;</span></a>
+<a name="140"><span class="lineNum">     140 </span>                :<span class="lineCov">        138 :         return accountNumber;</span></a>
 <a name="141"><span class="lineNum">     141 </span>                :            :     }</a>
 <a name="142"><span class="lineNum">     142 </span>                :            : </a>
 <a name="143"><span class="lineNum">     143 </span>                :            :     /** @dev added nonReentrant and whenNotPaused third party modifiers. It reverts if</a>

@@ -1,9 +1,9 @@
 {
-    "PriceFeed":{
-        "address":{
-            "sepolia":{
-                "ETHUSD":"0xD46A6bC8a7219AE21E2f9DaF93eEce945fdBA623"
-            }     
+    "PriceFeed": {
+        "address": {
+            "sepolia": {
+                "ETHUSD": "0xD46A6bC8a7219AE21E2f9DaF93eEce945fdBA623"
+            }
         }
     },
     "Liquidity": {
@@ -23,7 +23,7 @@
     },
     "DollarCostAverage": {
         "address": {
-            "sepolia": "0x9aFd04b5CAd7898f525809a3a9f468b51Bd4512C"
+            "sepolia": "0x9a355ad63347b48E219e1FDaF56b7366E70a27d7"
         },
         "abi": [
             {
@@ -792,6 +792,87 @@
                         "internalType": "struct IDollarCostAverage.RecurringBuy",
                         "name": "",
                         "type": "tuple"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256[]",
+                        "name": "recurringBuyIds",
+                        "type": "uint256[]"
+                    }
+                ],
+                "name": "getRecurringBuyFromIds",
+                "outputs": [
+                    {
+                        "components": [
+                            {
+                                "internalType": "address",
+                                "name": "sender",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "amountToSpend",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "tokenToSpend",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "tokenToBuy",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "timeIntervalInSeconds",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "paymentInterface",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "dexRouter",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "paymentDue",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "accountNumber",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "address[]",
+                                "name": "path",
+                                "type": "address[]"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "index",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "enum IDollarCostAverage.Status",
+                                "name": "status",
+                                "type": "uint8"
+                            }
+                        ],
+                        "internalType": "struct IDollarCostAverage.RecurringBuy[]",
+                        "name": "",
+                        "type": "tuple[]"
                     }
                 ],
                 "stateMutability": "view",
