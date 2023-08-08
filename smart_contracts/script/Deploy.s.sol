@@ -1,6 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
+<<<<<<< HEAD
+=======
+/** @author @EWCunha
+ *  @title Script to deploy smart contracts
+ */
+
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 import {Script} from "forge-std/Script.sol";
 import {AutomationLayer} from "../src/AutomationLayer.sol";
 import {DollarCostAverage} from "../src/DollarCostAverage.sol";
@@ -9,10 +16,17 @@ import {HelperConfig} from "./HelperConfig.s.sol";
 import {Duh} from "../src/Duh.sol";
 
 contract Deploy is Script {
+<<<<<<< HEAD
     bool public constant DEPLOY_DUH = true;
     bool public constant DEPLOY_DCA = true;
     bool public constant DEPLOY_AUTOMATION = true;
     bool public constant DEPLOY_SEQUENCER = true;
+=======
+    bool public constant DEPLOY_DUH = false;
+    bool public constant DEPLOY_DCA = true;
+    bool public constant DEPLOY_AUTOMATION = false;
+    bool public constant DEPLOY_SEQUENCER = false;
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
     AutomationLayer public automation;
     DollarCostAverage public dca;
@@ -41,15 +55,27 @@ contract Deploy is Script {
         token1 = token1_;
         token2 = token2_;
         defaultRouter = defaultRouter_;
+<<<<<<< HEAD
+=======
+        duh = Duh(duhToken);
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
         vm.startBroadcast(deployerKey);
         if (DEPLOY_DUH) {
             duh = new Duh();
+<<<<<<< HEAD
+=======
+            duhToken = address(duh);
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         }
 
         if (DEPLOY_AUTOMATION) {
             automation = new AutomationLayer(
+<<<<<<< HEAD
                 address(duh) == address(0) ? duhToken : address(duh),
+=======
+                duhToken,
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 minimumDuh,
                 address(0),
                 automationFee,
@@ -71,7 +97,11 @@ contract Deploy is Script {
                 defaultRouter,
                 address(automation),
                 wrapNative,
+<<<<<<< HEAD
                 address(duh) == address(0) ? duhToken : address(duh)
+=======
+                duhToken
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
             );
         }
         vm.stopBroadcast();

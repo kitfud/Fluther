@@ -58,13 +58,6 @@ contract AutomationLayer is IAutomationLayer, Security {
         }
     }
 
-    /// @dev checks if caller is oracle.
-    function __onlyOracle() private view {
-        if (msg.sender != s_oracleAddress) {
-            revert AutomationLayer__CallerNotOracle();
-        }
-    }
-
     /// @dev checks if node has sufficient DUH tokens.
     function __hasSufficientTokens() private view {
         if (IERC20(s_duh).balanceOf(msg.sender) < s_minimumDuh) {
@@ -326,7 +319,7 @@ contract AutomationLayer is IAutomationLayer, Security {
     ) external override(IAutomationLayer) {
         __nonReentrant();
         __whenNotPaused();
-        __onlyOracle();
+        __onlyAllowed();
 
         s_automationFee = automationFee;
 
@@ -396,7 +389,11 @@ contract AutomationLayer is IAutomationLayer, Security {
                 .getNode(nodeAddress)
                 .endBlockNumber;
 
+<<<<<<< HEAD
             if (block.number == nodeEndBlockNumber) {
+=======
+            if (!(block.number < nodeEndBlockNumber)) {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 sequencer.takeNextBlockNumbers(nodeAddress);
             }
         }
@@ -421,7 +418,15 @@ contract AutomationLayer is IAutomationLayer, Security {
         }
 
         return
+<<<<<<< HEAD
             IAutomatedContract(account.automatedContract).checkSimpleAutomation(account.id);
+=======
+            isNextNode &&
+            !(IERC20(s_duh).balanceOf(node) < s_minimumDuh) &&
+            IAutomatedContract(account.automatedContract).checkTrigger(
+                account.id
+            );
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     }
 
     /// @inheritdoc IAutomationLayer
@@ -516,7 +521,11 @@ contract AutomationLayer is IAutomationLayer, Security {
         uint256[] calldata accountNumbers
     ) external view override(IAutomationLayer) returns (uint256 payment) {
         Account memory account;
+<<<<<<< HEAD
         for (uint256 ii; ii < accountNumbers.length; ++ii) {
+=======
+        for (uint256 ii = 0; ii < accountNumbers.length; ++ii) {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
             account = s_accounts[accountNumbers[ii]];
             payment += IAutomatedContract(account.automatedContract)
                 .prospectAutomationPayment(account.id);

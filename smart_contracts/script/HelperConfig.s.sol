@@ -1,6 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
+<<<<<<< HEAD
+=======
+/** @author @EWCunha
+ *  @title script for configuring the default values depending on the network
+ */
+
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 import {Script} from "forge-std/Script.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/ERC20Mock.sol";
 import {UniswapMock} from "../test/mocks/UniswapMock.sol";
@@ -9,6 +16,10 @@ import {DEXFactoryMock} from "../test/mocks/DEXFactoryMock.sol";
 // import {DevOpsTools} from "@devops/DevOpsTools.sol";
 
 contract HelperConfig is Script {
+<<<<<<< HEAD
+=======
+    /* solhint-disable */
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     struct NetworkConfig {
         address wrapNative;
         address defaultRouter;
@@ -32,12 +43,21 @@ contract HelperConfig is Script {
     constructor() {
         if (block.chainid == 11155111) {
             activeNetworkConfig = getSepoliaConfig();
+<<<<<<< HEAD
+=======
+        } else if (block.chainid == 1 || block.chainid == 137) {
+            activeNetworkConfig = getMainnetConfig();
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         } else {
             activeNetworkConfig = getOrCreateAnvilConfig();
         }
     }
 
+<<<<<<< HEAD
     function getMainnetConfig() public view returns (NetworkConfig memory) {
+=======
+    function getMainnetConfig() internal view returns (NetworkConfig memory) {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         return
             NetworkConfig({
                 wrapNative: 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9,
@@ -56,7 +76,11 @@ contract HelperConfig is Script {
             });
     }
 
+<<<<<<< HEAD
     function getSepoliaConfig() public view returns (NetworkConfig memory) {
+=======
+    function getSepoliaConfig() internal view returns (NetworkConfig memory) {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         return
             NetworkConfig({
                 wrapNative: 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9, //0xD0dF82dE051244f04BfF3A8bB1f62E1cD39eED92,
@@ -83,7 +107,11 @@ contract HelperConfig is Script {
             });
     }
 
+<<<<<<< HEAD
     function getOrCreateAnvilConfig() public returns (NetworkConfig memory) {
+=======
+    function getOrCreateAnvilConfig() internal returns (NetworkConfig memory) {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         if (activeNetworkConfig.wrapNative != address(0)) {
             return activeNetworkConfig;
         }
@@ -94,7 +122,15 @@ contract HelperConfig is Script {
         ERC20Mock wrapNative = new ERC20Mock();
         ERC20Mock token1 = new ERC20Mock();
         ERC20Mock token2 = new ERC20Mock();
+<<<<<<< HEAD
         DEXFactoryMock factory = new DEXFactoryMock();
+=======
+        DEXFactoryMock factory = new DEXFactoryMock(
+            address(token1),
+            address(token2),
+            address(wrapNative)
+        );
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         UniswapMock dexRouter = new UniswapMock(address(factory));
         vm.stopBroadcast();
 

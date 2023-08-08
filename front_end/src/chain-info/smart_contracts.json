@@ -1,4 +1,14 @@
 {
+<<<<<<< HEAD
+=======
+    "PriceFeed": {
+        "address": {
+            "sepolia": {
+                "ETHUSD": "0xD46A6bC8a7219AE21E2f9DaF93eEce945fdBA623"
+            }
+        }
+    },
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     "Liquidity": {
         "address": {
             "sepolia": "0xD3Ce19025A1762fAf5F013D052cAF6721ca6C1CF"
@@ -16,7 +26,11 @@
     },
     "DollarCostAverage": {
         "address": {
+<<<<<<< HEAD
             "sepolia": "0xC4489B5A85d5DcDb8a9FE98725Dd7BB09EC0213C"
+=======
+            "sepolia": "0xf0EF015fDeFB728840a7407521b1a9806aff0ef2"
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         },
         "abi": [
             {
@@ -33,7 +47,16 @@
                     },
                     {
                         "internalType": "address",
+<<<<<<< HEAD
                         "name": "_wrapNative",
+=======
+                        "name": "wrapNative",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "duh",
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "type": "address"
                     }
                 ],
@@ -188,6 +211,28 @@
                         "type": "address"
                     },
                     {
+<<<<<<< HEAD
+=======
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "contractFeeShare",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "ContractFeeShareSet",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "caller",
+                        "type": "address"
+                    },
+                    {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "indexed": true,
                         "internalType": "address",
                         "name": "defaultRouter",
@@ -203,6 +248,72 @@
                     {
                         "indexed": true,
                         "internalType": "address",
+<<<<<<< HEAD
+=======
+                        "name": "caller",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "duh",
+                        "type": "address"
+                    }
+                ],
+                "name": "DuhTokenSet",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "caller",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "token",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "bool",
+                        "name": "isAllowed",
+                        "type": "bool"
+                    }
+                ],
+                "name": "ERC20AllowedSet",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "caller",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "fee",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "FeeSet",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "name": "previousOwner",
                         "type": "address"
                     },
@@ -287,6 +398,7 @@
                         "internalType": "address",
                         "name": "sender",
                         "type": "address"
+<<<<<<< HEAD
                     },
                     {
                         "components": [
@@ -350,6 +462,8 @@
                         "internalType": "struct IDollarCostAverage.RecurringBuy",
                         "name": "buy",
                         "type": "tuple"
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                     }
                 ],
                 "name": "RecurringBuyCreated",
@@ -359,6 +473,28 @@
                 "anonymous": false,
                 "inputs": [
                     {
+<<<<<<< HEAD
+=======
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "caller",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "slippagePercentage",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "SlippagePercentageSet",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "indexed": false,
                         "internalType": "address",
                         "name": "account",
@@ -471,6 +607,28 @@
                 "type": "function"
             },
             {
+<<<<<<< HEAD
+=======
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "token",
+                        "type": "address"
+                    }
+                ],
+                "name": "getAllowedERC20s",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "inputs": [],
                 "name": "getAutomationLayer",
                 "outputs": [
@@ -485,6 +643,22 @@
             },
             {
                 "inputs": [],
+<<<<<<< HEAD
+=======
+                "name": "getContractFeeShare",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "name": "getCurrentBlockTimestamp",
                 "outputs": [
                     {
@@ -511,6 +685,35 @@
             },
             {
                 "inputs": [],
+<<<<<<< HEAD
+=======
+                "name": "getDuh",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getFee",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "name": "getNextRecurringBuyId",
                 "outputs": [
                     {
@@ -590,6 +793,14 @@
                                 "type": "address[]"
                             },
                             {
+<<<<<<< HEAD
+=======
+                                "internalType": "uint256",
+                                "name": "index",
+                                "type": "uint256"
+                            },
+                            {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                                 "internalType": "enum IDollarCostAverage.Status",
                                 "name": "status",
                                 "type": "uint8"
@@ -666,6 +877,14 @@
                                 "type": "address[]"
                             },
                             {
+<<<<<<< HEAD
+=======
+                                "internalType": "uint256",
+                                "name": "index",
+                                "type": "uint256"
+                            },
+                            {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                                 "internalType": "enum IDollarCostAverage.Status",
                                 "name": "status",
                                 "type": "uint8"
@@ -682,6 +901,127 @@
             {
                 "inputs": [
                     {
+<<<<<<< HEAD
+=======
+                        "internalType": "address",
+                        "name": "sender",
+                        "type": "address"
+                    }
+                ],
+                "name": "getRecurringBuysFromUser",
+                "outputs": [
+                    {
+                        "internalType": "uint256[]",
+                        "name": "",
+                        "type": "uint256[]"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "address",
+                                "name": "sender",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "amountToSpend",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "tokenToSpend",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "tokenToBuy",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "timeIntervalInSeconds",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "paymentInterface",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "dexRouter",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "paymentDue",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "accountNumber",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "address[]",
+                                "name": "path",
+                                "type": "address[]"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "index",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "enum IDollarCostAverage.Status",
+                                "name": "status",
+                                "type": "uint8"
+                            }
+                        ],
+                        "internalType": "struct IDollarCostAverage.RecurringBuy[]",
+                        "name": "",
+                        "type": "tuple[]"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "sender",
+                        "type": "address"
+                    }
+                ],
+                "name": "getSenderToIds",
+                "outputs": [
+                    {
+                        "internalType": "uint256[]",
+                        "name": "",
+                        "type": "uint256[]"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getSlippagePercentage",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "internalType": "uint256",
                         "name": "startRecBuyId",
                         "type": "uint256"
@@ -747,6 +1087,14 @@
                                 "type": "address[]"
                             },
                             {
+<<<<<<< HEAD
+=======
+                                "internalType": "uint256",
+                                "name": "index",
+                                "type": "uint256"
+                            },
+                            {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                                 "internalType": "enum IDollarCostAverage.Status",
                                 "name": "status",
                                 "type": "uint8"
@@ -826,6 +1174,28 @@
                 "type": "function"
             },
             {
+<<<<<<< HEAD
+=======
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "recurringBuyId",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "prospectAutomationPayment",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "inputs": [],
                 "name": "renounceOwnership",
                 "outputs": [],
@@ -867,6 +1237,27 @@
                 "inputs": [
                     {
                         "internalType": "address",
+<<<<<<< HEAD
+=======
+                        "name": "token",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isAllowed",
+                        "type": "bool"
+                    }
+                ],
+                "name": "setAllowedERC20s",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "name": "automationLayerAddress",
                         "type": "address"
                     }
@@ -879,6 +1270,22 @@
             {
                 "inputs": [
                     {
+<<<<<<< HEAD
+=======
+                        "internalType": "uint256",
+                        "name": "contractFeeShare",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "setContractFeeShare",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "internalType": "address",
                         "name": "defaultRouter",
                         "type": "address"
@@ -893,6 +1300,48 @@
                 "inputs": [
                     {
                         "internalType": "address",
+<<<<<<< HEAD
+=======
+                        "name": "duh",
+                        "type": "address"
+                    }
+                ],
+                "name": "setDuh",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "fee",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "setFee",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "slippagePercentage",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "setSlippagePercentage",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "name": "newOwner",
                         "type": "address"
                     }
@@ -926,7 +1375,11 @@
     },
     "AutomationLayer": {
         "address": {
+<<<<<<< HEAD
             "sepolia": "0x4B5c46a52e5C15D6c5A0552DeB082500C680a497"
+=======
+            "sepolia": "0x2Ee43eDD9c3768b9fF3cB8F4f17A061eb8a2d847"
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         },
         "abi": [
             {
@@ -967,11 +1420,14 @@
             },
             {
                 "inputs": [],
+<<<<<<< HEAD
                 "name": "AutomationLayer__CallerNotOracle",
                 "type": "error"
             },
             {
                 "inputs": [],
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "name": "AutomationLayer__InvalidAccountNumber",
                 "type": "error"
             },
@@ -982,6 +1438,14 @@
             },
             {
                 "inputs": [],
+<<<<<<< HEAD
+=======
+                "name": "AutomationLayer__NoLiquidityPair",
+                "type": "error"
+            },
+            {
+                "inputs": [],
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "name": "AutomationLayer__NotAccpetingNewAccounts",
                 "type": "error"
             },
@@ -1002,11 +1466,14 @@
             },
             {
                 "inputs": [],
+<<<<<<< HEAD
                 "name": "AutomationLayer__UserDoesNotHaveEnoughBalanceAndOrAllowance",
                 "type": "error"
             },
             {
                 "inputs": [],
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "name": "Security__NotAllowed",
                 "type": "error"
             },
@@ -1574,6 +2041,47 @@
                 "type": "function"
             },
             {
+<<<<<<< HEAD
+=======
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "accountNumber",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "prospectPayment",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256[]",
+                        "name": "accountNumbers",
+                        "type": "uint256[]"
+                    }
+                ],
+                "name": "prospectPaymentBatch",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "payment",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "inputs": [],
                 "name": "renounceOwnership",
                 "outputs": [],
@@ -1739,7 +2247,11 @@
     },
     "NodeSequencer": {
         "address": {
+<<<<<<< HEAD
             "sepolia": "0x8723b2188EAf6dDBAa5f9648003935a979d477b4"
+=======
+            "sepolia": "0x20F278a77BfB77131a099e20C15985fDA4aA1Fc3"
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         },
         "abi": [
             {

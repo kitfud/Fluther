@@ -27,9 +27,6 @@ interface IAutomationLayer {
     /// @dev error for when an invalid account number is provided
     error AutomationLayer__InvalidAccountNumber();
 
-    /// @dev error for when the caller is not the oracle contract.
-    error AutomationLayer__CallerNotOracle();
-
     /// @dev error for when node does not have enough tokens to trigger an operation.
     error AutomationLayer__NotEnoughtTokens();
 

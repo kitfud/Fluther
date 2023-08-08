@@ -1,8 +1,15 @@
+<<<<<<< HEAD
 import React, { isValidElement } from 'react'
 import { useEffect,useState } from 'react'
 import {Typography,Snackbar,CircularProgress,Button,Card,Box,Paper,Table, TableBody,TableCell,TableContainer,TableHead,TableRow } from '@mui/material'
 import { ethers } from 'ethers'
 import DollarCost from '../chain-info/smart_contracts.json'
+=======
+import React from 'react'
+import { useEffect,useState } from 'react'
+import {Typography,Snackbar,CircularProgress,Button,Card,Box,Paper,Table, TableBody,TableCell,TableContainer,TableHead,TableRow, Slide } from '@mui/material'
+import { ethers } from 'ethers'
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
@@ -11,23 +18,38 @@ import smartContracts from '../chain-info/smart_contracts.json'
 
 const UserRecurringBuys = ({signer,contract,provider,address}) => {
 
+<<<<<<< HEAD
     // console.log(DollarCost.DollarCostAverage.address.sepolia)
 // console.log("address",address)
 const [data, setData] = useState(null)
+=======
+
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 const [tabledata,setTableData] = useState(null)
 const [processing, setProcessing] = useState(false)
 
   const [openSnackbar,setOpenSnackBar] = useState(false)
   const [txHash, setTxHash] = useState(null)
+<<<<<<< HEAD
   const [canceledIds,setCanceledIds] = useState(null)
  
+=======
+
+ 
+  const [buyIds,setBuyIds] = useState(null)
+  const [buyIdStructs,setBuyIdStructs] = useState(null)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
+<<<<<<< HEAD
     window.location.reload(false);
+=======
+    window.location.reload()
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     setOpenSnackBar(false);
     
   };
@@ -51,6 +73,7 @@ const [processing, setProcessing] = useState(false)
   );
 
     useEffect(()=>{
+<<<<<<< HEAD
 
     const loggingData = async()=>{
     const data = await logEventData("RecurringBuyCreated",[], provider)
@@ -174,6 +197,97 @@ console.log("result",result)
             console.log(err);
         });
 
+=======
+    if(provider!=null){
+    try{
+    logUserData()  
+    }
+    catch(err){
+    console.log(err)
+    }
+    }
+    },[provider,address])
+
+    useEffect(()=>{
+    if(buyIdStructs){
+    filterData(buyIdStructs)
+}
+    },[buyIdStructs])
+
+
+
+    const filterData = ()=>{
+   
+      let tableResult = []
+     
+      let counter = 0
+      buyIdStructs.forEach((element)=>{
+        counter++
+       let tdata = {
+            "buyId":buyIds[buyIdStructs.indexOf(element)].toNumber(),
+            "tokenToSpend":element.tokenToSpend,
+            "tokenToBuy":element.tokenToBuy,
+            "timeInterval":element.timeIntervalInSeconds.toNumber(),
+            "amount":ethers.utils.formatEther(element.amountToSpend)
+        }
+        tableResult.push(tdata)
+        if(counter == buyIdStructs.length){
+          setTableData(tableResult)
+        }
+      })
+
+    }
+
+
+
+    // useEffect(()=>{
+    //   if(buyIds){
+    //     logBuyStructs()
+    //   }
+    // },[buyIds])
+
+    // const logBuyStructs = async ()=>{
+    //   let buyStructs = await contract.getRecurringBuyFromIds(buyIds)
+    //   console.log("Buy STRUCTS", buyStructs)
+    //   setBuyIdStructs(buyStructs)
+    // }
+
+    const logUserData = async () => {
+     if(address){
+      
+      let userData = await contract.getRecurringBuysFromUser(address)
+      // console.log(userData)
+      let userBuyIds = userData[0]
+      let userBuyStructs= userData[1]
+
+      let userBuyIdsRefined = []
+      let userBuyStructsRefined = []
+
+      let counterIds = 0
+      userBuyIds.forEach((el)=>{
+        counterIds++
+        if(userBuyIds.indexOf(el) !=0){
+          userBuyIdsRefined.push(el)
+        }
+        if(counterIds==userBuyIds.length){
+          setBuyIds(userBuyIdsRefined)
+        }
+      })
+
+
+      let counterStructs = 0
+      userBuyStructs.forEach((el)=>{
+        counterStructs++
+        if(userBuyStructs.indexOf(el) !=0){
+          userBuyStructsRefined.push(el)
+        }
+        if(counterStructs==userBuyIds.length){
+          // console.log(userBuyIdsRefined)
+          setBuyIdStructs(userBuyStructsRefined)
+        }
+      })
+     }
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     }
 
     const handleCancel = async (id)=>{
@@ -224,6 +338,7 @@ console.log("result",result)
         }
       }
     
+<<<<<<< HEAD
  const removeCancelledContracts = (tableData) =>{
     // console.log('tableData',tableData)
     // console.log("cancelled",canceledIds)
@@ -231,6 +346,9 @@ console.log("result",result)
     // console.log("refined",refinedData)
     return refinedData
  }
+=======
+
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
  const translateToken = (row)=>{
     let translatedData = {}
@@ -273,6 +391,7 @@ console.log("result",result)
     <>
    {
     !processing?
+<<<<<<< HEAD
     <Card sx={{marginTop:'20px',padding:'40px'}}>
         <Box>
         <div>Current Dollar Cost Average Contracts</div>
@@ -280,6 +399,16 @@ console.log("result",result)
         <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="Current Dollar Cost Average">
         <TableHead sx={{backgroundColor:"lightyellow"}}>
+=======
+    <Slide direction="right" in={true} mountOnEnter>
+    <Card sx={{marginTop:'20px', marginBottom: "20px", padding:'0px', border:2, borderColor:"#e842fa"}}>
+        <Box>
+
+        </Box>
+        <TableContainer component={Paper}>
+      <Table sx={{ minWidth: 650, }} aria-label="Current Dollar Cost Average">
+        <TableHead sx={{backgroundColor:"#a7aeff"}}>
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
           <TableRow>
             <TableCell>buyId</TableCell>
             <TableCell align="right">Token To Spend</TableCell>
@@ -289,12 +418,21 @@ console.log("result",result)
             <TableCell align="right"></TableCell>
           </TableRow>
         </TableHead>
+<<<<<<< HEAD
         <TableBody>
           {tabledata?(removeCancelledContracts(tabledata).map((row) => {
             // let swap = {"tokenToBuy":"UNI","tokenToSpend":"WETH"}
             // console.log("row",row)
             let swap = translateToken(row)
             let time = translateTime(row)
+=======
+        <TableBody sx={{backgroundColor: "#ebecff"}}>
+          {tabledata?(tabledata.map((row) => {
+       
+            let swap = translateToken(row)
+            let time = translateTime(row)
+            let index = tabledata.indexOf(row)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
             
             return(
             <TableRow
@@ -307,16 +445,26 @@ console.log("result",result)
               <TableCell align="right">{swap.tokenToBuy}</TableCell>
               <TableCell align="right">{row.amount}</TableCell>
               <TableCell align="right">{time.timeInterval}</TableCell>
+<<<<<<< HEAD
               <TableCell><Button onClick={()=>handleCancel(row.buyId)} variant='contained' color="error">Cancel</Button></TableCell>
             </TableRow>)
           })):<div></div>}
+=======
+              <TableCell><Button onClick={()=>handleCancel(buyIds[index])} variant='contained' color="error">Cancel</Button></TableCell>
+            </TableRow>)
+          })):null}
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         </TableBody>
       </Table>
     </TableContainer>
 
 
 
+<<<<<<< HEAD
     </Card>:<Box display="flex"
+=======
+    </Card></Slide>:<Box display="flex"
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 alignItems="center"
                 justifyContent="center" 
                 sx={{marginTop:'20px'}}> <CircularProgress/></Box>

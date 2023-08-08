@@ -45,6 +45,11 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
     mapping(uint256 /* recurringBuyId */ => RecurringBuy /* data */)
         private s_recurringBuys;
     mapping(address /* sender */ => uint256[] /* ids */) private s_senderToIds;
+<<<<<<< HEAD
+=======
+    mapping(address /* ERC20 */ => bool /* isAllowed */)
+        private s_allowedERC20s;
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
     // constants
     uint256 private constant PRECISION = 10000;
@@ -80,7 +85,11 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
         uint256 endRecBuyId
     ) private view {
         if (
+<<<<<<< HEAD
             !(startRecBuyId < endRecBuyId) ||
+=======
+            startRecBuyId > endRecBuyId ||
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
             !(endRecBuyId < s_nextRecurringBuyId) ||
             startRecBuyId == 0 ||
             endRecBuyId == 0
@@ -108,9 +117,12 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
         if (defaultRouter == address(0)) {
             revert DollarCostAverage__InvalidDefaultRouterAddress();
         }
+<<<<<<< HEAD
         if (automationLayerAddress == address(0)) {
             revert DollarCostAverage__InvalidAutomationLayerAddress();
         }
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
         s_defaultRouter = defaultRouter;
         s_automationLayer = IAutomationLayer(automationLayerAddress);
@@ -146,7 +158,15 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
         if (!s_acceptingNewRecurringBuys) {
             revert DollarCostAverage__NotAcceptingNewRecurringBuys();
         }
+<<<<<<< HEAD
         if (tokenToSpend == address(0) || tokenToBuy == address(0)) {
+=======
+        if (
+            !s_allowedERC20s[tokenToSpend] ||
+            !s_allowedERC20s[tokenToBuy] ||
+            tokenToSpend == tokenToBuy
+        ) {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
             revert DollarCostAverage__InvalidTokenAddresses();
         }
         if (timeIntervalInSeconds == 0) {
@@ -161,11 +181,14 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
         address router = dexRouter == address(0) ? s_defaultRouter : dexRouter;
         address[] memory path = __checkPairs(router, tokenToSpend, tokenToBuy);
         uint256 nextRecurringBuyId = s_nextRecurringBuyId;
+<<<<<<< HEAD
         uint256 accountNumber = s_automationLayer.createAccount(
             nextRecurringBuyId,
             msg.sender,
             address(this)
         );
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
         recurringBuyIds.push(nextRecurringBuyId);
         RecurringBuy memory buy = RecurringBuy(
@@ -177,18 +200,41 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
             paymentInterface,
             router,
             block.timestamp,
+<<<<<<< HEAD
             accountNumber,
+=======
+            0,
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
             path,
             recurringBuyIds.length - 1,
             Status.SET
         );
 
+<<<<<<< HEAD
         s_recurringBuys[nextRecurringBuyId] = buy;
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         unchecked {
             ++s_nextRecurringBuyId;
         }
 
+<<<<<<< HEAD
         emit RecurringBuyCreated(nextRecurringBuyId, msg.sender, buy);
+=======
+        emit RecurringBuyCreated(nextRecurringBuyId, msg.sender);
+
+        uint256 accountNumber = 0;
+        if (address(s_automationLayer) != address(0)) {
+            accountNumber = s_automationLayer.createAccount(
+                nextRecurringBuyId,
+                msg.sender,
+                address(this)
+            );
+        }
+
+        buy.accountNumber = accountNumber;
+        s_recurringBuys[nextRecurringBuyId] = buy;
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     }
 
     /** @dev added nonReentrant and whenNotPaused third party modifiers. The given recurring buy ID
@@ -210,8 +256,13 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
             revert DollarCostAverage__CallerNotRecurringBuySender();
         }
 
+<<<<<<< HEAD
         buy.status = Status.CANCELLED;
         s_automationLayer.cancelAccount(buy.accountNumber);
+=======
+        // updating status
+        buy.status = Status.CANCELLED;
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
         // removing the ID from the array
         uint256[] storage ids = s_senderToIds[msg.sender];
@@ -222,6 +273,14 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
         ids.pop();
 
         emit RecurringBuyCancelled(recurringBuyId, buy.sender);
+<<<<<<< HEAD
+=======
+
+        // cancelling account on the automation contract
+        if (address(s_automationLayer) != address(0)) {
+            s_automationLayer.cancelAccount(buy.accountNumber);
+        }
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     }
 
     /** @dev added nonReentrant and whenNotPaused third party modifiers. The given recurring buy ID
@@ -274,7 +333,15 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
         }
 
         // automation node payment
+<<<<<<< HEAD
         if (msg.sender != buy.sender) {
+=======
+        uint256 feeFromAutomationLayer = 0;
+        if (address(s_automationLayer) != address(0)) {
+            feeFromAutomationLayer = s_automationLayer.getAutomationFee();
+        }
+        if (msg.sender != buy.sender && feeFromAutomationLayer > 0) {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
             // building path
             address[] memory pathPayment = __checkPairs(
                 s_defaultRouter,
@@ -283,8 +350,13 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
             );
 
             // fees calculation
+<<<<<<< HEAD
             uint256 automationFee = (protocolFee *
                 s_automationLayer.getAutomationFee()) / PRECISION;
+=======
+            uint256 automationFee = (protocolFee * feeFromAutomationLayer) /
+                PRECISION;
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
             protocolFee -= automationFee;
             uint256 payment = __prospectPayment(automationFee, pathPayment);
 
@@ -303,7 +375,13 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
         __transferERC20(
             buy.tokenToSpend,
             address(this),
+<<<<<<< HEAD
             address(s_automationLayer),
+=======
+            address(s_automationLayer) != address(0)
+                ? address(s_automationLayer)
+                : owner(),
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
             protocolFee,
             true
         );
@@ -339,10 +417,13 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
         __whenNotPaused();
         __onlyAllowed();
 
+<<<<<<< HEAD
         if (automationLayerAddress == address(0)) {
             revert DollarCostAverage__InvalidAutomationLayerAddress();
         }
 
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         s_automationLayer = IAutomationLayer(automationLayerAddress);
 
         emit AutomationLayerSet(msg.sender, automationLayerAddress);
@@ -448,6 +529,28 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
         emit DuhTokenSet(msg.sender, duh);
     }
 
+<<<<<<< HEAD
+=======
+    /** @dev Added nonReentrant and whenNotPaused third party modifiers. Only allowed callers
+     *  can call this function.
+     *  @inheritdoc IDollarCostAverage
+     */
+    function setAllowedERC20s(
+        address token,
+        bool isAllowed
+    ) external override(IDollarCostAverage) {
+        __nonReentrant();
+        __whenNotPaused();
+        __onlyAllowed();
+
+        if (token == address(0)) {
+            revert DollarCostAverage__InvalidTokenAddresses();
+        }
+
+        s_allowedERC20s[token] = isAllowed;
+    }
+
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     /// -----------------------------------------------------------------------
     /// Internal state-change functions
     /// -----------------------------------------------------------------------
@@ -601,7 +704,11 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
             forLoopEndRecBuyId - startRecBuyId
         );
 
+<<<<<<< HEAD
         uint256 recBuyCount;
+=======
+        uint256 recBuyCount = 0;
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         for (uint256 i = startRecBuyId; i < forLoopEndRecBuyId; ++i) {
             recurringBuys[i - startRecBuyId] = s_recurringBuys[i];
             if (__validateRecurringBuy(recurringBuys[i - startRecBuyId])) {
@@ -673,6 +780,36 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
     }
 
     /// @inheritdoc IDollarCostAverage
+<<<<<<< HEAD
+=======
+    function getAllowedERC20s(
+        address token
+    ) external view override(IDollarCostAverage) returns (bool) {
+        return s_allowedERC20s[token];
+    }
+
+    /// @inheritdoc IDollarCostAverage
+    function getRecurringBuysFromUser(
+        address sender
+    )
+        external
+        view
+        override(IDollarCostAverage)
+        returns (uint256[] memory, RecurringBuy[] memory)
+    {
+        uint256[] memory recurringBuyIds = s_senderToIds[sender];
+        RecurringBuy[] memory recBuys = new RecurringBuy[](
+            recurringBuyIds.length
+        );
+        for (uint256 ii = 0; ii < recurringBuyIds.length; ++ii) {
+            recBuys[ii] = s_recurringBuys[recurringBuyIds[ii]];
+        }
+
+        return (recurringBuyIds, recBuys);
+    }
+
+    /// @inheritdoc IDollarCostAverage
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     function isRecurringBuyValid(
         uint256 recurringBuyId
     ) public view override(IDollarCostAverage) returns (bool) {
