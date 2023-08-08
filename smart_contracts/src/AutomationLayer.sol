@@ -15,6 +15,8 @@ pragma solidity 0.8.19;
 import {IAutomationLayer} from "./interfaces/IAutomationLayer.sol";
 import {INodeSequencer} from "./interfaces/INodeSequencer.sol";
 import {IAutomatedContract} from "./interfaces/IAutomatedContract.sol";
+import {IDEXRouter} from "./interfaces/IDEXRouter.sol";
+import {IDEXFactory} from "./interfaces/IDEXFactory.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Security} from "./Security.sol";
 
@@ -53,13 +55,6 @@ contract AutomationLayer is IAutomationLayer, Security {
     function __validateAccountNumber(Status status) private pure {
         if (!__isValidAccount(status)) {
             revert AutomationLayer__InvalidAccountNumber();
-        }
-    }
-
-    /// @dev checks if caller is oracle.
-    function __onlyOracle() private view {
-        if (msg.sender != s_oracleAddress) {
-            revert AutomationLayer__CallerNotOracle();
         }
     }
 
@@ -334,7 +329,7 @@ contract AutomationLayer is IAutomationLayer, Security {
     ) external override(IAutomationLayer) {
         __nonReentrant();
         __whenNotPaused();
-        __onlyOracle();
+        __onlyAllowed();
 
         s_automationFee = automationFee;
 

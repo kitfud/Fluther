@@ -185,7 +185,10 @@ interface IDollarCostAverage {
     event DuhTokenSet(address indexed caller, address indexed duh);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     /** @dev event for when a ERC20 token permission is set.
      *  @param caller: address of the function caller.
      *  @param token: ERC20 token address.
@@ -197,6 +200,9 @@ interface IDollarCostAverage {
         bool isAllowed
     );
 
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     /// -----------------------------------------------------------------------
     /// Functions
@@ -261,13 +267,19 @@ interface IDollarCostAverage {
      */
     function setDuh(address duh) external;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
     /** @notice sets permission for the given token address.
      *  @param token: ERC20 token address.
      *  @param isAllowed: true if the token is allowed, false otherwise.
      */
     function setAllowedERC20s(address token, bool isAllowed) external;
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
     /** @notice gets the timestamp of the current block.
@@ -329,7 +341,10 @@ interface IDollarCostAverage {
     ) external view returns (RecurringBuy[] memory);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     /** @notice reads the permission of the given ERC20 token address.
      *  @param token: the ERC20 token address to.
      *  @return bool true if the token is allowed, false otherwise.
@@ -344,6 +359,9 @@ interface IDollarCostAverage {
         address sender
     ) external view returns (uint256[] memory, RecurringBuy[] memory);
 
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     /** @notice gets if given recurring buy ID is valid.
      *  @param recurringBuyId: ID of the recurring buy.

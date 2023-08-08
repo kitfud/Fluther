@@ -2,11 +2,17 @@
 pragma solidity 0.8.19;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 /** @author @EWCunha
  *  @title Security smart contract unit test
  */
 
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 import {Test} from "forge-std/Test.sol";
 import {Security} from "../../src/Security.sol";

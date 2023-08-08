@@ -32,6 +32,7 @@
             <td></td>
             <td class="headerItem">Lines:</td>
 <<<<<<< HEAD
+<<<<<<< HEAD
             <td class="headerCovTableEntry">134</td>
             <td class="headerCovTableEntry">177</td>
             <td class="headerCovTableEntryMed">75.7 %</td>
@@ -45,6 +46,8 @@
             <td class="headerCovTableEntry">34</td>
             <td class="headerCovTableEntryLo">70.6 %</td>
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
             <td class="headerCovTableEntry">187</td>
             <td class="headerCovTableEntry">194</td>
             <td class="headerCovTableEntryHi">96.4 %</td>
@@ -57,6 +60,9 @@
             <td class="headerCovTableEntry">36</td>
             <td class="headerCovTableEntry">37</td>
             <td class="headerCovTableEntryHi">97.3 %</td>
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
           </tr>
           <tr>
@@ -65,9 +71,15 @@
             <td></td>
             <td class="headerItem">Branches:</td>
 <<<<<<< HEAD
+<<<<<<< HEAD
             <td class="headerCovTableEntry">30</td>
             <td class="headerCovTableEntry">38</td>
             <td class="headerCovTableEntryMed">78.9 %</td>
+=======
+            <td class="headerCovTableEntry">36</td>
+            <td class="headerCovTableEntry">44</td>
+            <td class="headerCovTableEntryMed">81.8 %</td>
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
             <td class="headerCovTableEntry">36</td>
             <td class="headerCovTableEntry">44</td>
@@ -137,6 +149,7 @@
 <a name="45"><span class="lineNum">      45 </span>                :            :     mapping(uint256 /* recurringBuyId */ =&gt; RecurringBuy /* data */)</a>
 <a name="46"><span class="lineNum">      46 </span>                :            :         private s_recurringBuys;</a>
 <a name="47"><span class="lineNum">      47 </span>                :            :     mapping(address /* sender */ =&gt; uint256[] /* ids */) private s_senderToIds;</a>
+<<<<<<< HEAD
 <<<<<<< HEAD
 <a name="48"><span class="lineNum">      48 </span>                :            : </a>
 <a name="49"><span class="lineNum">      49 </span>                :            :     // constants</a>
@@ -440,6 +453,8 @@
 <a name="347"><span class="lineNum">     347 </span>                :            : </a>
 <a name="348"><span class="lineNum">     348 </span>                :<span class="lineCov">          2 :         emit AutomationLayerSet(msg.sender, automationLayerAddress);</span></a>
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 <a name="48"><span class="lineNum">      48 </span>                :            :     mapping(address /* ERC20 */ =&gt; bool /* isAllowed */)</a>
 <a name="49"><span class="lineNum">      49 </span>                :            :         private s_allowedERC20s;</a>
 <a name="50"><span class="lineNum">      50 </span>                :            : </a>
@@ -741,6 +756,9 @@
 <a name="346"><span class="lineNum">     346 </span>                :            :         );</a>
 <a name="347"><span class="lineNum">     347 </span>                :            : </a>
 <a name="348"><span class="lineNum">     348 </span>                :<span class="lineCov">         31 :         emit PaymentTransferred(recurringBuyId, buy.sender, amounts);</span></a>
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 <a name="349"><span class="lineNum">     349 </span>                :            :     }</a>
 <a name="350"><span class="lineNum">     350 </span>                :            : </a>
@@ -748,6 +766,7 @@
 <a name="352"><span class="lineNum">     352 </span>                :            :      *  Only allowed addresses can call this function.</a>
 <a name="353"><span class="lineNum">     353 </span>                :            :      *  @inheritdoc IDollarCostAverage</a>
 <a name="354"><span class="lineNum">     354 </span>                :            :      */</a>
+<<<<<<< HEAD
 <<<<<<< HEAD
 <a name="355"><span class="lineNum">     355 </span>                :            :     function setDefaultRouter(</a>
 <a name="356"><span class="lineNum">     356 </span>                :            :         address defaultRouter</a>
@@ -780,6 +799,8 @@
 <a name="383"><span class="lineNum">     383 </span>                :            : </a>
 <a name="384"><span class="lineNum">     384 </span>                :<span class="lineCov">          3 :         emit AcceptingRecurringBuysSet(msg.sender, acceptingNewRecurringBuys);</span></a>
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 <a name="355"><span class="lineNum">     355 </span>                :            :     function setAutomationLayer(</a>
 <a name="356"><span class="lineNum">     356 </span>                :            :         address automationLayerAddress</a>
 <a name="357"><span class="lineNum">     357 </span>                :            :     ) external override(IDollarCostAverage) {</a>
@@ -810,6 +831,9 @@
 <a name="382"><span class="lineNum">     382 </span>                :<span class="lineCov">          2 :         s_defaultRouter = defaultRouter;</span></a>
 <a name="383"><span class="lineNum">     383 </span>                :            : </a>
 <a name="384"><span class="lineNum">     384 </span>                :<span class="lineCov">          2 :         emit DefaultRouterSet(msg.sender, defaultRouter);</span></a>
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 <a name="385"><span class="lineNum">     385 </span>                :            :     }</a>
 <a name="386"><span class="lineNum">     386 </span>                :            : </a>
@@ -817,6 +841,7 @@
 <a name="388"><span class="lineNum">     388 </span>                :            :      *  Only allowed addresses can call this function.</a>
 <a name="389"><span class="lineNum">     389 </span>                :            :      *  @inheritdoc IDollarCostAverage</a>
 <a name="390"><span class="lineNum">     390 </span>                :            :      */</a>
+<<<<<<< HEAD
 <<<<<<< HEAD
 <a name="391"><span class="lineNum">     391 </span>                :            :     function setFee(uint256 fee) external override(IDollarCostAverage) {</a>
 <a name="392"><span class="lineNum">     392 </span>                :<span class="lineNoCov">          0 :         __nonReentrant();</span></a>
@@ -843,6 +868,8 @@
 <a name="413"><span class="lineNum">     413 </span>                :            : </a>
 <a name="414"><span class="lineNum">     414 </span>                :<span class="lineNoCov">          0 :         emit ContractFeeShareSet(msg.sender, contractFeeShare);</span></a>
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 <a name="391"><span class="lineNum">     391 </span>                :            :     function setAcceptingNewRecurringBuys(</a>
 <a name="392"><span class="lineNum">     392 </span>                :            :         bool acceptingNewRecurringBuys</a>
 <a name="393"><span class="lineNum">     393 </span>                :            :     ) external override(IDollarCostAverage) {</a>
@@ -867,6 +894,9 @@
 <a name="412"><span class="lineNum">     412 </span>                :<span class="lineCov">          2 :         s_fee = fee;</span></a>
 <a name="413"><span class="lineNum">     413 </span>                :            : </a>
 <a name="414"><span class="lineNum">     414 </span>                :<span class="lineCov">          2 :         emit FeeSet(msg.sender, fee);</span></a>
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 <a name="415"><span class="lineNum">     415 </span>                :            :     }</a>
 <a name="416"><span class="lineNum">     416 </span>                :            : </a>
@@ -874,6 +904,7 @@
 <a name="418"><span class="lineNum">     418 </span>                :            :      *  Only allowed addresses can call this function.</a>
 <a name="419"><span class="lineNum">     419 </span>                :            :      *  @inheritdoc IDollarCostAverage</a>
 <a name="420"><span class="lineNum">     420 </span>                :            :      */</a>
+<<<<<<< HEAD
 <<<<<<< HEAD
 <a name="421"><span class="lineNum">     421 </span>                :            :     function setSlippagePercentage(</a>
 <a name="422"><span class="lineNum">     422 </span>                :            :         uint256 slippagePercentage</a>
@@ -1254,6 +1285,8 @@
 <a name="797"><span class="lineNum">     797 </span>                :            :     }</a>
 <a name="798"><span class="lineNum">     798 </span>                :            : }</a>
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 <a name="421"><span class="lineNum">     421 </span>                :            :     function setContractFeeShare(</a>
 <a name="422"><span class="lineNum">     422 </span>                :            :         uint256 contractFeeShare</a>
 <a name="423"><span class="lineNum">     423 </span>                :            :     ) external override(IDollarCostAverage) {</a>
@@ -1694,6 +1727,9 @@
 <a name="858"><span class="lineNum">     858 </span>                :<span class="lineCov">         25 :         return amountsOut[amountsOut.length - 1];</span></a>
 <a name="859"><span class="lineNum">     859 </span>                :            :     }</a>
 <a name="860"><span class="lineNum">     860 </span>                :            : }</a>
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 </pre>
       </td>

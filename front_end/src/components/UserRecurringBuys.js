@@ -1,14 +1,20 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import React, { isValidElement } from 'react'
 import { useEffect,useState } from 'react'
 import {Typography,Snackbar,CircularProgress,Button,Card,Box,Paper,Table, TableBody,TableCell,TableContainer,TableHead,TableRow } from '@mui/material'
 import { ethers } from 'ethers'
 import DollarCost from '../chain-info/smart_contracts.json'
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 import React from 'react'
 import { useEffect,useState } from 'react'
 import {Typography,Snackbar,CircularProgress,Button,Card,Box,Paper,Table, TableBody,TableCell,TableContainer,TableHead,TableRow, Slide } from '@mui/material'
 import { ethers } from 'ethers'
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
 import IconButton from '@mui/material/IconButton';
@@ -19,9 +25,13 @@ import smartContracts from '../chain-info/smart_contracts.json'
 const UserRecurringBuys = ({signer,contract,provider,address}) => {
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     // console.log(DollarCost.DollarCostAverage.address.sepolia)
 // console.log("address",address)
 const [data, setData] = useState(null)
+=======
+
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
 
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
@@ -31,13 +41,19 @@ const [processing, setProcessing] = useState(false)
   const [openSnackbar,setOpenSnackBar] = useState(false)
   const [txHash, setTxHash] = useState(null)
 <<<<<<< HEAD
+<<<<<<< HEAD
   const [canceledIds,setCanceledIds] = useState(null)
  
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
  
   const [buyIds,setBuyIds] = useState(null)
   const [buyIdStructs,setBuyIdStructs] = useState(null)
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
 
@@ -46,7 +62,11 @@ const [processing, setProcessing] = useState(false)
       return;
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
     window.location.reload(false);
+=======
+    window.location.reload()
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
     window.location.reload()
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
@@ -73,6 +93,7 @@ const [processing, setProcessing] = useState(false)
   );
 
     useEffect(()=>{
+<<<<<<< HEAD
 <<<<<<< HEAD
 
     const loggingData = async()=>{
@@ -198,6 +219,8 @@ console.log("result",result)
         });
 
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     if(provider!=null){
     try{
     logUserData()  
@@ -287,6 +310,9 @@ console.log("result",result)
         }
       })
      }
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     }
 
@@ -339,6 +365,7 @@ console.log("result",result)
       }
     
 <<<<<<< HEAD
+<<<<<<< HEAD
  const removeCancelledContracts = (tableData) =>{
     // console.log('tableData',tableData)
     // console.log("cancelled",canceledIds)
@@ -346,6 +373,9 @@ console.log("result",result)
     // console.log("refined",refinedData)
     return refinedData
  }
+=======
+
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
 
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
@@ -392,6 +422,7 @@ console.log("result",result)
    {
     !processing?
 <<<<<<< HEAD
+<<<<<<< HEAD
     <Card sx={{marginTop:'20px',padding:'40px'}}>
         <Box>
         <div>Current Dollar Cost Average Contracts</div>
@@ -400,6 +431,8 @@ console.log("result",result)
       <Table sx={{ minWidth: 650 }} aria-label="Current Dollar Cost Average">
         <TableHead sx={{backgroundColor:"lightyellow"}}>
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     <Slide direction="right" in={true} mountOnEnter>
     <Card sx={{marginTop:'20px', marginBottom: "20px", padding:'0px', border:2, borderColor:"#e842fa"}}>
         <Box>
@@ -408,6 +441,9 @@ console.log("result",result)
         <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650, }} aria-label="Current Dollar Cost Average">
         <TableHead sx={{backgroundColor:"#a7aeff"}}>
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
           <TableRow>
             <TableCell>buyId</TableCell>
@@ -419,6 +455,7 @@ console.log("result",result)
           </TableRow>
         </TableHead>
 <<<<<<< HEAD
+<<<<<<< HEAD
         <TableBody>
           {tabledata?(removeCancelledContracts(tabledata).map((row) => {
             // let swap = {"tokenToBuy":"UNI","tokenToSpend":"WETH"}
@@ -426,12 +463,17 @@ console.log("result",result)
             let swap = translateToken(row)
             let time = translateTime(row)
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         <TableBody sx={{backgroundColor: "#ebecff"}}>
           {tabledata?(tabledata.map((row) => {
        
             let swap = translateToken(row)
             let time = translateTime(row)
             let index = tabledata.indexOf(row)
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
             
             return(
@@ -446,9 +488,15 @@ console.log("result",result)
               <TableCell align="right">{row.amount}</TableCell>
               <TableCell align="right">{time.timeInterval}</TableCell>
 <<<<<<< HEAD
+<<<<<<< HEAD
               <TableCell><Button onClick={()=>handleCancel(row.buyId)} variant='contained' color="error">Cancel</Button></TableCell>
             </TableRow>)
           })):<div></div>}
+=======
+              <TableCell><Button onClick={()=>handleCancel(buyIds[index])} variant='contained' color="error">Cancel</Button></TableCell>
+            </TableRow>)
+          })):null}
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
               <TableCell><Button onClick={()=>handleCancel(buyIds[index])} variant='contained' color="error">Cancel</Button></TableCell>
             </TableRow>)
@@ -461,7 +509,11 @@ console.log("result",result)
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     </Card>:<Box display="flex"
+=======
+    </Card></Slide>:<Box display="flex"
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
     </Card></Slide>:<Box display="flex"
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028

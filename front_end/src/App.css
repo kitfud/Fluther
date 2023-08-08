@@ -47,8 +47,6 @@
   top: 0;
   z-index: -2;
 }
-<<<<<<< HEAD
-=======
 
 .highlight:hover{
   opacity: 0.5;
@@ -78,4 +76,3 @@
 .tooltip:hover .tooltiptext {
   visibility: visible;
 }
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028

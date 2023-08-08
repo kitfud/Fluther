@@ -2,11 +2,17 @@
 pragma solidity 0.8.19;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 /** @author @EWCunha
  *  @title script for configuring the default values depending on the network
  */
 
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 import {Script} from "forge-std/Script.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/ERC20Mock.sol";
@@ -17,6 +23,10 @@ import {DEXFactoryMock} from "../test/mocks/DEXFactoryMock.sol";
 
 contract HelperConfig is Script {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    /* solhint-disable */
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
     /* solhint-disable */
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
@@ -44,6 +54,11 @@ contract HelperConfig is Script {
         if (block.chainid == 11155111) {
             activeNetworkConfig = getSepoliaConfig();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        } else if (block.chainid == 1 || block.chainid == 137) {
+            activeNetworkConfig = getMainnetConfig();
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
         } else if (block.chainid == 1 || block.chainid == 137) {
             activeNetworkConfig = getMainnetConfig();
@@ -54,7 +69,11 @@ contract HelperConfig is Script {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     function getMainnetConfig() public view returns (NetworkConfig memory) {
+=======
+    function getMainnetConfig() internal view returns (NetworkConfig memory) {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
     function getMainnetConfig() internal view returns (NetworkConfig memory) {
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
@@ -77,7 +96,11 @@ contract HelperConfig is Script {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     function getSepoliaConfig() public view returns (NetworkConfig memory) {
+=======
+    function getSepoliaConfig() internal view returns (NetworkConfig memory) {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
     function getSepoliaConfig() internal view returns (NetworkConfig memory) {
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
@@ -108,7 +131,11 @@ contract HelperConfig is Script {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     function getOrCreateAnvilConfig() public returns (NetworkConfig memory) {
+=======
+    function getOrCreateAnvilConfig() internal returns (NetworkConfig memory) {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
     function getOrCreateAnvilConfig() internal returns (NetworkConfig memory) {
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
@@ -123,13 +150,19 @@ contract HelperConfig is Script {
         ERC20Mock token1 = new ERC20Mock();
         ERC20Mock token2 = new ERC20Mock();
 <<<<<<< HEAD
+<<<<<<< HEAD
         DEXFactoryMock factory = new DEXFactoryMock();
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         DEXFactoryMock factory = new DEXFactoryMock(
             address(token1),
             address(token2),
             address(wrapNative)
         );
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         UniswapMock dexRouter = new UniswapMock(address(factory));
         vm.stopBroadcast();

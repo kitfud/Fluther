@@ -1,6 +1,9 @@
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     "PriceFeed": {
         "address": {
             "sepolia": {
@@ -8,6 +11,9 @@
             }
         }
     },
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     "Liquidity": {
         "address": {
@@ -27,7 +33,11 @@
     "DollarCostAverage": {
         "address": {
 <<<<<<< HEAD
+<<<<<<< HEAD
             "sepolia": "0xC4489B5A85d5DcDb8a9FE98725Dd7BB09EC0213C"
+=======
+            "sepolia": "0xf0EF015fDeFB728840a7407521b1a9806aff0ef2"
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
             "sepolia": "0xf0EF015fDeFB728840a7407521b1a9806aff0ef2"
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
@@ -48,14 +58,20 @@
                     {
                         "internalType": "address",
 <<<<<<< HEAD
+<<<<<<< HEAD
                         "name": "_wrapNative",
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "name": "wrapNative",
                         "type": "address"
                     },
                     {
                         "internalType": "address",
                         "name": "duh",
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "type": "address"
                     }
@@ -212,7 +228,10 @@
                     },
                     {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "indexed": false,
                         "internalType": "uint256",
                         "name": "contractFeeShare",
@@ -232,6 +251,9 @@
                         "type": "address"
                     },
                     {
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "indexed": true,
                         "internalType": "address",
@@ -249,7 +271,10 @@
                         "indexed": true,
                         "internalType": "address",
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "name": "caller",
                         "type": "address"
                     },
@@ -313,6 +338,9 @@
                     {
                         "indexed": true,
                         "internalType": "address",
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "name": "previousOwner",
                         "type": "address"
@@ -399,6 +427,7 @@
                         "name": "sender",
                         "type": "address"
 <<<<<<< HEAD
+<<<<<<< HEAD
                     },
                     {
                         "components": [
@@ -464,6 +493,8 @@
                         "type": "tuple"
 =======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                     }
                 ],
                 "name": "RecurringBuyCreated",
@@ -474,7 +505,10 @@
                 "inputs": [
                     {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "indexed": true,
                         "internalType": "address",
                         "name": "caller",
@@ -494,6 +528,9 @@
                 "anonymous": false,
                 "inputs": [
                     {
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "indexed": false,
                         "internalType": "address",
@@ -608,7 +645,10 @@
             },
             {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "inputs": [
                     {
                         "internalType": "address",
@@ -628,6 +668,9 @@
                 "type": "function"
             },
             {
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "inputs": [],
                 "name": "getAutomationLayer",
@@ -644,7 +687,10 @@
             {
                 "inputs": [],
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "name": "getContractFeeShare",
                 "outputs": [
                     {
@@ -658,6 +704,9 @@
             },
             {
                 "inputs": [],
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "name": "getCurrentBlockTimestamp",
                 "outputs": [
@@ -686,7 +735,10 @@
             {
                 "inputs": [],
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "name": "getDuh",
                 "outputs": [
                     {
@@ -713,6 +765,9 @@
             },
             {
                 "inputs": [],
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "name": "getNextRecurringBuyId",
                 "outputs": [
@@ -794,12 +849,18 @@
                             },
                             {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                                 "internalType": "uint256",
                                 "name": "index",
                                 "type": "uint256"
                             },
                             {
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                                 "internalType": "enum IDollarCostAverage.Status",
                                 "name": "status",
@@ -878,12 +939,18 @@
                             },
                             {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                                 "internalType": "uint256",
                                 "name": "index",
                                 "type": "uint256"
                             },
                             {
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                                 "internalType": "enum IDollarCostAverage.Status",
                                 "name": "status",
@@ -902,7 +969,10 @@
                 "inputs": [
                     {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "internalType": "address",
                         "name": "sender",
                         "type": "address"
@@ -1021,6 +1091,9 @@
             {
                 "inputs": [
                     {
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "internalType": "uint256",
                         "name": "startRecBuyId",
@@ -1088,12 +1161,18 @@
                             },
                             {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                                 "internalType": "uint256",
                                 "name": "index",
                                 "type": "uint256"
                             },
                             {
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                                 "internalType": "enum IDollarCostAverage.Status",
                                 "name": "status",
@@ -1175,7 +1254,10 @@
             },
             {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "inputs": [
                     {
                         "internalType": "uint256",
@@ -1195,6 +1277,9 @@
                 "type": "function"
             },
             {
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "inputs": [],
                 "name": "renounceOwnership",
@@ -1238,7 +1323,10 @@
                     {
                         "internalType": "address",
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "name": "token",
                         "type": "address"
                     },
@@ -1257,6 +1345,9 @@
                 "inputs": [
                     {
                         "internalType": "address",
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "name": "automationLayerAddress",
                         "type": "address"
@@ -1271,7 +1362,10 @@
                 "inputs": [
                     {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "internalType": "uint256",
                         "name": "contractFeeShare",
                         "type": "uint256"
@@ -1285,6 +1379,9 @@
             {
                 "inputs": [
                     {
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "internalType": "address",
                         "name": "defaultRouter",
@@ -1301,7 +1398,10 @@
                     {
                         "internalType": "address",
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "name": "duh",
                         "type": "address"
                     }
@@ -1341,6 +1441,9 @@
                 "inputs": [
                     {
                         "internalType": "address",
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                         "name": "newOwner",
                         "type": "address"
@@ -1376,7 +1479,11 @@
     "AutomationLayer": {
         "address": {
 <<<<<<< HEAD
+<<<<<<< HEAD
             "sepolia": "0x4B5c46a52e5C15D6c5A0552DeB082500C680a497"
+=======
+            "sepolia": "0x2Ee43eDD9c3768b9fF3cB8F4f17A061eb8a2d847"
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
             "sepolia": "0x2Ee43eDD9c3768b9fF3cB8F4f17A061eb8a2d847"
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
@@ -1421,11 +1528,14 @@
             {
                 "inputs": [],
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "name": "AutomationLayer__CallerNotOracle",
                 "type": "error"
             },
             {
                 "inputs": [],
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "name": "AutomationLayer__InvalidAccountNumber",
@@ -1439,12 +1549,18 @@
             {
                 "inputs": [],
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "name": "AutomationLayer__NoLiquidityPair",
                 "type": "error"
             },
             {
                 "inputs": [],
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "name": "AutomationLayer__NotAccpetingNewAccounts",
                 "type": "error"
@@ -1467,11 +1583,14 @@
             {
                 "inputs": [],
 <<<<<<< HEAD
+<<<<<<< HEAD
                 "name": "AutomationLayer__UserDoesNotHaveEnoughBalanceAndOrAllowance",
                 "type": "error"
             },
             {
                 "inputs": [],
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "name": "Security__NotAllowed",
@@ -2042,7 +2161,10 @@
             },
             {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "inputs": [
                     {
                         "internalType": "uint256",
@@ -2081,6 +2203,9 @@
                 "type": "function"
             },
             {
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
                 "inputs": [],
                 "name": "renounceOwnership",
@@ -2248,7 +2373,11 @@
     "NodeSequencer": {
         "address": {
 <<<<<<< HEAD
+<<<<<<< HEAD
             "sepolia": "0x8723b2188EAf6dDBAa5f9648003935a979d477b4"
+=======
+            "sepolia": "0x20F278a77BfB77131a099e20C15985fDA4aA1Fc3"
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
             "sepolia": "0x20F278a77BfB77131a099e20C15985fDA4aA1Fc3"
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028

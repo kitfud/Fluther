@@ -38,7 +38,11 @@
           <tr>
             <td class="headerItem">Date:</td>
 <<<<<<< HEAD
+<<<<<<< HEAD
             <td class="headerValue">2023-08-01 23:05:11</td>
+=======
+            <td class="headerValue">2023-08-07 21:45:08</td>
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
             <td class="headerValue">2023-08-07 21:45:08</td>
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
@@ -127,7 +131,11 @@
 <a name="52"><span class="lineNum">      52 </span>                :            :     /// @dev Only EOA can call the function.</a>
 <a name="53"><span class="lineNum">      53 </span>                :            :     function __onlyEOA() private view {</a>
 <<<<<<< HEAD
+<<<<<<< HEAD
 <a name="54"><span class="lineNum">      54 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 40 times"> + </span>]:<span class="lineCov">         42 :         if (msg.sender != tx.origin) {</span></a>
+=======
+<a name="54"><span class="lineNum">      54 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 42 times"> + </span>]:<span class="lineCov">         44 :         if (msg.sender != tx.origin) {</span></a>
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
 <a name="54"><span class="lineNum">      54 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 42 times"> + </span>]:<span class="lineCov">         44 :         if (msg.sender != tx.origin) {</span></a>
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
@@ -141,7 +149,11 @@
 <a name="62"><span class="lineNum">      62 </span>                :            :      */</a>
 <a name="63"><span class="lineNum">      63 </span>                :            :     function __checkNodeStatus(address node, bool value) private view {</a>
 <<<<<<< HEAD
+<<<<<<< HEAD
 <a name="64"><span class="lineNum">      64 </span>        [<span class="branchCov" title="Branch 0 was taken 4 times"> + </span><span class="branchCov" title="Branch 1 was taken 51 times"> + </span>]:<span class="lineCov">         55 :         if (s_nodes[node].isActive != value) {</span></a>
+=======
+<a name="64"><span class="lineNum">      64 </span>        [<span class="branchCov" title="Branch 0 was taken 4 times"> + </span><span class="branchCov" title="Branch 1 was taken 55 times"> + </span>]:<span class="lineCov">         59 :         if (s_nodes[node].isActive != value) {</span></a>
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
 <a name="64"><span class="lineNum">      64 </span>        [<span class="branchCov" title="Branch 0 was taken 4 times"> + </span><span class="branchCov" title="Branch 1 was taken 55 times"> + </span>]:<span class="lineCov">         59 :         if (s_nodes[node].isActive != value) {</span></a>
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
@@ -154,7 +166,11 @@
 <a name="71"><span class="lineNum">      71 </span>                :            :      */</a>
 <a name="72"><span class="lineNum">      72 </span>                :            :     function __checkDuhFunds(address node) private view {</a>
 <<<<<<< HEAD
+<<<<<<< HEAD
 <a name="73"><span class="lineNum">      73 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 11 times"> + </span>]:<span class="lineCov">         13 :         if (!__hasDuhFunds(node)) {</span></a>
+=======
+<a name="73"><span class="lineNum">      73 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 13 times"> + </span>]:<span class="lineCov">         15 :         if (!__hasDuhFunds(node)) {</span></a>
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
 <a name="73"><span class="lineNum">      73 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 13 times"> + </span>]:<span class="lineCov">         15 :         if (!__hasDuhFunds(node)) {</span></a>
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
@@ -167,7 +183,11 @@
 <a name="80"><span class="lineNum">      80 </span>                :            :      */</a>
 <a name="81"><span class="lineNum">      81 </span>                :            :     function __checkNodeBlockNumberRange(address node) private view {</a>
 <<<<<<< HEAD
+<<<<<<< HEAD
 <a name="82"><span class="lineNum">      82 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 9 times"> + </span>]:<span class="lineCov">         11 :         if (!(s_nodes[node].endBlockNumber &lt; block.number)) {</span></a>
+=======
+<a name="82"><span class="lineNum">      82 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 11 times"> + </span>]:<span class="lineCov">         13 :         if (s_nodes[node].endBlockNumber &gt; block.number) {</span></a>
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
 <a name="82"><span class="lineNum">      82 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 11 times"> + </span>]:<span class="lineCov">         13 :         if (s_nodes[node].endBlockNumber &gt; block.number) {</span></a>
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
@@ -189,7 +209,11 @@
 <a name="98"><span class="lineNum">      98 </span>                :            :     /// @dev checks if it is currently accepting new nodes.</a>
 <a name="99"><span class="lineNum">      99 </span>                :            :     function __isAcceptingNewNodes() private view {</a>
 <<<<<<< HEAD
+<<<<<<< HEAD
 <a name="100"><span class="lineNum">     100 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 46 times"> + </span>]:<span class="lineCov">         48 :         if (!s_acceptingNewNodes) {</span></a>
+=======
+<a name="100"><span class="lineNum">     100 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 48 times"> + </span>]:<span class="lineCov">         50 :         if (!s_acceptingNewNodes) {</span></a>
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
 <a name="100"><span class="lineNum">     100 </span>        [<span class="branchCov" title="Branch 0 was taken 2 times"> + </span><span class="branchCov" title="Branch 1 was taken 48 times"> + </span>]:<span class="lineCov">         50 :         if (!s_acceptingNewNodes) {</span></a>
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
@@ -228,6 +252,7 @@
 <a name="133"><span class="lineNum">     133 </span>                :            :      */</a>
 <a name="134"><span class="lineNum">     134 </span>                :            :     function registerNode() external override(INodeSequencer) {</a>
 <<<<<<< HEAD
+<<<<<<< HEAD
 <a name="135"><span class="lineNum">     135 </span>                :<span class="lineCov">         39 :         __nonReentrant();</span></a>
 <a name="136"><span class="lineNum">     136 </span>                :<span class="lineCov">         39 :         __whenNotPaused();</span></a>
 <a name="137"><span class="lineNum">     137 </span>                :<span class="lineCov">         38 :         __isAcceptingNewNodes();</span></a>
@@ -243,6 +268,8 @@
 <a name="147"><span class="lineNum">     147 </span>                :            :                 : startBlockNumber;</a>
 <a name="148"><span class="lineNum">     148 </span>                :<span class="lineCov">         31 :             endBlockNumber =</span></a>
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 <a name="135"><span class="lineNum">     135 </span>                :<span class="lineCov">         41 :         __nonReentrant();</span></a>
 <a name="136"><span class="lineNum">     136 </span>                :<span class="lineCov">         41 :         __whenNotPaused();</span></a>
 <a name="137"><span class="lineNum">     137 </span>                :<span class="lineCov">         40 :         __isAcceptingNewNodes();</span></a>
@@ -257,21 +284,30 @@
 <a name="146"><span class="lineNum">     146 </span>                :            :                 ? startBlockNumber + 1</a>
 <a name="147"><span class="lineNum">     147 </span>                :            :                 : startBlockNumber;</a>
 <a name="148"><span class="lineNum">     148 </span>                :<span class="lineCov">         33 :             endBlockNumber =</span></a>
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 <a name="149"><span class="lineNum">     149 </span>                :            :                 startBlockNumber +</a>
 <a name="150"><span class="lineNum">     150 </span>                :            :                 s_timePeriodForNode /</a>
 <a name="151"><span class="lineNum">     151 </span>                :            :                 AVERAGE_TIME_PER_BLOCK;</a>
 <a name="152"><span class="lineNum">     152 </span>                :            : </a>
 <<<<<<< HEAD
+<<<<<<< HEAD
 <a name="153"><span class="lineNum">     153 </span>                :<span class="lineCov">         31 :             s_startBlockNumber = endBlockNumber + 1;</span></a>
 <a name="154"><span class="lineNum">     154 </span>                :            :         }</a>
 <a name="155"><span class="lineNum">     155 </span>                :            : </a>
 <a name="156"><span class="lineNum">     156 </span>                :<span class="lineCov">         35 :         s_nodes[msg.sender] = Node({</span></a>
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 <a name="153"><span class="lineNum">     153 </span>                :<span class="lineCov">         33 :             s_startBlockNumber = endBlockNumber + 1;</span></a>
 <a name="154"><span class="lineNum">     154 </span>                :            :         }</a>
 <a name="155"><span class="lineNum">     155 </span>                :            : </a>
 <a name="156"><span class="lineNum">     156 </span>                :<span class="lineCov">         37 :         s_nodes[msg.sender] = Node({</span></a>
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 <a name="157"><span class="lineNum">     157 </span>                :            :             startBlockNumber: startBlockNumber,</a>
 <a name="158"><span class="lineNum">     158 </span>                :            :             endBlockNumber: endBlockNumber,</a>
@@ -279,17 +315,23 @@
 <a name="160"><span class="lineNum">     160 </span>                :            :         });</a>
 <a name="161"><span class="lineNum">     161 </span>                :            : </a>
 <<<<<<< HEAD
+<<<<<<< HEAD
 <a name="162"><span class="lineNum">     162 </span>        [<span class="branchCov" title="Branch 0 was taken 31 times"> + </span><span class="branchCov" title="Branch 1 was taken 35 times"> + </span>]:<span class="lineCov">         35 :         if (startBlockNumber != 0) {</span></a>
 <a name="163"><span class="lineNum">     163 </span>                :<span class="lineCov">         31 :             __assignBlockNumbers(startBlockNumber, endBlockNumber, msg.sender);</span></a>
 <a name="164"><span class="lineNum">     164 </span>                :            :         }</a>
 <a name="165"><span class="lineNum">     165 </span>                :            : </a>
 <a name="166"><span class="lineNum">     166 </span>                :<span class="lineCov">         35 :         emit NodeRegistered(msg.sender, startBlockNumber, endBlockNumber);</span></a>
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 <a name="162"><span class="lineNum">     162 </span>        [<span class="branchCov" title="Branch 0 was taken 33 times"> + </span><span class="branchCov" title="Branch 1 was taken 37 times"> + </span>]:<span class="lineCov">         37 :         if (startBlockNumber != 0) {</span></a>
 <a name="163"><span class="lineNum">     163 </span>                :<span class="lineCov">         33 :             __assignBlockNumbers(startBlockNumber, endBlockNumber, msg.sender);</span></a>
 <a name="164"><span class="lineNum">     164 </span>                :            :         }</a>
 <a name="165"><span class="lineNum">     165 </span>                :            : </a>
 <a name="166"><span class="lineNum">     166 </span>                :<span class="lineCov">         37 :         emit NodeRegistered(msg.sender, startBlockNumber, endBlockNumber);</span></a>
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 <a name="167"><span class="lineNum">     167 </span>                :            :     }</a>
 <a name="168"><span class="lineNum">     168 </span>                :            : </a>
@@ -394,6 +436,7 @@
 <a name="267"><span class="lineNum">     267 </span>                :            :         address node</a>
 <a name="268"><span class="lineNum">     268 </span>                :            :     ) public override(INodeSequencer) {</a>
 <<<<<<< HEAD
+<<<<<<< HEAD
 <a name="269"><span class="lineNum">     269 </span>                :<span class="lineCov">          7 :         __nonReentrant();</span></a>
 <a name="270"><span class="lineNum">     270 </span>                :<span class="lineCov">          7 :         __whenNotPaused();</span></a>
 <a name="271"><span class="lineNum">     271 </span>                :<span class="lineCov">          6 :         __checkNodeStatus(node, true);</span></a>
@@ -417,6 +460,8 @@
 <a name="289"><span class="lineNum">     289 </span>                :            : </a>
 <a name="290"><span class="lineNum">     290 </span>                :<span class="lineCov">          3 :         emit NextBlockNumbersTakens(</span></a>
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 <a name="269"><span class="lineNum">     269 </span>                :<span class="lineCov">          9 :         __nonReentrant();</span></a>
 <a name="270"><span class="lineNum">     270 </span>                :<span class="lineCov">          9 :         __whenNotPaused();</span></a>
 <a name="271"><span class="lineNum">     271 </span>                :<span class="lineCov">          8 :         __checkNodeStatus(node, true);</span></a>
@@ -439,6 +484,9 @@
 <a name="288"><span class="lineNum">     288 </span>                :<span class="lineCov">          5 :         __assignBlockNumbers(startBlockNumber, endBlockNumber, node);</span></a>
 <a name="289"><span class="lineNum">     289 </span>                :            : </a>
 <a name="290"><span class="lineNum">     290 </span>                :<span class="lineCov">          5 :         emit NextBlockNumbersTakens(</span></a>
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 <a name="291"><span class="lineNum">     291 </span>                :            :             msg.sender,</a>
 <a name="292"><span class="lineNum">     292 </span>                :            :             node,</a>
@@ -514,8 +562,13 @@
 <a name="362"><span class="lineNum">     362 </span>                :            :         address node</a>
 <a name="363"><span class="lineNum">     363 </span>                :            :     ) private {</a>
 <<<<<<< HEAD
+<<<<<<< HEAD
 <a name="364"><span class="lineNum">     364 </span>                :<span class="lineCov">         36 :         for (uint256 ii = startBlockNumber; ii &lt; endBlockNumber + 1; ++ii) {</span></a>
 <a name="365"><span class="lineNum">     365 </span>                :<span class="lineCov">     207396 :             s_blockNumberToNode[ii] = node;</span></a>
+=======
+<a name="364"><span class="lineNum">     364 </span>                :<span class="lineCov">         40 :         for (uint256 ii = startBlockNumber; ii &lt; endBlockNumber + 1; ++ii) {</span></a>
+<a name="365"><span class="lineNum">     365 </span>                :<span class="lineCov">     230440 :             s_blockNumberToNode[ii] = node;</span></a>
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
 <a name="364"><span class="lineNum">     364 </span>                :<span class="lineCov">         40 :         for (uint256 ii = startBlockNumber; ii &lt; endBlockNumber + 1; ++ii) {</span></a>
 <a name="365"><span class="lineNum">     365 </span>                :<span class="lineCov">     230440 :             s_blockNumberToNode[ii] = node;</span></a>
@@ -537,7 +590,11 @@
 <a name="380"><span class="lineNum">     380 </span>                :            :         address node</a>
 <a name="381"><span class="lineNum">     381 </span>                :            :     ) private returns (uint256, uint256) {</a>
 <<<<<<< HEAD
+<<<<<<< HEAD
 <a name="382"><span class="lineNum">     382 </span>                :<span class="lineCov">          3 :         uint256 takenStartBlockNumber;</span></a>
+=======
+<a name="382"><span class="lineNum">     382 </span>                :<span class="lineCov">          3 :         uint256 takenStartBlockNumber = 0;</span></a>
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
 <a name="382"><span class="lineNum">     382 </span>                :<span class="lineCov">          3 :         uint256 takenStartBlockNumber = 0;</span></a>
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
@@ -634,7 +691,11 @@
 <a name="473"><span class="lineNum">     473 </span>                :            :         address node</a>
 <a name="474"><span class="lineNum">     474 </span>                :            :     ) external view override(INodeSequencer) returns (Node memory) {</a>
 <<<<<<< HEAD
+<<<<<<< HEAD
 <a name="475"><span class="lineNum">     475 </span>                :<span class="lineCov">         21 :         return s_nodes[node];</span></a>
+=======
+<a name="475"><span class="lineNum">     475 </span>                :<span class="lineCov">         25 :         return s_nodes[node];</span></a>
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
 <a name="475"><span class="lineNum">     475 </span>                :<span class="lineCov">         25 :         return s_nodes[node];</span></a>
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
@@ -658,7 +719,11 @@
 <a name="493"><span class="lineNum">     493 </span>                :            :         address node</a>
 <a name="494"><span class="lineNum">     494 </span>                :            :     ) external view override(INodeSequencer) returns (bool) {</a>
 <<<<<<< HEAD
+<<<<<<< HEAD
 <a name="495"><span class="lineNum">     495 </span>                :<span class="lineCov">         10 :         return node == s_blockNumberToNode[block.number];</span></a>
+=======
+<a name="495"><span class="lineNum">     495 </span>                :<span class="lineCov">         12 :         return node == s_blockNumberToNode[block.number];</span></a>
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
 <a name="495"><span class="lineNum">     495 </span>                :<span class="lineCov">         12 :         return node == s_blockNumberToNode[block.number];</span></a>
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
@@ -674,15 +739,21 @@
 <a name="505"><span class="lineNum">     505 </span>                :            :      */</a>
 <a name="506"><span class="lineNum">     506 </span>                :            :     function __hasDuhFunds(address node) private view returns (bool) {</a>
 <<<<<<< HEAD
+<<<<<<< HEAD
 <a name="507"><span class="lineNum">     507 </span>                :<span class="lineCov">         48 :         uint256 minimumDuh = s_automationLayer.getMinimumDuh();</span></a>
 <a name="508"><span class="lineNum">     508 </span>                :<span class="lineCov">         48 :         IERC20 duhToken = IERC20(s_automationLayer.getDuh());</span></a>
 <a name="509"><span class="lineNum">     509 </span>                :            : </a>
 <a name="510"><span class="lineNum">     510 </span>                :<span class="lineCov">         48 :         return !(duhToken.balanceOf(node) &lt; minimumDuh);</span></a>
 =======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 <a name="507"><span class="lineNum">     507 </span>                :<span class="lineCov">         52 :         uint256 minimumDuh = s_automationLayer.getMinimumDuh();</span></a>
 <a name="508"><span class="lineNum">     508 </span>                :<span class="lineCov">         52 :         IERC20 duhToken = IERC20(s_automationLayer.getDuh());</span></a>
 <a name="509"><span class="lineNum">     509 </span>                :            : </a>
 <a name="510"><span class="lineNum">     510 </span>                :<span class="lineCov">         52 :         return !(duhToken.balanceOf(node) &lt; minimumDuh);</span></a>
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 <a name="511"><span class="lineNum">     511 </span>                :            :     }</a>
 <a name="512"><span class="lineNum">     512 </span>                :            : }</a>
