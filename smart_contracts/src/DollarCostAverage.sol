@@ -715,14 +715,15 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
     }
 
     /// @inheritdoc IDollarCostAverage
-    function getRecurringBuyFromIds(
-        uint256[] calldata recurringBuyIds
+    function getRecurringBuysFromUser(
+        address sender
     )
         external
         view
         override(IDollarCostAverage)
-        returns (RecurringBuy[] memory)
+        returns (uint256[] memory, RecurringBuy[] memory)
     {
+        uint256[] memory recurringBuyIds = s_senderToIds[sender];
         RecurringBuy[] memory recBuys = new RecurringBuy[](
             recurringBuyIds.length
         );
@@ -730,7 +731,7 @@ contract DollarCostAverage is IDollarCostAverage, IAutomatedContract, Security {
             recBuys[ii] = s_recurringBuys[recurringBuyIds[ii]];
         }
 
-        return recBuys;
+        return (recurringBuyIds, recBuys);
     }
 
     /// @inheritdoc IDollarCostAverage

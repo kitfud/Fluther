@@ -136,5 +136,6 @@ contract DollarCostAverageFailOnRevertInvariant is StdInvariant, Test {
         dca.getDuh();
         dca.getSenderToIds(msg.sender);
         dca.getAllowedERC20s(msg.sender);
+        dca.getRecurringBuysFromUser(msg.sender);
     }
 }

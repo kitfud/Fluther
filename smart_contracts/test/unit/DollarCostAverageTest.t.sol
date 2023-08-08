@@ -1990,10 +1990,10 @@ contract DollarCostAverageTest is Test {
     }
 
     /// -----------------------------------------------------------------------
-    /// Test for: getRecurringBuyFromIds
+    /// Test for: getRecurringBuysFromUser
     /// -----------------------------------------------------------------------
 
-    function testGetRecurringBuyFromIds()
+    function testGetRecurringBuysFromUser()
         public
         createRecurringBuy(token1, token2, address(0))
         createRecurringBuy(token1, token2, address(0))
@@ -2001,19 +2001,15 @@ contract DollarCostAverageTest is Test {
         createRecurringBuy(token1, token2, address(0))
         createRecurringBuy(token1, token2, address(0))
     {
-        uint256[] memory recBuyIds = new uint256[](5);
-        recBuyIds[0] = 1;
-        recBuyIds[1] = 2;
-        recBuyIds[2] = 3;
-        recBuyIds[3] = 4;
-        recBuyIds[4] = 5;
-        IDollarCostAverage.RecurringBuy[] memory recBuys = dca
-            .getRecurringBuyFromIds(recBuyIds);
+        (
+            uint256[] memory recBuyIds,
+            IDollarCostAverage.RecurringBuy[] memory recBuys
+        ) = dca.getRecurringBuysFromUser(user);
 
-        assertEq(recBuys.length, 5);
+        assertEq(recBuys.length, recBuyIds.length);
         assertEq(
             uint8(recBuys[0].status),
-            uint8(IDollarCostAverage.Status.SET)
+            uint8(IDollarCostAverage.Status.UNSET)
         );
         assertEq(
             uint8(recBuys[1].status),
@@ -2029,6 +2025,10 @@ contract DollarCostAverageTest is Test {
         );
         assertEq(
             uint8(recBuys[4].status),
+            uint8(IDollarCostAverage.Status.SET)
+        );
+        assertEq(
+            uint8(recBuys[5].status),
             uint8(IDollarCostAverage.Status.SET)
         );
     }
