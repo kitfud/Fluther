@@ -82,6 +82,7 @@ interface IDollarCostAverage {
      *  @param paymentDue: next payment due timestamp.
      *  @param accountNumber: number of the account in the automation layer smart contract.
      *  @param path: address array for the swap path.
+     *  @param index: index in the IDs array (0 is for non-existent recurring buy).
      *  @param status: recurring buy status (UNSET, SET, or CANCELLED).
      */
     struct RecurringBuy {
@@ -95,6 +96,7 @@ interface IDollarCostAverage {
         uint256 paymentDue;
         uint256 accountNumber;
         address[] path;
+        uint256 index;
         Status status;
     }
 
@@ -105,13 +107,8 @@ interface IDollarCostAverage {
     /** @dev event for when a new recurring buy is created.
      *  @param recBuyId: new recurring buy ID.
      *  @param sender: address of the recurring buy sender.
-     *  @param buy: RecurringBuy struct with all the information of a recurring buy.
      */
-    event RecurringBuyCreated(
-        uint256 indexed recBuyId,
-        address indexed sender,
-        RecurringBuy buy
-    );
+    event RecurringBuyCreated(uint256 indexed recBuyId, address indexed sender);
 
     /** @dev event for when a recurring buy is cancelled.
      *  @param recBuyId: recurring buy ID.
@@ -134,7 +131,7 @@ interface IDollarCostAverage {
     );
 
     /** @dev event for when the a new automation layer contract is set.
-     *  @param caller: caller's address.
+     *  @param caller: function caller's address.
      *  @param automationLayerAddress: address of the new automation layer.
      */
     event AutomationLayerSet(
@@ -143,7 +140,7 @@ interface IDollarCostAverage {
     );
 
     /** @dev event for when the a new default DEX router address is set.
-     *  @param caller: caller's address.
+     *  @param caller: function caller's address.
      *  @param defaultRouter: address of the new default DEX router.
      */
     event DefaultRouterSet(
@@ -152,12 +149,50 @@ interface IDollarCostAverage {
     );
 
     /** @dev event for when the a new default DEX router address is set.
-     *  @param caller: caller's address.
+     *  @param caller: function caller's address.
      *  @param acceptingRecurringBuys: true if accepting, false otherwise.
      */
     event AcceptingRecurringBuysSet(
         address indexed caller,
         bool acceptingRecurringBuys
+    );
+
+    /** @dev event for when a new fee is set.
+     *  @param caller: function caller's address.
+     *  @param fee: the new fee value.
+     */
+    event FeeSet(address indexed caller, uint256 fee);
+
+    /** @dev event for when a new value for contract fee share is set.
+     *  @param caller: function caller's address.
+     *  @param contractFeeShare: the new value for the contract fee share.
+     */
+    event ContractFeeShareSet(address indexed caller, uint256 contractFeeShare);
+
+    /** @dev event for when a new value for slippage percentage is set.
+     *  @param caller: function caller's address.
+     *  @param slippagePercentage: the new value for the slippage percentage.
+     */
+    event SlippagePercentageSet(
+        address indexed caller,
+        uint256 slippagePercentage
+    );
+
+    /** @dev event for when a new address for the DUH token is set.
+     *  @param caller: address of the function caller.
+     *  @param duh: new address for the DUH token.
+     */
+    event DuhTokenSet(address indexed caller, address indexed duh);
+
+    /** @dev event for when a ERC20 token permission is set.
+     *  @param caller: address of the function caller.
+     *  @param token: ERC20 token address.
+     *  @param isAllowed: true if the token is allowed, false otherwise.
+     */
+    event ERC20AllowedSet(
+        address indexed caller,
+        address indexed token,
+        bool isAllowed
     );
 
     /// -----------------------------------------------------------------------
@@ -202,6 +237,32 @@ interface IDollarCostAverage {
     function setAcceptingNewRecurringBuys(
         bool acceptingNewRecurringBuys
     ) external;
+
+    /** @notice sets new fee value.
+     *  @param fee: new fee value.
+     */
+    function setFee(uint256 fee) external;
+
+    /** @notice sets new contract fee share value.
+     *  @param contractFeeShare: new contract fee share value.
+     */
+    function setContractFeeShare(uint256 contractFeeShare) external;
+
+    /** @notice sets new splippage percentage value.
+     *  @param slippagePercentage: new value for splippage percentage.
+     */
+    function setSlippagePercentage(uint256 slippagePercentage) external;
+
+    /** @notice sets new address for the DUH token.
+     *  @param duh: new address of DUH.
+     */
+    function setDuh(address duh) external;
+
+    /** @notice sets permission for the given token address.
+     *  @param token: ERC20 token address.
+     *  @param isAllowed: true if the token is allowed, false otherwise.
+     */
+    function setAllowedERC20s(address token, bool isAllowed) external;
 
     /** @notice gets the timestamp of the current block.
      *  @return uint256 value for the block timestamp.
@@ -261,6 +322,20 @@ interface IDollarCostAverage {
         uint256 endRecBuyId
     ) external view returns (RecurringBuy[] memory);
 
+    /** @notice reads the permission of the given ERC20 token address.
+     *  @param token: the ERC20 token address to.
+     *  @return bool true if the token is allowed, false otherwise.
+     */
+    function getAllowedERC20s(address token) external view returns (bool);
+
+    /** @notice gets an array of {struct-RecurringBuy} for the given sender address.
+     *  @param sender: sender's address.
+     *  @return array of recurring buy IDs and array of {struct-RecurringBuy}.
+     */
+    function getRecurringBuysFromUser(
+        address sender
+    ) external view returns (uint256[] memory, RecurringBuy[] memory);
+
     /** @notice gets if given recurring buy ID is valid.
      *  @param recurringBuyId: ID of the recurring buy.
      *  @return bool that specifies if the recurring buy is valid (true) or not (false).
@@ -268,4 +343,32 @@ interface IDollarCostAverage {
     function isRecurringBuyValid(
         uint256 recurringBuyId
     ) external view returns (bool);
+
+    /** @notice reads fee storage variable.
+     *  @return uint256 value for the fee storage variable.
+     */
+    function getFee() external view returns (uint256);
+
+    /** @notice reads the contractFeeShare storage variable.
+     *  @return uint256 value for the contractFeeShare.
+     */
+    function getContractFeeShare() external view returns (uint256);
+
+    /** @notice reads the slippagePercentage storage variable.
+     *  @return uint256 value for the slippagePercentage.
+     */
+    function getSlippagePercentage() external view returns (uint256);
+
+    /** @notice reads duh storage variable.
+     *  @return address for the duh ERC20 smart contract.
+     */
+    function getDuh() external view returns (address);
+
+    /** @notice reads the arrays of a given sender address form the senderToIds storage mapping.
+     *  @param sender: sender address of the recurring buy.
+     *  @return uint256 array with all recurring buy IDs from the given sender address.
+     */
+    function getSenderToIds(
+        address sender
+    ) external view returns (uint256[] memory);
 }

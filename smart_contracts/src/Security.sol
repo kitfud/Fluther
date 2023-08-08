@@ -67,8 +67,8 @@ contract Security is Ownable, Pausable, ReentrancyGuard {
     /// @dev Uses the whenNotPaused modifier. This way reduces smart contract size.
     function __whenNotPaused() internal view whenNotPaused {}
 
-    /// @dev Uses the onlyOwner modifier. This way reduces smart contract size.
-    function __onlyOwner() internal view onlyOwner {}
+    // /// @dev Uses the onlyOwner modifier. This way reduces smart contract size.
+    // function __onlyOwner() internal view onlyOwner {}
 
     /// @dev Only allowed addresses can call function.
     function __onlyAllowed() internal view {
@@ -148,14 +148,26 @@ contract Security is Ownable, Pausable, ReentrancyGuard {
         uint256 value,
         bool revert_
     ) internal returns (bool) {
-        (bool success, bytes memory data) = token.call(
-            abi.encodeWithSelector(
-                IERC20(token).transferFrom.selector,
-                from,
-                to,
-                value
-            )
-        );
+        bool success;
+        bytes memory data;
+        if (from != address(this)) {
+            (success, data) = token.call(
+                abi.encodeWithSelector(
+                    IERC20(token).transferFrom.selector,
+                    from,
+                    to,
+                    value
+                )
+            );
+        } else {
+            (success, data) = token.call(
+                abi.encodeWithSelector(
+                    IERC20(token).transfer.selector,
+                    to,
+                    value
+                )
+            );
+        }
 
         if (!success || (data.length != 0 && !abi.decode(data, (bool)))) {
             if (revert_) {

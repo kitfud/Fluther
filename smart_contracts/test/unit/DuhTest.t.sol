@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
+/** @author @EWCunha
+ *  @title DUH ERC20 smart contract unit test
+ */
+
 import {Test} from "forge-std/Test.sol";
 import {Duh} from "../../src/Duh.sol";
 import {Security} from "../../src/Security.sol";

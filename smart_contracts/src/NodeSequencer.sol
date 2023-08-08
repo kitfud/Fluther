@@ -79,7 +79,7 @@ contract NodeSequencer is INodeSequencer, Security {
      *  @param node: the address of the node.
      */
     function __checkNodeBlockNumberRange(address node) private view {
-        if (!(s_nodes[node].endBlockNumber < block.number)) {
+        if (s_nodes[node].endBlockNumber > block.number) {
             revert NodeSequencer__NodeCannotTakeBlockNumbers();
         }
     }
@@ -138,8 +138,8 @@ contract NodeSequencer is INodeSequencer, Security {
         __checkNodeStatus(msg.sender, false);
         __onlyEOA();
 
-        uint256 startBlockNumber;
-        uint256 endBlockNumber;
+        uint256 startBlockNumber = 0;
+        uint256 endBlockNumber = 0;
         if (__hasDuhFunds(msg.sender)) {
             startBlockNumber = s_startBlockNumber;
             startBlockNumber = startBlockNumber == block.number
@@ -379,7 +379,7 @@ contract NodeSequencer is INodeSequencer, Security {
         uint256 endBlockNumber,
         address node
     ) private returns (uint256, uint256) {
-        uint256 takenStartBlockNumber;
+        uint256 takenStartBlockNumber = 0;
         for (uint256 ii = startBlockNumber; ii < endBlockNumber + 1; ++ii) {
             if (s_blockNumberToNode[ii] == address(0)) {
                 s_blockNumberToNode[ii] = node;

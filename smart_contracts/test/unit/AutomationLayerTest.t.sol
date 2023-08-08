@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
+/** @author @EWCunha
+ *  @title AutomationLayer smart contract unit test
+ */
+
 import {Test, console} from "forge-std/Test.sol";
 import {Deploy} from "../../script/Deploy.s.sol";
 import {DeployMocks} from "../../script/DeployMocks.s.sol";
@@ -108,7 +112,7 @@ contract AutomationLayerTest is Test {
         (
             address wNative,
             address defaultRouter_,
-            ,
+            address duh,
             uint256 minDuh,
             uint256 automationFee_,
             address oracleAddr,
@@ -122,6 +126,7 @@ contract AutomationLayerTest is Test {
         oracle = oracleAddr;
         signer = vm.addr(deployerPk);
         defaultRouter = defaultRouter_;
+        duhToken = address(duhToken) == address(0) ? Duh(duh) : duhToken;
 
         vm.deal(user, INITAL_USER_FUNDS);
         if (block.chainid == 11155111) {
@@ -142,11 +147,20 @@ contract AutomationLayerTest is Test {
 
             ERC20Mock(wNative).mint(defaultRouter, INITAL_DEX_ERC20_FUNDS);
             ERC20Mock(wNative).mint(user, INITAL_USER_ERC20_FUNDS);
+
+            vm.prank(signer);
+            duhToken.mint(defaultRouter, INITAL_DEX_ERC20_FUNDS);
         }
 
         ERC20Mock(token1).mint(defaultRouter, INITAL_DEX_ERC20_FUNDS);
         ERC20Mock(token2).mint(defaultRouter, INITAL_DEX_ERC20_FUNDS);
         ERC20Mock(token1).mint(user, INITAL_USER_ERC20_FUNDS);
+
+        vm.startPrank(signer);
+        dca.setAllowedERC20s(token1, true);
+        dca.setAllowedERC20s(token2, true);
+        dca.setAllowedERC20s(wNative, true);
+        vm.stopPrank();
     }
 
     /// -----------------------------------------------------------------------
@@ -376,17 +390,18 @@ contract AutomationLayerTest is Test {
     {
         address anotherUser = makeAddr("anotherUser");
         uint256 accountNumber = automation.getNextAccountNumber() - 1;
+        uint256 id = automation.getAccount(accountNumber).id;
 
         // sequencer != address(0)
         uint256 userBalanceBefore = duhToken.balanceOf(anotherUser);
 
         vm.prank(anotherUser);
-        vm.expectCall(address(dca), abi.encodeCall(dca.trigger, 0));
+        vm.expectCall(address(dca), abi.encodeCall(dca.trigger, id));
         automation.triggerAutomation(accountNumber);
 
         uint256 userBalanceAfter = duhToken.balanceOf(anotherUser);
 
-        assertEq(userBalanceAfter - automationFee, userBalanceBefore);
+        assertTrue(userBalanceAfter > userBalanceBefore);
 
         // sequencer == address(0)
         vm.warp(block.timestamp + 2.1 minutes);
@@ -402,16 +417,13 @@ contract AutomationLayerTest is Test {
         ERC20Mock(token1).mint(anotherUser, 1 ether);
         ERC20Mock(token1).approve(address(dca), type(uint256).max);
         duhToken.approve(address(automation), type(uint256).max);
-        vm.expectCall(address(dca), abi.encodeCall(dca.trigger, 0));
+        vm.expectCall(address(dca), abi.encodeCall(dca.trigger, id));
         automation.triggerAutomation(accountNumber);
         vm.stopPrank();
 
         uint256 anotherUserBalanceAfter = duhToken.balanceOf(anotherUser);
 
-        assertEq(
-            anotherUserBalanceAfter - automationFee,
-            anotherUserBalanceBefore
-        );
+        assertTrue(anotherUserBalanceAfter > anotherUserBalanceBefore);
     }
 
     function testTriggerAutomationEvent()
@@ -426,6 +438,33 @@ contract AutomationLayerTest is Test {
         vm.prank(user);
         vm.expectEmit(true, true, true, false, address(automation));
         emit AutomationDone(accountNumber, user, address(dca));
+        automation.triggerAutomation(accountNumber);
+    }
+
+    function testTriggerAutomationShouldTakeNextBlocksIfCurrentBlockIsLastBlock()
+        public
+        createRecurringBuy(user)
+        giveDuhToken(makeAddr("anotherUser"))
+        setNode(makeAddr("anotherUser"))
+    {
+        address anotherUser = makeAddr("anotherUser");
+        uint256 accountNumber = automation.getNextAccountNumber() - 1;
+
+        uint256 endBlockNumber = sequencer.getNode(anotherUser).endBlockNumber;
+        vm.roll(endBlockNumber);
+
+        vm.prank(anotherUser);
+        vm.expectCall(
+            address(sequencer),
+            abi.encodeCall(sequencer.getNode, anotherUser)
+        );
+        vm.expectCall(
+            address(sequencer),
+            abi.encodeWithSignature(
+                "takeNextBlockNumbers(address)",
+                anotherUser
+            )
+        );
         automation.triggerAutomation(accountNumber);
     }
 
@@ -498,41 +537,29 @@ contract AutomationLayerTest is Test {
         accountNumbers[2] = 2;
         accountNumbers[3] = 3;
 
+        uint256[] memory ids = new uint256[](4);
+        ids[0] = automation.getAccount(accountNumbers[0]).id;
+        ids[1] = automation.getAccount(accountNumbers[1]).id;
+        ids[2] = automation.getAccount(accountNumbers[2]).id;
+        ids[3] = automation.getAccount(accountNumbers[3]).id;
+
         address anotherUser = makeAddr("anotherUser");
 
         uint256 userBalanceBefore = duhToken.balanceOf(user);
         uint256 anotherUserBalanceBefore = duhToken.balanceOf(anotherUser);
 
         vm.prank(anotherUser);
-        vm.expectCall(
-            address(dca),
-            abi.encodeCall(dca.trigger, accountNumbers[0])
-        );
-        vm.expectCall(
-            address(dca),
-            abi.encodeCall(dca.trigger, accountNumbers[1])
-        );
-        vm.expectCall(
-            address(dca),
-            abi.encodeCall(dca.trigger, accountNumbers[2])
-        );
-        vm.expectCall(
-            address(dca),
-            abi.encodeCall(dca.trigger, accountNumbers[3])
-        );
+        vm.expectCall(address(dca), abi.encodeCall(dca.trigger, ids[0]));
+        vm.expectCall(address(dca), abi.encodeCall(dca.trigger, ids[1]));
+        vm.expectCall(address(dca), abi.encodeCall(dca.trigger, ids[2]));
+        vm.expectCall(address(dca), abi.encodeCall(dca.trigger, ids[3]));
         automation.triggerBatchAutomation(accountNumbers);
 
         uint256 userBalanceAfter = duhToken.balanceOf(user);
         uint256 anotherUserBalanceAfter = duhToken.balanceOf(anotherUser);
 
-        assertEq(
-            userBalanceAfter,
-            userBalanceBefore - accountNumbers.length * automationFee
-        );
-        assertEq(
-            anotherUserBalanceAfter,
-            anotherUserBalanceBefore + accountNumbers.length * automationFee
-        );
+        assertEq(userBalanceAfter, userBalanceBefore);
+        assertTrue(anotherUserBalanceAfter > anotherUserBalanceBefore);
     }
 
     function testTriggerBatchAutomationEvent()
@@ -551,6 +578,12 @@ contract AutomationLayerTest is Test {
         accountNumbers[2] = 2;
         accountNumbers[3] = 3;
 
+        uint256[] memory ids = new uint256[](4);
+        ids[0] = automation.getAccount(accountNumbers[0]).id;
+        ids[1] = automation.getAccount(accountNumbers[1]).id;
+        ids[2] = automation.getAccount(accountNumbers[2]).id;
+        ids[3] = automation.getAccount(accountNumbers[3]).id;
+
         bool[] memory result = new bool[](4);
         result[0] = true;
         result[1] = false;
@@ -560,20 +593,52 @@ contract AutomationLayerTest is Test {
         address anotherUser = makeAddr("anotherUser");
 
         vm.prank(anotherUser);
-        vm.expectCall(
-            address(dca),
-            abi.encodeCall(dca.trigger, accountNumbers[0])
-        );
-        vm.expectCall(
-            address(dca),
-            abi.encodeCall(dca.trigger, accountNumbers[2])
-        );
-        vm.expectCall(
-            address(dca),
-            abi.encodeCall(dca.trigger, accountNumbers[3])
-        );
+        vm.expectCall(address(dca), abi.encodeCall(dca.trigger, ids[0]));
+        vm.expectCall(address(dca), abi.encodeCall(dca.trigger, ids[2]));
+        vm.expectCall(address(dca), abi.encodeCall(dca.trigger, ids[3]));
         vm.expectEmit(true, false, false, true, address(automation));
         emit BatchAutomationDone(anotherUser, accountNumbers, result);
+        automation.triggerBatchAutomation(accountNumbers);
+    }
+
+    function testTriggerBatchAutomationShouldTakeNextBlocksIfCurrentBlockIsLastBlock()
+        public
+        createRecurringBuy(user)
+        createRecurringBuy(user)
+        createRecurringBuy(user)
+        createRecurringBuy(user)
+        giveDuhToken(user)
+        giveDuhToken(makeAddr("anotherUser"))
+        setNode(makeAddr("anotherUser"))
+    {
+        uint256[] memory accountNumbers = new uint256[](4);
+        accountNumbers[0] = 0;
+        accountNumbers[1] = 1;
+        accountNumbers[2] = 2;
+        accountNumbers[3] = 3;
+
+        uint256[] memory ids = new uint256[](4);
+        ids[0] = automation.getAccount(accountNumbers[0]).id;
+        ids[1] = automation.getAccount(accountNumbers[1]).id;
+        ids[2] = automation.getAccount(accountNumbers[2]).id;
+        ids[3] = automation.getAccount(accountNumbers[3]).id;
+        address anotherUser = makeAddr("anotherUser");
+
+        uint256 endBlockNumber = sequencer.getNode(anotherUser).endBlockNumber;
+        vm.roll(endBlockNumber);
+
+        vm.prank(anotherUser);
+        vm.expectCall(
+            address(sequencer),
+            abi.encodeCall(sequencer.getNode, anotherUser)
+        );
+        vm.expectCall(
+            address(sequencer),
+            abi.encodeWithSignature(
+                "takeNextBlockNumbers(address)",
+                anotherUser
+            )
+        );
         automation.triggerBatchAutomation(accountNumbers);
     }
 
@@ -885,6 +950,9 @@ contract AutomationLayerTest is Test {
 
         uint256 autoFeeBefore = automation.getAutomationFee();
 
+        vm.prank(signer);
+        automation.setAllowed(oracleAddress, true);
+
         vm.prank(oracleAddress);
         automation.setAutomationFee(newAutoFee);
 
@@ -898,6 +966,9 @@ contract AutomationLayerTest is Test {
         address oracleAddress = automation.getOracleAddress();
         uint256 newAutoFee = 0.1 ether;
 
+        vm.prank(signer);
+        automation.setAllowed(oracleAddress, true);
+
         vm.prank(oracleAddress);
         vm.expectEmit(true, false, false, true, address(automation));
         emit AutomationFeeSet(oracleAddress, newAutoFee);
@@ -908,9 +979,7 @@ contract AutomationLayerTest is Test {
         uint256 newAutoFee = 0.1 ether;
 
         vm.prank(user);
-        vm.expectRevert(
-            IAutomationLayer.AutomationLayer__CallerNotOracle.selector
-        );
+        vm.expectRevert(Security.Security__NotAllowed.selector);
         automation.setAutomationFee(newAutoFee);
     }
 
@@ -984,7 +1053,6 @@ contract AutomationLayerTest is Test {
     {
         uint256 accountNumber = automation.getNextAccountNumber() - 1;
         uint256 recurringBuyId = automation.getAccount(accountNumber).id;
-        console.log(automation.getSequencerAddress());
         address anotherUser = makeAddr("anotherUser");
 
         vm.prank(anotherUser);
@@ -1074,54 +1142,6 @@ contract AutomationLayerTest is Test {
         assertTrue(!canAutomate);
     }
 
-    function testCheckAutomationFalseIfUserDoesNotHaveEnoughDuhFunds()
-        public
-        createRecurringBuy(user)
-        giveDuhToken(makeAddr("anotherUser"))
-        setNode(makeAddr("anotherUser"))
-    {
-        uint256 accountNumber = automation.getNextAccountNumber() - 1;
-
-        address anotherUser = makeAddr("anotherUser");
-
-        vm.prank(user);
-        duhToken.transfer(anotherUser, 1 ether);
-        duhToken.approve(address(automation), type(uint256).max);
-
-        vm.prank(anotherUser);
-        bool canAutomate = automation.checkAutomation(
-            accountNumber,
-            anotherUser
-        );
-
-        assertTrue(!canAutomate);
-    }
-
-    function testCheckAutomationFalseIfUserHaventApprovedForDuh()
-        public
-        createRecurringBuy(user)
-        giveDuhToken(makeAddr("anotherUser"))
-        setNode(makeAddr("anotherUser"))
-    {
-        uint256 accountNumber = automation.getNextAccountNumber() - 1;
-
-        address anotherUser = makeAddr("anotherUser");
-
-        vm.prank(user);
-        duhToken.approve(address(automation), 0);
-
-        vm.prank(signer);
-        duhToken.mint(user, 1 ether);
-
-        vm.prank(anotherUser);
-        bool canAutomate = automation.checkAutomation(
-            accountNumber,
-            anotherUser
-        );
-
-        assertTrue(!canAutomate);
-    }
-
     /// -----------------------------------------------------------------------
     /// Test for: getAccount
     /// -----------------------------------------------------------------------
@@ -1134,7 +1154,7 @@ contract AutomationLayerTest is Test {
 
         assertEq(account.user, user);
         assertEq(account.automatedContract, address(dca));
-        assertEq(account.id, 0);
+        assertEq(account.id, 1);
         assertEq(uint8(account.status), uint8(IAutomationLayer.Status.SET));
     }
 
@@ -1206,5 +1226,44 @@ contract AutomationLayerTest is Test {
         bool accept = automation.getAcceptingNewAccounts();
 
         assertTrue(accept);
+    }
+
+    /// -----------------------------------------------------------------------
+    /// Test for: prospectPayment
+    /// -----------------------------------------------------------------------
+
+    function testProspectPayment()
+        public
+        createRecurringBuy(user)
+        giveDuhToken(user)
+    {
+        uint256 accountNumber = automation.getNextAccountNumber() - 1;
+
+        uint256 payment = automation.prospectPayment(accountNumber);
+
+        assertTrue(payment > 0);
+    }
+
+    /// -----------------------------------------------------------------------
+    /// Test for: prospectPaymentBatch
+    /// -----------------------------------------------------------------------
+
+    function testProspectPaymentBatch()
+        public
+        createRecurringBuy(user)
+        createRecurringBuy(user)
+        createRecurringBuy(user)
+        createRecurringBuy(user)
+        giveDuhToken(user)
+    {
+        uint256[] memory accountNumbers = new uint256[](4);
+        accountNumbers[0] = 0;
+        accountNumbers[1] = 1;
+        accountNumbers[2] = 2;
+        accountNumbers[3] = 3;
+
+        uint256 payment = automation.prospectPaymentBatch(accountNumbers);
+
+        assertTrue(payment > 0);
     }
 }

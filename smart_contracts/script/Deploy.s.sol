@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
+/** @author @EWCunha
+ *  @title Script to deploy smart contracts
+ */
+
 import {Script} from "forge-std/Script.sol";
 import {AutomationLayer} from "../src/AutomationLayer.sol";
 import {DollarCostAverage} from "../src/DollarCostAverage.sol";
@@ -10,8 +14,8 @@ import {Duh} from "../src/Duh.sol";
 
 contract Deploy is Script {
     bool public constant DEPLOY_DUH = false;
-    bool public constant DEPLOY_DCA = false;
-    bool public constant DEPLOY_AUTOMATION = true;
+    bool public constant DEPLOY_DCA = true;
+    bool public constant DEPLOY_AUTOMATION = false;
     bool public constant DEPLOY_SEQUENCER = false;
 
     AutomationLayer public automation;
@@ -41,15 +45,17 @@ contract Deploy is Script {
         token1 = token1_;
         token2 = token2_;
         defaultRouter = defaultRouter_;
+        duh = Duh(duhToken);
 
         vm.startBroadcast(deployerKey);
         if (DEPLOY_DUH) {
             duh = new Duh();
+            duhToken = address(duh);
         }
 
         if (DEPLOY_AUTOMATION) {
             automation = new AutomationLayer(
-                address(duh) == address(0) ? duhToken : address(duh),
+                duhToken,
                 minimumDuh,
                 address(0),
                 automationFee,
@@ -70,7 +76,8 @@ contract Deploy is Script {
             dca = new DollarCostAverage(
                 defaultRouter,
                 address(automation),
-                wrapNative
+                wrapNative,
+                duhToken
             );
         }
         vm.stopBroadcast();

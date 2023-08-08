@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
+/** @author @EWCunha
+ *  @title NodeSequencer smart contract unit test
+ */
+
 import {Test, console} from "forge-std/Test.sol";
 import {Deploy} from "../../script/Deploy.s.sol";
 import {HelperConfig} from "../../script/HelperConfig.s.sol";
@@ -87,11 +91,12 @@ contract NodeSequencerTest is Test {
         duhToken = deployer.duh();
         timePeriodForNode = deployer.timePeriodForNode();
 
-        (address wNative, , , , , , , , uint256 deployerPk) = config
+        (address wNative, , address duh, , , , , , uint256 deployerPk) = config
             .activeNetworkConfig();
 
         signer = vm.addr(deployerPk);
         vm.deal(user, INITIAL_USER_FUNDS);
+        duhToken = address(duhToken) == address(0) ? Duh(duh) : duhToken;
 
         if (block.chainid == 11155111) {
             vm.prank(user);
