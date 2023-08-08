@@ -441,11 +441,16 @@ return ()=>clearTimeout(colorChange)
       //first contract object made from token to spend erc20contract
       await erc20contract.connect(signer).approve(smartContracts.DollarCostAverage.address.sepolia,ethers.utils.parseEther(amount))
       setSpendingApproved(true)
-      setDisabledTextFeild(true)  
+      setDisabledTextFeild(true) 
+      
+      setDelayRender(true)
     }
     catch(err){
       console.log(err)
       setSpendingApproved(false)
+
+      setDelayRender(false)
+      setDisabledTextFeild(false)
     }
    
   }
