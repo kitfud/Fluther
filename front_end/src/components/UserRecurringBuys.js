@@ -69,59 +69,75 @@ const [processing, setProcessing] = useState(false)
 
 
     const filterData = ()=>{
-      if(buyIdStructs){
-      console.log("Buy ID Structs", buyIdStructs)
-      }
+   
       let tableResult = []
      
+      let counter = 0
       buyIdStructs.forEach((element)=>{
+        counter++
        let tdata = {
-            "buyId":element.index.toNumber(),
+            "buyId":buyIds[buyIdStructs.indexOf(element)].toNumber(),
             "tokenToSpend":element.tokenToSpend,
             "tokenToBuy":element.tokenToBuy,
             "timeInterval":element.timeIntervalInSeconds.toNumber(),
             "amount":ethers.utils.formatEther(element.amountToSpend)
         }
         tableResult.push(tdata)
+        if(counter == buyIdStructs.length){
+          setTableData(tableResult)
+        }
       })
-    // console.log("tableresult",tableResult)
-    setTableData(tableResult)
+
     }
 
 
 
-    useEffect(()=>{
-      if(buyIds){
-        logBuyStructs()
-      }
-    },[buyIds])
+    // useEffect(()=>{
+    //   if(buyIds){
+    //     logBuyStructs()
+    //   }
+    // },[buyIds])
 
-    const logBuyStructs = async ()=>{
-      let buyStructs = await contract.getRecurringBuyFromIds(buyIds)
-      console.log("Buy STRUCTS", buyStructs)
-      setBuyIdStructs(buyStructs)
-    }
+    // const logBuyStructs = async ()=>{
+    //   let buyStructs = await contract.getRecurringBuyFromIds(buyIds)
+    //   console.log("Buy STRUCTS", buyStructs)
+    //   setBuyIdStructs(buyStructs)
+    // }
 
     const logUserData = async () => {
      if(address){
       
-      let buyIds = await contract.getSenderToIds(address)
-      let buyIdsAdjusted = []
-    
-      let counter = 0
+      let userData = await contract.getRecurringBuysFromUser(address)
+      // console.log(userData)
+      let userBuyIds = userData[0]
+      let userBuyStructs= userData[1]
 
-     buyIds.forEach((el)=>{
-      counter++
-      let numId = el.toNumber()
-      if(numId !=0){
-        buyIdsAdjusted.push(el.toNumber())
-      }
-      if (counter == buyIds.length){
+      let userBuyIdsRefined = []
+      let userBuyStructsRefined = []
 
-        setBuyIds(buyIdsAdjusted)
-
+      let counterIds = 0
+      userBuyIds.forEach((el)=>{
+        counterIds++
+        if(userBuyIds.indexOf(el) !=0){
+          userBuyIdsRefined.push(el)
         }
-     })
+        if(counterIds==userBuyIds.length){
+          setBuyIds(userBuyIdsRefined)
+        }
+      })
+
+
+      let counterStructs = 0
+      userBuyStructs.forEach((el)=>{
+        counterStructs++
+        if(userBuyStructs.indexOf(el) !=0){
+          userBuyStructsRefined.push(el)
+        }
+        if(counterStructs==userBuyIds.length){
+          // console.log(userBuyIdsRefined)
+          setBuyIdStructs(userBuyStructsRefined)
+        }
+      })
      }
     }
 
@@ -242,11 +258,11 @@ const [processing, setProcessing] = useState(false)
             
             return(
             <TableRow
-              key={buyIds[index]}
+              key={row.buyId}
               sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
             >
           
-              <TableCell align="right">{buyIds[index]}</TableCell>
+              <TableCell align="right">{row.buyId}</TableCell>
               <TableCell align="right">{swap.tokenToSpend}</TableCell>
               <TableCell align="right">{swap.tokenToBuy}</TableCell>
               <TableCell align="right">{row.amount}</TableCell>
