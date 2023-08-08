@@ -239,6 +239,7 @@ const getCurrentExchangePrice = async()=>{
   useEffect(()=>{
     let balanceCheck
     if(signer && erc20contract && address){
+    
     balanceCheck= setInterval(()=>{checkAllowance()},1000)
     }
     return ()=>clearInterval(balanceCheck)
@@ -299,6 +300,8 @@ const getCurrentExchangePrice = async()=>{
       setPriceFeedContract(new ethers.Contract(smartContracts.PriceFeed.address.sepolia.ETHUSD,PriceFeedABI.sepolia,provider))  
 
 //core contract objects for dollar cost averaging made below
+// console.log(smartContracts.WETHMock.address.sepolia)
+
       setErc20Contract(new ethers.Contract(smartContracts.WETHMock.address.sepolia,ABI,provider))
       setDuhContract(new ethers.Contract(smartContracts.Duh.address.sepolia,ABI,provider))
       setWEth(new ethers.Contract(smartContracts.WETHMock.address.sepolia,ABI,provider))
@@ -339,6 +342,7 @@ let colorChange
 if(unicolor=="green"){
   colorChange = setTimeout(()=>{
     setUniColor("black")
+    checkAllowance()
   },2000)
 }
 return ()=>clearTimeout(colorChange)
@@ -388,9 +392,10 @@ return ()=>clearTimeout(colorChange)
  
  if(address && erc20contract){
 
+   
     let allowanceAmount = await erc20contract.allowance(address,smartContracts.DollarCostAverage.address.sepolia)
     let convertedAllowance = parseFloat(allowanceAmount.toString())/10**18
-
+   
     setAllowance(convertedAllowance)
    
     return convertedAllowance

@@ -92,18 +92,6 @@ const [processing, setProcessing] = useState(false)
 
 
 
-    // useEffect(()=>{
-    //   if(buyIds){
-    //     logBuyStructs()
-    //   }
-    // },[buyIds])
-
-    // const logBuyStructs = async ()=>{
-    //   let buyStructs = await contract.getRecurringBuyFromIds(buyIds)
-    //   console.log("Buy STRUCTS", buyStructs)
-    //   setBuyIdStructs(buyStructs)
-    // }
-
     const logUserData = async () => {
      if(address){
       
