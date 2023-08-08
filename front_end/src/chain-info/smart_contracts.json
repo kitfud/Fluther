@@ -23,7 +23,7 @@
     },
     "DollarCostAverage": {
         "address": {
-            "sepolia": "0x9a355ad63347b48E219e1FDaF56b7366E70a27d7"
+            "sepolia": "0xf0EF015fDeFB728840a7407521b1a9806aff0ef2"
         },
         "abi": [
             {
@@ -800,13 +800,18 @@
             {
                 "inputs": [
                     {
-                        "internalType": "uint256[]",
-                        "name": "recurringBuyIds",
-                        "type": "uint256[]"
+                        "internalType": "address",
+                        "name": "sender",
+                        "type": "address"
                     }
                 ],
-                "name": "getRecurringBuyFromIds",
+                "name": "getRecurringBuysFromUser",
                 "outputs": [
+                    {
+                        "internalType": "uint256[]",
+                        "name": "",
+                        "type": "uint256[]"
+                    },
                     {
                         "components": [
                             {

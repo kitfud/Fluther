@@ -328,13 +328,13 @@ interface IDollarCostAverage {
      */
     function getAllowedERC20s(address token) external view returns (bool);
 
-    /** @notice gets an array of {struct-RecurringBuy} for the given array of IDs
-     *  @param recurringBuyIds: array of recurring buy IDs.
-     *  @return array of {struct-RecurringBuy}.
+    /** @notice gets an array of {struct-RecurringBuy} for the given sender address.
+     *  @param sender: sender's address.
+     *  @return array of recurring buy IDs and array of {struct-RecurringBuy}.
      */
-    function getRecurringBuyFromIds(
-        uint256[] calldata recurringBuyIds
-    ) external view returns (RecurringBuy[] memory);
+    function getRecurringBuysFromUser(
+        address sender
+    ) external view returns (uint256[] memory, RecurringBuy[] memory);
 
     /** @notice gets if given recurring buy ID is valid.
      *  @param recurringBuyId: ID of the recurring buy.

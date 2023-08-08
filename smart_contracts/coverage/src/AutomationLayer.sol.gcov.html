@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2023-08-07 13:57:31</td>
+            <td class="headerValue">2023-08-07 21:45:08</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">28</td>
@@ -584,7 +584,7 @@
 <a name="513"><span class="lineNum">     513 </span>                :            :         uint256[] calldata accountNumbers</a>
 <a name="514"><span class="lineNum">     514 </span>                :            :     ) external view override(IAutomationLayer) returns (uint256 payment) {</a>
 <a name="515"><span class="lineNum">     515 </span>                :<span class="lineCov">          1 :         Account memory account;</span></a>
-<a name="516"><span class="lineNum">     516 </span>                :<span class="lineCov">          1 :         for (uint256 ii; ii &lt; accountNumbers.length; ++ii) {</span></a>
+<a name="516"><span class="lineNum">     516 </span>                :<span class="lineCov">          1 :         for (uint256 ii = 0; ii &lt; accountNumbers.length; ++ii) {</span></a>
 <a name="517"><span class="lineNum">     517 </span>                :<span class="lineCov">          4 :             account = s_accounts[accountNumbers[ii]];</span></a>
 <a name="518"><span class="lineNum">     518 </span>                :<span class="lineCov">          4 :             payment += IAutomatedContract(account.automatedContract)</span></a>
 <a name="519"><span class="lineNum">     519 </span>                :            :                 .prospectAutomationPayment(account.id);</a>

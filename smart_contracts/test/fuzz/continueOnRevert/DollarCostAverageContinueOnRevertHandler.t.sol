@@ -192,10 +192,8 @@ contract DollarCostAverageContinueOnRevertHandler is Test {
         dca.getValidRangeOfRecurringBuys(startRecBuyId, endRecBuyId);
     }
 
-    function getRecurringBuyFromIds(
-        uint256[] calldata recurringBuyIds
-    ) external view {
-        dca.getRecurringBuyFromIds(recurringBuyIds);
+    function getRecurringBuysFromUser(address sender) external view {
+        dca.getRecurringBuysFromUser(sender);
     }
 
     function __getValidRecBuyData(

@@ -746,11 +746,11 @@ contract DollarCostAverageFuzz is Test {
     }
 
     /// -----------------------------------------------------------------------
-    /// Test for: getRecurringBuyFromIds
+    /// Test for: getRecurringBuysFromUser
     /// -----------------------------------------------------------------------
 
-    function testGetRecurringBuyFromIds(
-        uint256[] memory recBuyIds
+    function testGetRecurringBuysFromUser(
+        address sender
     )
         public
         createRecurringBuy
@@ -758,7 +758,6 @@ contract DollarCostAverageFuzz is Test {
         createRecurringBuy
         createRecurringBuy
     {
-        vm.assume(recBuyIds.length < 5);
-        dca.getRecurringBuyFromIds(recBuyIds);
+        dca.getRecurringBuysFromUser(sender);
     }
 }
