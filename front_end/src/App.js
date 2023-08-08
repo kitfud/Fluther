@@ -44,6 +44,9 @@ import MusicOffIcon from '@mui/icons-material/MusicOff';
 
 import Tenderness from './audio/tenderness.mp3'
 
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import TokenFountain from './components/TokenFountain'
+
 
 const theme = createTheme({
   palette: {
@@ -93,6 +96,7 @@ const theme = createTheme({
         },
       },
     },
+
   }
 })
 
@@ -106,6 +110,13 @@ const modalStyle = {
   border: '2px solid #000',
   boxShadow: 24,
   p: 4,
+};
+
+const fountainModalStyle = {
+  position: 'absolute',
+  top: '10%',
+  right: '0%',
+  width: 400,
 };
 const audio = new Audio(Tenderness)
 audio.load()
@@ -160,6 +171,16 @@ const handleModalClose = () => setOpen(false);
 const [tokenChangeData, setTokenChangeData] = useState([])
 
 const [music, setMusic] = useState(false)
+
+const [openFountain,setOpenFountain] = useState(false)
+
+const handleCloseFountain = ()=>{
+  setOpenFountain(false)
+}
+
+const handleOpenFountain = ()=>{
+  setOpenFountain(true)
+}
 
 
 
@@ -437,17 +458,6 @@ return ()=>clearTimeout(colorChange)
 
   const submitAgreement = async () => {
   
-    let data = {
-      "user": address,
-      "amount": amount,
-      "token1": token1,
-      "token2": token2,
-      "interval": interval,
-      "intervalAmount": intervalAmount,
-    }
- 
-  
-
 const input = intervalAmount;
 const amountInterval = ethers.utils.parseUnits(input)
 
@@ -666,7 +676,7 @@ const handleMusic =(event)=>{
 
   return (
     <>
-      {/* {address?console.log(address):null} */}
+
       <Particles
         id="particles_stuff"
         options={particlesOptions}
@@ -686,6 +696,31 @@ const handleMusic =(event)=>{
       </Fab>
   }
 
+
+<Box className="tooltip" sx={{position:'fixed', right:'3%', marginTop:'1%'}}>
+<span className="tooltiptextBank" > Click For Test WETH Faucet</span>
+<Fab onClick={handleOpenFountain} color = "primary" >
+    <AttachMoneyIcon/>
+</Fab>
+</Box>
+
+<Modal
+  open={openFountain}
+  onClose = {handleCloseFountain}
+ 
+>
+  <Box  sx={fountainModalStyle}>
+  <TokenFountain provider={provider} 
+  signer={signer} 
+  address={address} 
+  contract={erc20contract} 
+  theme={theme}/>
+  </Box>
+
+
+</Modal>
+
+
       <Modal
         open={open}
         onClose={handleClose}
@@ -697,8 +732,6 @@ const handleMusic =(event)=>{
         {renderChart}
         <Typography sx={{position:'relative',left:'50px'}}>Date</Typography>
         </Box>
-     
-        
       </Modal>
     
 
