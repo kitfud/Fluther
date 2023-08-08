@@ -16,6 +16,8 @@ import {Snackbar,
   FormControlLabel,
   Switch,
   Modal,
+  Fab,
+
   InputLabel, MenuItem, FormControl, Select,TableContainer,Table,TableHead,TableRow,TableCell,TableBody, Icon, Slide} from "@mui/material";
 
 import ABI from './chain-info/erc20ABI.json'
@@ -37,8 +39,10 @@ import LinearProgress from '@mui/material/LinearProgress';
 
 import {LineChart,Line, CartesianGrid,XAxis,YAxis,Label,Tooltip} from 'recharts'
 import EthDater from 'ethereum-block-by-date'
+import MusicNoteIcon from '@mui/icons-material/MusicNote';
+import MusicOffIcon from '@mui/icons-material/MusicOff';
 
-
+import Tenderness from './audio/tenderness.mp3'
 
 
 const theme = createTheme({
@@ -103,6 +107,8 @@ const modalStyle = {
   boxShadow: 24,
   p: 4,
 };
+const audio = new Audio(Tenderness)
+audio.load()
 
 function App() {
   const [amount, setAmount] = useState("")
@@ -152,6 +158,8 @@ const handleModalOpen = () => setOpen(true);
 const handleModalClose = () => setOpen(false);
 
 const [tokenChangeData, setTokenChangeData] = useState([])
+
+const [music, setMusic] = useState(false)
 
 
 
@@ -637,6 +645,20 @@ function handleReturn(event){
 
 
 
+const handleMusic =(event)=>{
+  
+  if(!music){
+    setMusic(true)
+    audio.play()
+  }
+  else{
+    setMusic(false)
+    audio.pause()
+  }
+}
+
+
+
   return (
     <>
       {/* {address?console.log(address):null} */}
@@ -648,6 +670,17 @@ function handleReturn(event){
     
       
       <ThemeProvider theme={theme}>
+
+{
+  music?
+      (<Fab onClick={handleMusic} sx={{position:'fixed', marginLeft:'3%',marginTop:'1%'}} color="primary" aria-label="add">
+        <MusicNoteIcon />
+      </Fab>):
+      <Fab onClick={handleMusic} sx={{position:'fixed', marginLeft:'3%',marginTop:'1%'}} color="primary" aria-label="add">
+      <MusicOffIcon />
+      </Fab>
+  }
+
       <Modal
         open={open}
         onClose={handleClose}
