@@ -1,8 +1,8 @@
 //import required dependencies
 
-const { automationLayerABI } = require("./ABIs/automationLayerABI");
-const {sequencerABI} = require("./ABIs/nodeSequencerABI")
-const {dollarCostAverageABI} = require("./ABIs/DollarCostAverageABI")
+const { automationLayerABI } = require("./Automation_Nodes/ABIs/automationLayerABI");
+const {sequencerABI} = require("./Automation_Nodes/ABIs/nodeSequencerABI")
+const {dollarCostAverageABI} = require("./Automation_Nodes/ABIs/flutherNode4ABI.js")
 const { Contract, ethers } = require("ethers");
 require("dotenv").config();
 
@@ -16,7 +16,7 @@ const randomProvider = Math.floor(Math.random() * providers.length);
 const provider = new ethers.providers.WebSocketProvider(
   providers[randomProvider]
 );
-dollarCostAverageContractAddress = "0x324B97C7881517BD64D05888431c72877a70df26"
+dollarCostAverageContractAddress = "0xf0EF015fDeFB728840a7407521b1a9806aff0ef2" //0xf55E52bEb2EBa42AB68e66Dd50305F8F7D51082B" //"0x9a355ad63347b48E219e1FDaF56b7366E70a27d7" //0x324B97C7881517BD64D05888431c72877a70df26"
 const automationLayerContractAddress =
   "0xa7A8d5FECc527dE4e1108F2CaDa27862aAeC5f03";
 const sequencerAddress = "0x851A7C0A34262da85AEeEbe8dFdb24C4Fef49835";
@@ -48,35 +48,6 @@ var dollarCostAverageContract = new ethers.Contract(dollarCostAverageContractAdd
   const getNextRecurringBuyId = await dollarCostAverageContract.getNextRecurringBuyId()
   console.log(getNextRecurringBuyId.toString())
 
-
-  /*
-  estimateGas = await
-              sequencerContract.estimateGas.registerNode()
-  
-  const tx = {
-    maxFeePerGas: (await provider.getGasPrice()) * 2,
-    maxPriorityFeePerGas: 50000000000,
-    gasLimit: estimateGas *2,
-    nonce: await provider.getTransactionCount(wallet.address, "pending"),
-  };
-
-  const registerNode = await sequencerContract.registerNode(tx)
-  const receipt = await registerNode.wait();
-  console.log(
-    ` Transaction https://polygonscan.com/tx/${receipt.transactionHash} mined, status success`
-  );
-  await timer(60000);
-
-  const totalAccountsindex = await automationLayerContract.getNextAccountNumber();
-  console.log("totalAccountsindex", totalAccountsindex.toString());
-*/
-//const getCurrentNode = await sequencerContract.getCurrentNode();
-  
-
- // console.log(getCurrentNode);
-  //console.log(wallet.address);
-  
- // if (getCurrentNode == wallet.address) {
     let account = -1;
     while (account < getNextRecurringBuyId - 1) {
       account = account + 1;
@@ -84,7 +55,7 @@ var dollarCostAverageContract = new ethers.Contract(dollarCostAverageContractAdd
       console.log("account", account);
       let checkSimpleAutomation;
       try {
-        checkSimpleAutomation = await dollarCostAverageContract.checkSimpleAutomation(account);
+        checkSimpleAutomation = await dollarCostAverageContract.checkTrigger(account);
       } catch (error) {
         console.log("cannot checkSimpleAutomation", account);
         checkSimpleAutomation = false;
@@ -95,7 +66,7 @@ var dollarCostAverageContract = new ethers.Contract(dollarCostAverageContractAdd
           let estimateGas;
           try {
             estimateGas = await
-            dollarCostAverageContract.estimateGas.simpleAutomation(account)
+            dollarCostAverageContract.estimateGas.trigger(account)
             ;
           } catch (error) {
             estimateGas == 0;
@@ -114,7 +85,7 @@ var dollarCostAverageContract = new ethers.Contract(dollarCostAverageContractAdd
           };
 
           //Liquidate eligible vault
-          const simpleAutomation = await dollarCostAverageContract.simpleAutomation(account, tx);
+          const simpleAutomation = await dollarCostAverageContract.trigger(account, tx);
           console.log("simpleAutomation", simpleAutomation);
           const receipt = await simpleAutomation.wait();
 

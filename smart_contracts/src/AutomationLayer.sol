@@ -421,15 +421,7 @@ contract AutomationLayer is IAutomationLayer, Security {
         }
 
         return
-<<<<<<< HEAD
             IAutomatedContract(account.automatedContract).checkSimpleAutomation(account.id);
-=======
-            isNextNode &&
-            !(IERC20(s_duh).balanceOf(node) < s_minimumDuh) &&
-            IAutomatedContract(account.automatedContract).checkTrigger(
-                account.id
-            );
->>>>>>> 8e582c487af948970f76f7e24a1ca4aeefdebf0b
     }
 
     /// @inheritdoc IAutomationLayer
