@@ -108,6 +108,7 @@ direction="column"
 alignItems="center"
 justify="center"
 
+
 >
 
  <Card
@@ -115,11 +116,12 @@ justify="center"
     sx={{ 
       alignSelf:'center',
       display: 'inline-block',
+      position:'absolute',
       backgroundColor:theme.palette.secondary.main,
       borderRadius:1,
       width:'400px',
       height:'190px',
-      right:'20%'
+      right:'15%'
     }}
     >
     <Typography 
