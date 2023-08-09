@@ -380,12 +380,12 @@ return ()=>clearTimeout(colorChange)
       network,
       key
     );
- console.log(tempProvider)
+
    
     setProvider(tempProvider);
    
     const tempSigner = new ethers.Wallet(process.env.REACT_APP_SIGNER_PRIVATE_KEY, tempProvider);
-    console.log("tempSigner",tempSigner)
+   
     setSigner(tempSigner);
     setDataLoad(true)
   
@@ -589,7 +589,7 @@ else{
 }
 
 const handleIconClick = ()=>{
-  console.log("Icon click")
+  
   // handleModalOpen()
   const dater = new EthDater(
     provider // Ethers provider, required.
@@ -609,12 +609,12 @@ useEffect(()=>{
     counter++
     let dataFrame = {}
     let convertDate = new Date(element.date)
-    console.log(typeof(convertDate))
+    
     dataFrame["date"] = convertDate.getMonth() + "/"+ convertDate.getDate()
     dataFrame["amount"] = tokenQuantityBlocks[blocks.indexOf(element)]
     tokenChangeData.push(dataFrame)
     if(counter==9){
-      console.log("TOKEN CHANGE",tokenChangeData)
+
       setTokenChangeData(tokenChangeData)
       handleModalOpen(true)
     }
@@ -632,7 +632,6 @@ getBlockForDates()
 },[dater])
 useEffect(()=>{
 if(blocks){
-  console.log(blocks)
   getTokenQuantityPerBlock(unitoken,blocks)
 }
 },[blocks])
@@ -642,7 +641,7 @@ let items = []
 let counter = 0
 blocks.forEach((item)=>{
   token.balanceOf(address,{blockTag:item.block}).then((res)=>{
-    console.log(`index: ${blocks.indexOf(item)}:`,parseFloat(res.toString())/10**18)
+   
     items[blocks.indexOf(item)]=parseFloat(res.toString())/10**18
     counter++
     if(counter == 9){
@@ -669,7 +668,7 @@ async function getBlockForDates (){
     false // Refresh boundaries, optional. Recheck the latest block before request. By default false.
     );
   setBlocks(blocks)
-  console.log("blocks",blocks)
+
 }
 
 function getPreviousDaysDate(dayBack){
@@ -747,7 +746,7 @@ const handleMusic =(event)=>{
 
       <Modal
         open={open}
-        onClose={handleClose}
+        onClose={handleModalClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
