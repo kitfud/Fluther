@@ -10,7 +10,7 @@ const activeChain = "ethereum";
 
 root.render(
   <React.StrictMode>
-    <ThirdwebProvider activeChain={activeChain}>
+      <ThirdwebProvider activeChain={activeChain}>
       <App />
     </ThirdwebProvider>
   </React.StrictMode>
