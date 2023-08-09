@@ -546,7 +546,7 @@ const action = (
 );
 
 const handleIntervalSpendCheck= (e)=>{
-  console.log(thresholdETHtransaction)
+
 const reg = new RegExp(/^[0-9]+([.][0-9]+)?$/);
 const emptyString = new RegExp(/^$/);
 
