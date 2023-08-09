@@ -8,10 +8,12 @@ import {Card,
     Button,
     Grid,
     Snackbar,
+    Divider,
+    Link
 } from '@mui/material'
-
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+
 
 import { ethers } from 'ethers'
 
@@ -21,6 +23,7 @@ const [amount, setAmount] = useState(null)
 const [processing, setProcessing] = useState(false)
 const [txHash, setTxHash] = useState(null)
 const [openSnackbar,setOpenSnackBar] = useState(false)
+
 
 const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -99,6 +102,36 @@ try{
 }
 }
 
+const addTokenMetaMask = async ()=>{
+const tokenAddress = '0x87FF5ccd14Dc002903E5B274C0E569c7a215e5A1';
+const tokenSymbol = 'WETH';
+const tokenDecimals = 18;
+const tokenImage = 'https://raw.githubusercontent.com/dappradar/tokens/main/ethereum/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2/logo.png';
+try {
+  // 'wasAdded' is a boolean. Like any RPC method, an error can be thrown.
+  const wasAdded = await window.ethereum.request({
+    method: 'wallet_watchAsset',
+    params: {
+      type: 'ERC20',
+      options: {
+        address: tokenAddress, // The address of the token.
+        symbol: tokenSymbol, // A ticker symbol or shorthand, up to 5 characters.
+        decimals: tokenDecimals, // The number of decimals in the token.
+        image: tokenImage, // A string URL of the token logo.
+      },
+    },
+  });
+
+  if (wasAdded) {
+    console.log('Thanks for your interest!');
+  } else {
+    console.log('Your loss!');
+  }
+} catch (error) {
+  console.log(error);
+}
+}
+
 
   return (
 <Grid
@@ -119,8 +152,8 @@ justify="center"
       position:'absolute',
       backgroundColor:theme.palette.secondary.main,
       borderRadius:1,
-      width:'400px',
-      height:'190px',
+      width:'550px',
+      height:'370px',
       right:'15%'
     }}
     >
@@ -160,10 +193,69 @@ justify="center"
 }
      </Box>
        
-        
-      
-    </Box>
+     <Divider sx={{marginBottom:'10px'}}/>
 
+
+<Box
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            >
+<Card 
+display="flex"
+alignSelf="center"
+justifyContent="center"
+sx={{width:'95%',borderRadius:0}}>
+
+<Typography 
+fontSize={18}
+display="flex"
+alignItems="left"
+component={'h1'}
+>
+  Name: Fluter Test WETH
+</Typography>
+<Typography 
+fontSize={18}
+display="flex"
+alignItems="left"
+component={'h1'}
+>
+  Symbol: WETH
+</Typography>
+
+<Typography 
+fontSize={18}
+display="flex"
+alignItems="left"
+component={'h1'}
+>
+  Decimals: 18
+</Typography>
+
+<Typography 
+fontSize={18}
+display="flex"
+alignItems="left"
+component={'h1'}
+>
+  Address: <Link target="_blank" href="https://sepolia.etherscan.io/address/0x87FF5ccd14Dc002903E5B274C0E569c7a215e5A1#code"> 0x87FF5ccd14Dc002903E5B274C0E569c7a215e5A1 </Link>
+</Typography>
+</Card>
+ </Box>
+
+    
+    <Box
+    display="flex"
+    alignItems="center"
+    justifyContent="center"
+    component="div"
+    marginTop="20px"
+    >
+    <Button onClick={addTokenMetaMask} variant="contained" color="success">Add Token To MetaMask</Button>
+
+    </Box>
+    </Box>
     </Card>
     <Snackbar
         anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
