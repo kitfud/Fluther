@@ -747,12 +747,23 @@ const handleMusic =(event)=>{
           justify="center"
           style={{ minHeight: '100vh' }}
         >
+          <Box
+            sx={{
+              zIndex: 5,
+              marginTop:'2vh',
+            }}
+          >
+            <Typography fontSize="100px" color="#a939c4" fontFamily="Cherry Bomb One">
+              fluther
+            </Typography>
+          </Box>
+
           {/* CONNECT WALLET BUTTON */}
           <Slide direction="down" in={true} mountOnEnter>
             <Box 
               sx={{
                 marginBottom:'10px',
-                marginTop:'4vh',
+                marginTop:'2vh',
                 zIndex: 10,
               }}
               display="flex"
