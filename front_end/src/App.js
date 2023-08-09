@@ -525,7 +525,7 @@ const handleClose = (event, reason) => {
   if (reason === 'clickaway') {
     return;
   }
-  window.location.reload(false);
+  // window.location.reload(false);
   setOpenSnackBar(false);
 };
 
@@ -1180,7 +1180,7 @@ const handleMusic =(event)=>{
      
       <Zoom in={checked}>
       <Box>
-      <UserRecurringBuys signer={signer} contract={dollarCostAverageContract} provider={provider} address={address}/> 
+      <UserRecurringBuys balance={ethbalance} signer={signer} contract={dollarCostAverageContract} provider={provider} address={address}/> 
       </Box>
        </Zoom>
        
