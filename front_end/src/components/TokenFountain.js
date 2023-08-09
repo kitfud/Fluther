@@ -213,7 +213,7 @@ display="flex"
 alignItems="left"
 component={'h1'}
 >
-  Name: Fluter Test WETH
+  Name: Fluther Test WETH
 </Typography>
 <Typography 
 fontSize={18}

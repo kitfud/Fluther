@@ -525,7 +525,7 @@ const handleClose = (event, reason) => {
   if (reason === 'clickaway') {
     return;
   }
-  window.location.reload(false);
+  // window.location.reload(false);
   setOpenSnackBar(false);
 };
 
@@ -546,7 +546,7 @@ const action = (
 );
 
 const handleIntervalSpendCheck= (e)=>{
-  console.log(thresholdETHtransaction)
+
 const reg = new RegExp(/^[0-9]+([.][0-9]+)?$/);
 const emptyString = new RegExp(/^$/);
 
@@ -1180,7 +1180,7 @@ const handleMusic =(event)=>{
      
       <Zoom in={checked}>
       <Box>
-      <UserRecurringBuys signer={signer} contract={dollarCostAverageContract} provider={provider} address={address}/> 
+      <UserRecurringBuys balance={ethbalance} signer={signer} contract={dollarCostAverageContract} provider={provider} address={address}/> 
       </Box>
        </Zoom>
        

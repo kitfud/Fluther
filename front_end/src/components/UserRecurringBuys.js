@@ -8,7 +8,7 @@ import CloseIcon from '@mui/icons-material/Close';
 
 import smartContracts from '../chain-info/smart_contracts.json'
 
-const UserRecurringBuys = ({signer,contract,provider,address}) => {
+const UserRecurringBuys = ({balance,signer,contract,provider,address}) => {
 
 
 const [tabledata,setTableData] = useState(null)
@@ -26,10 +26,11 @@ const [processing, setProcessing] = useState(false)
     if (reason === 'clickaway') {
       return;
     }
-    window.location.reload()
+    // window.location.reload()
     setOpenSnackBar(false);
     
   };
+
 
 
 
@@ -58,7 +59,7 @@ const [processing, setProcessing] = useState(false)
     console.log(err)
     }
     }
-    },[provider,address])
+    },[provider,address,balance])
 
     useEffect(()=>{
     if(buyIdStructs){
