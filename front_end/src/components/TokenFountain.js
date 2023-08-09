@@ -107,7 +107,7 @@ spacing={0}
 direction="column"
 alignItems="center"
 justify="center"
-style={{ minHeight: '100vh' }}
+
 >
 
  <Card
@@ -118,6 +118,7 @@ style={{ minHeight: '100vh' }}
       backgroundColor:theme.palette.secondary.main,
       borderRadius:1,
       width:'400px',
+      height:'190px',
       right:'20%'
     }}
     >
