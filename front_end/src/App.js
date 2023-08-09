@@ -786,7 +786,7 @@ const handleMusic =(event)=>{
           <Card 
             variant="outlined"
             sx={{ 
-              alignSelf:'center',
+              
               display: 'inline-block',
               backgroundColor:theme.palette.secondary.main,
               //opacity: 0.9,
