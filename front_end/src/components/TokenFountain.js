@@ -147,7 +147,6 @@ justify="center"
  <Card
     variant="outlined"
     sx={{ 
-      alignSelf:'center',
       display: 'inline-block',
       position:'absolute',
       backgroundColor:theme.palette.secondary.main,
@@ -203,8 +202,7 @@ justify="center"
             >
 <Card 
 display="flex"
-alignSelf="center"
-justifyContent="center"
+
 sx={{width:'95%',borderRadius:0}}>
 
 <Typography 
