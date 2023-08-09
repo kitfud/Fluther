@@ -194,7 +194,7 @@ justify="center"
        
      <Divider sx={{marginBottom:'10px'}}/>
 
-
+{window.ethereum.isMetaMask?
 <Box
               display="flex"
               alignItems="center"
@@ -240,9 +240,9 @@ component={'h1'}
   Address: <Link target="_blank" href="https://sepolia.etherscan.io/address/0x87FF5ccd14Dc002903E5B274C0E569c7a215e5A1#code"> 0x87FF5ccd14Dc002903E5B274C0E569c7a215e5A1 </Link>
 </Typography>
 </Card>
- </Box>
+ </Box>:null
 
-    
+}
     <Box
     display="flex"
     alignItems="center"

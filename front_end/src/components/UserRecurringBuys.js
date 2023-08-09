@@ -8,7 +8,7 @@ import CloseIcon from '@mui/icons-material/Close';
 
 import smartContracts from '../chain-info/smart_contracts.json'
 
-const UserRecurringBuys = ({balance,signer,contract,provider,address}) => {
+const UserRecurringBuys = ({processingApp,cancelOccur,setCancelOccur,balance,signer,contract,provider,address}) => {
 
 
 const [tabledata,setTableData] = useState(null)
@@ -51,7 +51,8 @@ const [processing, setProcessing] = useState(false)
   );
 
     useEffect(()=>{
-    if(provider!=null){
+    if(contract){
+   
     try{
     logUserData()  
     }
@@ -59,7 +60,9 @@ const [processing, setProcessing] = useState(false)
     console.log(err)
     }
     }
-    },[provider,address,balance])
+    },[provider,address,balance,contract,processingApp])
+
+
 
     useEffect(()=>{
     if(buyIdStructs){
@@ -91,13 +94,12 @@ const [processing, setProcessing] = useState(false)
 
     }
 
-
-
     const logUserData = async () => {
-     if(address){
+
+     if(contract && address){
       
       let userData = await contract.getRecurringBuysFromUser(address)
-      // console.log(userData)
+  
       let userBuyIds = userData[0]
       let userBuyStructs= userData[1]
 
@@ -138,6 +140,8 @@ const [processing, setProcessing] = useState(false)
         let hash = tx.hash
         setTxHash(hash.toString())
         isTransactionMined(hash.toString())
+        
+       
 
         }
         catch(err){
@@ -173,6 +177,7 @@ const [processing, setProcessing] = useState(false)
                 console.log("COMPLETED BLOCK: " + stringBlock)
                 // setReloadPage(true)
                 setOpenSnackBar(true)
+                setCancelOccur(true)
       
             }
         }
