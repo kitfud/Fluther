@@ -173,6 +173,7 @@ const [tokenChangeData, setTokenChangeData] = useState([])
 const [music, setMusic] = useState(false)
 
 const [openFountain,setOpenFountain] = useState(false)
+const [cancelOccur,setCancelOccur] = useState(false)
 
 const handleCloseFountain = ()=>{
   setOpenFountain(false)
@@ -207,7 +208,8 @@ const handleChange = () => {
   setChecked((prev) => !prev);
 };
 
-  const address = useAddress();
+const address = useAddress();
+
 
 
   //address below is deployment to Polygon mainnet
@@ -224,6 +226,7 @@ const handleChange = () => {
     loadFull(main);
   },[])
 
+  
   useEffect(() => {
     if(!dataload){
     updateEthers()
@@ -254,12 +257,15 @@ const getCurrentExchangePrice = async()=>{
 
 
   useEffect(()=>{
+  
+ if(provider !=null){
     checkAllowance()
+ }
   },[address,wethbalance])
 
   useEffect(()=>{
     let balanceCheck
-    if(signer && erc20contract && address){
+    if(signer !=null && erc20contract && address){
     
     balanceCheck= setInterval(()=>{checkAllowance()},1000)
     }
@@ -267,8 +273,6 @@ const getCurrentExchangePrice = async()=>{
   },[signer,erc20contract,allowance])
 
   useEffect(()=>{
-   
-
     if(allowance && typeof(allowance)=="number"){
 
       if(delayRender==true){
@@ -313,15 +317,14 @@ const getCurrentExchangePrice = async()=>{
 
   useEffect(() => {
     if(provider !== null){
-      //setting contract to approve spending amount, wEth in this case
+    
+  
       try{
 
 
 //price feed contract object is made below
       setPriceFeedContract(new ethers.Contract(smartContracts.PriceFeed.address.sepolia.ETHUSD,PriceFeedABI.sepolia,provider))  
 
-//core contract objects for dollar cost averaging made below
-// console.log(smartContracts.WETHMock.address.sepolia)
 
       setErc20Contract(new ethers.Contract(smartContracts.WETHMock.address.sepolia,ABI,provider))
       setDuhContract(new ethers.Contract(smartContracts.Duh.address.sepolia,ABI,provider))
@@ -370,56 +373,72 @@ return ()=>clearTimeout(colorChange)
 },[unicolor])  
 
   const updateEthers = async ()=>{
-    let tempProvider = await new ethers.providers.Web3Provider(window.ethereum);
+    // let tempProvider = await new ethers.providers.Web3Provider(window.ethereum);
+    const network = process.env.REACT_APP_ETHEREUM_NETWORK;
+    const key = process.env.REACT_APP_INFURA_API_KEY
+    const tempProvider = new ethers.providers.InfuraProvider(
+      network,
+      key
+    );
+ console.log(tempProvider)
+   
     setProvider(tempProvider);
-
-    let tempSigner = await tempProvider.getSigner();
+   
+    const tempSigner = new ethers.Wallet(process.env.REACT_APP_SIGNER_PRIVATE_KEY, tempProvider);
+    console.log("tempSigner",tempSigner)
     setSigner(tempSigner);
     setDataLoad(true)
+  
 
     let dollaAverageAddress = smartContracts.DollarCostAverage.address.sepolia
     let dollaAverageAbi = smartContracts.DollarCostAverage.abi
   
-    let tempContract = await new ethers.Contract(dollaAverageAddress,dollaAverageAbi,tempProvider);
+    let tempContract = new ethers.Contract(dollaAverageAddress,dollaAverageAbi,tempProvider);
     setDollarCostAverageContract(tempContract);
+    
   }
 
   const checkTokenBalance = async ()=>{
 
-    if(provider !== null && address !== null && address !== undefined){
+   
+    if(provider!== null && address !== null && address !== undefined){
+  
       const ethbal = await provider.getBalance(address);
       let valueToNumber = parseFloat(ethbal.toString())
       let valueConverted = valueToNumber/10**18
       setEthBalance(valueConverted)
     }
 
-    if(wethtoken!==null && address !==null && address!== undefined){
-    // console.log("address",address)
-    var user = ethers.utils.getAddress(address)
-    var wethbal= (await wethtoken.balanceOf(user)/10**18).toString();
+    if(provider!=null  && address!== undefined){
+    // console.log("address",signer.address)
+   
+    var wethbal= (await wethtoken.balanceOf(address)/10**18).toString();
+   
     setWEthBalance(wethbal)
     }
-    if(unitoken !==null && address !==null && address!== undefined ){
-    var unibal= (await unitoken.balanceOf(user)/10**18).toString();
+
+    
+    if(provider !=null && address!== undefined ){
+    var unibal= (await unitoken.balanceOf(address)/10**18).toString();
     setUniBalance(unibal)
     }
+   
     //this is the if statement which controls the color change on amount increase
-    if(unitoken !==null && address !==null && address!== undefined ){
+    if(provider !=null&& address!== undefined){
     checkTokenIncrease(unibal,wethbal)
       }
   }
 
   const checkAllowance = async ()=>{
  
- if(address && erc20contract){
+ if(address && erc20contract && provider!=null){
 
-   
+ 
     let allowanceAmount = await erc20contract.allowance(address,smartContracts.DollarCostAverage.address.sepolia)
     let convertedAllowance = parseFloat(allowanceAmount.toString())/10**18
    
     setAllowance(convertedAllowance)
    
-    return convertedAllowance
  }
     
   }
@@ -786,7 +805,7 @@ const handleMusic =(event)=>{
           <Card 
             variant="outlined"
             sx={{ 
-              alignSelf:'center',
+              
               display: 'inline-block',
               backgroundColor:theme.palette.secondary.main,
               //opacity: 0.9,
@@ -1172,7 +1191,7 @@ const handleMusic =(event)=>{
         </Snackbar>
         <Box >
         <FormControlLabel 
-        sx={{color:'#e000f8'}}
+        sx={{color:'white'}}
         control={<Switch checked={checked} onChange={handleChange} />}
         label="Display User Agreements"
       />
@@ -1180,7 +1199,7 @@ const handleMusic =(event)=>{
      
       <Zoom in={checked}>
       <Box>
-      <UserRecurringBuys balance={ethbalance} signer={signer} contract={dollarCostAverageContract} provider={provider} address={address}/> 
+      <UserRecurringBuys processingApp={processing} setCancelOccur={setCancelOccur} cancelOccur = {cancelOccur} balance={ethbalance} signer={signer} contract={dollarCostAverageContract} provider={provider} address={address}/> 
       </Box>
        </Zoom>
        

@@ -15,6 +15,7 @@
     "@testing-library/user-event": "^14.4.3",
     "@thirdweb-dev/react": "^3",
     "@thirdweb-dev/sdk": "^3",
+    "dotenv": "^16.3.1",
     "ethereum-block-by-date": "^1.4.9",
     "ethers": "^5",
     "material-icons": "^1.13.9",
