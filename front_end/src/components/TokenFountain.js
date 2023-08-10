@@ -17,7 +17,7 @@ import CloseIcon from '@mui/icons-material/Close';
 
 import { ethers } from 'ethers'
 
-const TokenFountain = ({theme,contract,address,signer,provider}) => {
+const TokenFountain = ({theme,contract,address,signer,infuraProvider}) => {
 
 const [amount, setAmount] = useState(null)
 const [processing, setProcessing] = useState(false)
@@ -55,13 +55,13 @@ const isTransactionMined = async (transactionHash) => {
     let transactionBlockFound = false
   
     while (transactionBlockFound === false) {
-        let tx = await provider.getTransactionReceipt(transactionHash)
+        let tx = await infuraProvider.getTransactionReceipt(transactionHash)
         console.log("transaction status check....")
         try {
             await tx.blockNumber
         }
         catch (error) {
-            tx = await provider.getTransactionReceipt(transactionHash)
+            tx = await infuraProvider.getTransactionReceipt(transactionHash)
         }
         finally {
             console.log("proceeding")

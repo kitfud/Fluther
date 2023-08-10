@@ -8,7 +8,7 @@ import CloseIcon from '@mui/icons-material/Close';
 
 import smartContracts from '../chain-info/smart_contracts.json'
 
-const UserRecurringBuys = ({processingApp,cancelOccur,setCancelOccur,balance,signer,contract,provider,address}) => {
+const UserRecurringBuys = ({processingApp,setCancelOccur,balance,signer,contract,provider,address}) => {
 
 
 const [tabledata,setTableData] = useState(null)
@@ -24,9 +24,12 @@ const [processing, setProcessing] = useState(false)
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
+     
+
       return;
     }
     // window.location.reload()
+    window.location.reload();
     setOpenSnackBar(false);
     
   };
@@ -178,6 +181,7 @@ const [processing, setProcessing] = useState(false)
                 // setReloadPage(true)
                 setOpenSnackBar(true)
                 setCancelOccur(true)
+                logUserData()
       
             }
         }
@@ -273,7 +277,7 @@ const [processing, setProcessing] = useState(false)
     </Card></Slide>:<Box display="flex"
                 alignItems="center"
                 justifyContent="center" 
-                sx={{marginTop:'20px'}}> <CircularProgress/></Box>
+                sx={{marginTop:'20px',marginBottom:'10px'}}> <CircularProgress sx={{color:"white"}}/></Box>
 }
         <Snackbar
         anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
