@@ -661,10 +661,18 @@ else{
 const handleIconClick = ()=>{
   
   // handleModalOpen()
+if(infuraProvider){
   const dater = new EthDater(
   infuraProvider // Ethers provider, required.
 );
 setDater(dater)
+  }
+  else{
+    const dater = new EthDater(
+      provider // Ethers provider, required.
+    );
+    setDater(dater)
+  }
 
 }
 
