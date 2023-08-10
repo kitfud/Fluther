@@ -174,6 +174,7 @@ const [music, setMusic] = useState(false)
 
 const [openFountain,setOpenFountain] = useState(false)
 const [cancelOccur,setCancelOccur] = useState(false)
+const [infuraProvider, setInfuraProvider] = useState(null)
 
 const handleCloseFountain = ()=>{
   setOpenFountain(false)
@@ -228,10 +229,8 @@ const address = useAddress();
 
   
   useEffect(() => {
-    if(!dataload){
+    console.log("UPDATING ETHERS")
     updateEthers()
-    }
-    
   },[])
 
   useEffect(()=>{
@@ -323,19 +322,19 @@ const getCurrentExchangePrice = async()=>{
 
 
 //price feed contract object is made below
-      setPriceFeedContract(new ethers.Contract(smartContracts.PriceFeed.address.sepolia.ETHUSD,PriceFeedABI.sepolia,provider))  
+      setPriceFeedContract(new ethers.Contract(smartContracts.PriceFeed.address.sepolia.ETHUSD,PriceFeedABI.sepolia,infuraProvider))  
 
 
-      setErc20Contract(new ethers.Contract(smartContracts.WETHMock.address.sepolia,ABI,provider))
-      setDuhContract(new ethers.Contract(smartContracts.Duh.address.sepolia,ABI,provider))
-      setWEth(new ethers.Contract(smartContracts.WETHMock.address.sepolia,ABI,provider))
-      setUNI(new ethers.Contract(smartContracts.UNIMock.address.sepolia,ABI,provider))
+      setErc20Contract(new ethers.Contract(smartContracts.WETHMock.address.sepolia,ABI,infuraProvider))
+      setDuhContract(new ethers.Contract(smartContracts.Duh.address.sepolia,ABI,infuraProvider))
+      setWEth(new ethers.Contract(smartContracts.WETHMock.address.sepolia,ABI,infuraProvider))
+      setUNI(new ethers.Contract(smartContracts.UNIMock.address.sepolia,ABI,infuraProvider))
       }
       catch(err){
       console.log(err)
       }
     }
-  },[provider])
+  },[infuraProvider])
 
 
 
@@ -373,19 +372,24 @@ return ()=>clearTimeout(colorChange)
 },[unicolor])  
 
   const updateEthers = async ()=>{
-    // let tempProvider = await new ethers.providers.Web3Provider(window.ethereum);
+    let tempProvider = await new ethers.providers.Web3Provider(window.ethereum);
+    setProvider(tempProvider);
     const network = process.env.REACT_APP_ETHEREUM_NETWORK;
     const key = process.env.REACT_APP_INFURA_API_KEY
-    const tempProvider = new ethers.providers.InfuraProvider(
+    const infuraTempProvider = new ethers.providers.InfuraProvider(
       network,
       key
     );
 
+    setInfuraProvider(infuraTempProvider)
+
    
-    setProvider(tempProvider);
-   
-    const tempSigner = new ethers.Wallet(process.env.REACT_APP_SIGNER_PRIVATE_KEY, tempProvider);
-   
+    
+    // const Metaprovider = new ethers.providers.Web3Provider(window.ethereum);
+    const tempSigner =tempProvider.getSigner();
+    // const tempSigner = new ethers.Wallet(process.env.REACT_APP_SIGNER_PRIVATE_KEY, tempProvider);
+ 
+    
     setSigner(tempSigner);
     setDataLoad(true)
   
@@ -403,7 +407,7 @@ return ()=>clearTimeout(colorChange)
    
     if(provider!== null && address !== null && address !== undefined){
   
-      const ethbal = await provider.getBalance(address);
+      const ethbal = await infuraProvider.getBalance(address);
       let valueToNumber = parseFloat(ethbal.toString())
       let valueConverted = valueToNumber/10**18
       setEthBalance(valueConverted)
@@ -514,13 +518,13 @@ const isTransactionMined = async (transactionHash) => {
   let transactionBlockFound = false
 
   while (transactionBlockFound === false) {
-      let tx = await provider.getTransactionReceipt(transactionHash)
+      let tx = await infuraProvider.getTransactionReceipt(transactionHash)
       console.log("transaction status check....")
       try {
           await tx.blockNumber
       }
       catch (error) {
-          tx = await provider.getTransactionReceipt(transactionHash)
+          tx = await infuraProvider.getTransactionReceipt(transactionHash)
       }
       finally {
           console.log("proceeding")
@@ -528,13 +532,17 @@ const isTransactionMined = async (transactionHash) => {
 
 
       if (tx && tx.blockNumber) {
-         
-          setProcessing(false)
+        
           console.log("block number assigned.")
           transactionBlockFound = true
           let stringBlock = tx.blockNumber.toString()
           console.log("COMPLETED BLOCK: " + stringBlock)
-          setOpenSnackBar(true)
+          
+          setTimeout(()=>{
+            setProcessing(false)
+            setOpenSnackBar(true)
+          },10000)
+          
 
       }
   }
@@ -544,7 +552,7 @@ const handleClose = (event, reason) => {
   if (reason === 'clickaway') {
     return;
   }
-  // window.location.reload(false);
+  window.location.reload(false);
   setOpenSnackBar(false);
 };
 
@@ -592,7 +600,7 @@ const handleIconClick = ()=>{
   
   // handleModalOpen()
   const dater = new EthDater(
-    provider // Ethers provider, required.
+  infuraProvider // Ethers provider, required.
 );
 setDater(dater)
 
@@ -733,7 +741,7 @@ const handleMusic =(event)=>{
  
 >
   <Box  sx={fountainModalStyle}>
-  <TokenFountain provider={provider} 
+  <TokenFountain infuraProvider={infuraProvider} 
   signer={signer} 
   address={address} 
   contract={erc20contract} 
