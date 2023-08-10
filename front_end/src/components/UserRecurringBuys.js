@@ -24,6 +24,8 @@ const [processing, setProcessing] = useState(false)
 
   const [currentDataLength, setCurrentDataLength] = useState(null)
 
+  const [cancelUpdateAgreements, setCancelUpdateAgreements] = useState(false)
+
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -44,6 +46,22 @@ const [processing, setProcessing] = useState(false)
       },1000)
     }
     if(!updateAgreements){
+      clearInterval(checkAgreements)
+    }
+    return ()=>clearInterval(checkAgreements)
+
+  },[updateAgreements])
+
+  useEffect(()=>{
+    let checkAgreements
+
+    if(cancelUpdateAgreements){
+      checkAgreements= setInterval(()=>{
+        console.log("checking for updates")
+        logUserData()
+      },1000)
+    }
+    if(!cancelUpdateAgreements){
       clearInterval(checkAgreements)
     }
     return ()=>clearInterval(checkAgreements)
@@ -111,6 +129,9 @@ const [processing, setProcessing] = useState(false)
           if(buyIdStructs.length>currentDataLength && updateAgreements){
             setUpdateAgreements(false)
           }
+          if(buyIdStructs.length<currentDataLength&& cancelUpdateAgreements){
+            setCancelUpdateAgreements(false)
+          }
           setCurrentDataLength(buyIdStructs.length)
          
         }
@@ -162,13 +183,13 @@ const [processing, setProcessing] = useState(false)
         setProcessing(true)
         let tx = await contract.connect(signer).cancelRecurringPayment(id)
         let hash = tx.hash
+        setCancelUpdateAgreements(true)
         setTxHash(hash.toString())
         isTransactionMined(hash.toString())
         
-       
-
         }
         catch(err){
+        setCancelUpdateAgreements(false)
         setProcessing(false)
         console.log(err)
         }
@@ -252,6 +273,7 @@ const [processing, setProcessing] = useState(false)
    {
     !processing?
     !updateAgreements?
+    !cancelUpdateAgreements?
     <Slide direction="right" in={true} mountOnEnter>
     <Card sx={{marginTop:'20px', marginBottom: "20px", padding:'0px', border:2, borderColor:"#e842fa"}}>
         <Box>
@@ -293,16 +315,19 @@ const [processing, setProcessing] = useState(false)
         </TableBody>
       </Table>
     </TableContainer>
-
-
-
-    </Card></Slide>:<Box display="flex"
-                alignItems="center"
-                justifyContent="center" 
-                sx={{marginTop:'20px',marginBottom:'10px'}}> <CircularProgress sx={{color:"white"}}/></Box>:<Box display="flex"
-                alignItems="center"
-                justifyContent="center" 
-                sx={{marginTop:'20px',marginBottom:'10px'}}> <CircularProgress sx={{color:"white"}}/></Box>
+    </Card></Slide>:
+        <Box display="flex"
+        alignItems="center"
+        justifyContent="center" 
+        sx={{marginTop:'20px',marginBottom:'10px'}}> <CircularProgress sx={{color:"white"}}/></Box>:
+    <Box display="flex"
+        alignItems="center"
+        justifyContent="center" 
+        sx={{marginTop:'20px',marginBottom:'10px'}}> <CircularProgress sx={{color:"white"}}/></Box>:
+        <Box display="flex"
+              alignItems="center"
+              justifyContent="center" 
+              sx={{marginTop:'20px',marginBottom:'10px'}}> <CircularProgress sx={{color:"white"}}/></Box>
 }
         <Snackbar
         anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
