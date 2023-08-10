@@ -40,9 +40,9 @@ Sit back and let the tokens swaps amass via Fluther.
 ## Running the dApp locally
 To run the dApp locally,an Infura API key is needed. Follow [these instructions](https://www.infura.io/) to create your own API key with Infura. After downloading this repository, create a `.env` file in the `front_end` folder. Copy and paste your created API token in the file with the variable names as follows, replacing in <INFURA_API_KEY> and <PRIVATE_KEY> with your own details:
 
-`REACT_APP_ETHEREUM_NETWORK = "sepolia"`
-`REACT_APP_INFURA_API_KEY = "<INFURA_API_KEY>"`
-`REACT_APP_SIGNER_PRIVATE_KEY = "<PRIVATE-KEY> "`
+`REACT_APP_ETHEREUM_NETWORK = "sepolia"`  
+`REACT_APP_INFURA_API_KEY = "<INFURA_API_KEY>"`  
+`REACT_APP_SIGNER_PRIVATE_KEY = "<PRIVATE-KEY> "`  
 
 Details on how to access a MetaMask private key can be found [here](https://support.metamask.io/hc/en-us/articles/360015289632-How-to-export-an-account-s-private-key)
 
