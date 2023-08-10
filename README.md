@@ -46,6 +46,14 @@ To run the dApp locally,an Infura API key is needed. Follow [these instructions]
 
 Details on how to access a MetaMask private key can be found [here](https://support.metamask.io/hc/en-us/articles/360015289632-How-to-export-an-account-s-private-key)
 
+<strong>Once the .env file is created:</strong>
+
+CD into the `front_end` folder, and run:
+```
+npm install
+npm start
+```
+
 ## Live Deployment
 TBD->Click Link to Be Deployed [HERE]
 
