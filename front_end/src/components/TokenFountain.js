@@ -23,7 +23,24 @@ const [amount, setAmount] = useState(null)
 const [processing, setProcessing] = useState(false)
 const [txHash, setTxHash] = useState(null)
 const [openSnackbar,setOpenSnackBar] = useState(false)
+const [amountError,setAmountError] = useState(false)
 
+const handleTokenRequestCheck= (e)=>{
+
+  const reg = new RegExp(/^[0-9]+([.][0-9]+)?$/);
+  const emptyString = new RegExp(/^$/);
+  
+  //check to make sure only number passes and also not empty strings
+  
+  if(reg.test(e.target.value) || emptyString.test(e.target.value)){ 
+    setAmountError(false)
+    setAmount(e.target.value)
+  }
+  else{
+    setAmount("")
+    setAmountError(true)
+  }
+  }
 
 const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -132,6 +149,35 @@ try {
 }
 }
 
+const addUNITokenMetaMask = async ()=>{
+  const tokenAddress = '0x6e4c13eD298b5Fcac70dc0F672f75aAeCca52768';
+  const tokenSymbol = 'UNI';
+  const tokenDecimals = 18;
+  const tokenImage = 'https://img.freepik.com/premium-vector/uniswap-uni-token-symbol-cryptocurrency-logo-coin-icon-isolated-white-background-vector-illustration_337410-888.jpg?w=2000';
+  try {
+    // 'wasAdded' is a boolean. Like any RPC method, an error can be thrown.
+    const wasAdded = await window.ethereum.request({
+      method: 'wallet_watchAsset',
+      params: {
+        type: 'ERC20',
+        options: {
+          address: tokenAddress, // The address of the token.
+          symbol: tokenSymbol, // A ticker symbol or shorthand, up to 5 characters.
+          decimals: tokenDecimals, // The number of decimals in the token.
+          image: tokenImage, // A string URL of the token logo.
+        },
+      },
+    });
+  
+    if (wasAdded) {
+      console.log('Thanks for your interest!');
+    } else {
+      console.log('Your loss!');
+    }
+  } catch (error) {
+    console.log(error);
+  }
+  }
 
   return (
 <Grid
@@ -152,7 +198,7 @@ justify="center"
       backgroundColor:theme.palette.secondary.main,
       borderRadius:1,
       width:'550px',
-      height:'370px',
+      height:'550px',
       right:'15%'
     }}
     >
@@ -172,7 +218,9 @@ justify="center"
          sx={{
             width: "100%"
           }}
-          onChange={(e) => setAmount(e.target.value) }
+          error = {amountError}
+          helperText={amountError?'only number or decimal values':''}
+          onChange={(e) => handleTokenRequestCheck(e) }
           label="Request amount (WETH)"
           variant="filled"
         ></TextField>
@@ -183,19 +231,21 @@ justify="center"
         component="div">
 {
     !processing?
+    !amountError?
      <Button
         sx={{marginTop:'5px',marginBottom:'10px'}}
         display='flex'
         variant="contained"
         onClick={handleRequestAmount}>Request Test WETH
-        </Button>:<CircularProgress sx={{marginTop:'5px',marginBottom:'10px'}}/>
+        </Button>:null:
+        <CircularProgress sx={{marginTop:'5px',marginBottom:'10px'}}/>
 }
      </Box>
        
      <Divider sx={{marginBottom:'10px'}}/>
 
 {window.ethereum.isMetaMask?
-<Box
+<><Box
               display="flex"
               alignItems="center"
               justifyContent="center"
@@ -239,21 +289,100 @@ component={'h1'}
 >
   Address: <Link target="_blank" href="https://sepolia.etherscan.io/address/0x87FF5ccd14Dc002903E5B274C0E569c7a215e5A1#code"> 0x87FF5ccd14Dc002903E5B274C0E569c7a215e5A1 </Link>
 </Typography>
+
+
 </Card>
- </Box>:null
+
+ </Box>
+ 
+ <Box
+ display="flex"
+ alignItems="center"
+ justifyContent="center"
+ component="div"
+ marginTop="20px"
+ >
+ <Button onClick={addTokenMetaMask} variant="contained" color="success">Add WETH Token To MetaMask</Button>
+
+ </Box>
+ </>
+ 
+ :null
 
 }
-    <Box
-    display="flex"
-    alignItems="center"
-    justifyContent="center"
-    component="div"
-    marginTop="20px"
-    >
-    <Button onClick={addTokenMetaMask} variant="contained" color="success">Add Token To MetaMask</Button>
 
+   
     </Box>
-    </Box>
+
+    <Divider sx={{marginBottom:'10px',marginTop:'10px'}}/>
+
+    {window.ethereum.isMetaMask?
+<><Box
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            >
+<Card 
+display="flex"
+
+sx={{width:'95%',borderRadius:0}}>
+
+<Typography 
+fontSize={18}
+display="flex"
+alignItems="left"
+component={'h1'}
+>
+  Name: Fluther Test UNI
+</Typography>
+<Typography 
+fontSize={18}
+display="flex"
+alignItems="left"
+component={'h1'}
+>
+  Symbol: UNI
+</Typography>
+
+<Typography 
+fontSize={18}
+display="flex"
+alignItems="left"
+component={'h1'}
+>
+  Decimals: 18
+</Typography>
+
+<Typography 
+fontSize={18}
+display="flex"
+alignItems="left"
+component={'h1'}
+>
+  Address: <Link target="_blank" href="https://sepolia.etherscan.io/address/0x6e4c13eD298b5Fcac70dc0F672f75aAeCca52768#code"> 0x6e4c13eD298b5Fcac70dc0F672f75aAeCca52768 </Link>
+</Typography>
+
+
+</Card>
+
+ </Box>
+ 
+ <Box
+ display="flex"
+ alignItems="center"
+ justifyContent="center"
+ component="div"
+ marginTop="20px"
+ >
+ <Button onClick={addUNITokenMetaMask} variant="contained" color="warning">Add UNI Token To MetaMask</Button>
+
+ </Box>
+ </>
+ 
+ :null
+
+}
+
     </Card>
     <Snackbar
         anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}

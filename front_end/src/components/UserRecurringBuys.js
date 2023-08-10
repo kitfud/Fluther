@@ -53,20 +53,20 @@ const [processing, setProcessing] = useState(false)
   },[updateAgreements])
 
   useEffect(()=>{
-    let checkAgreements
+    let checkCancelAgreements
 
     if(cancelUpdateAgreements){
-      checkAgreements= setInterval(()=>{
+      checkCancelAgreements= setInterval(()=>{
         console.log("checking for updates")
         logUserData()
       },1000)
     }
     if(!cancelUpdateAgreements){
-      clearInterval(checkAgreements)
+      clearInterval(checkCancelAgreements)
     }
-    return ()=>clearInterval(checkAgreements)
+    return ()=>clearInterval(checkCancelAgreements)
 
-  },[updateAgreements])
+  },[cancelUpdateAgreements])
 
 
 
@@ -103,6 +103,7 @@ const [processing, setProcessing] = useState(false)
 
     useEffect(()=>{
     if(buyIdStructs){
+     
     filterData(buyIdStructs)
 }
     },[buyIdStructs])
@@ -112,6 +113,10 @@ const [processing, setProcessing] = useState(false)
     const filterData = ()=>{
    
       let tableResult = []
+      if(buyIdStructs.length==0 && cancelUpdateAgreements){
+        setCancelUpdateAgreements(false)
+        setTableData(tableResult)
+      }
      
       let counter = 0
       buyIdStructs.forEach((element)=>{
@@ -125,13 +130,15 @@ const [processing, setProcessing] = useState(false)
         }
         tableResult.push(tdata)
         if(counter == buyIdStructs.length){
+  
           setTableData(tableResult)
           if(buyIdStructs.length>currentDataLength && updateAgreements){
             setUpdateAgreements(false)
           }
-          if(buyIdStructs.length<currentDataLength&& cancelUpdateAgreements){
+          else if(buyIdStructs.length<currentDataLength && cancelUpdateAgreements){
             setCancelUpdateAgreements(false)
           }
+       
           setCurrentDataLength(buyIdStructs.length)
          
         }
@@ -158,6 +165,7 @@ const [processing, setProcessing] = useState(false)
           userBuyIdsRefined.push(el)
         }
         if(counterIds==userBuyIds.length){
+          
           setBuyIds(userBuyIdsRefined)
         }
       })
@@ -170,7 +178,7 @@ const [processing, setProcessing] = useState(false)
           userBuyStructsRefined.push(el)
         }
         if(counterStructs==userBuyIds.length){
-          // console.log(userBuyIdsRefined)
+     
           setBuyIdStructs(userBuyStructsRefined)
         }
       })
