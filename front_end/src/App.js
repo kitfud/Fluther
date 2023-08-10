@@ -176,6 +176,8 @@ const [openFountain,setOpenFountain] = useState(false)
 const [cancelOccur,setCancelOccur] = useState(false)
 const [infuraProvider, setInfuraProvider] = useState(null)
 
+const [updateAgreements,setUpdateAgreements] = useState(false)
+
 const handleCloseFountain = ()=>{
   setOpenFountain(false)
 }
@@ -502,11 +504,10 @@ const amountInterval = ethers.utils.parseUnits(input)
 })
 
   let tx = await dollarCostAverageContract.connect(signer).createRecurringBuy(amountInterval,token1,token2,interval,'0x0000000000000000000000000000000000000000',quickSwapRouterAddress)
-
-
   let hash = tx.hash
   setTxHash(hash.toString())
   isTransactionMined(hash.toString())
+  setUpdateAgreements(true)
   }
   catch(err){
     setProcessing(false)
@@ -538,10 +539,10 @@ const isTransactionMined = async (transactionHash) => {
           let stringBlock = tx.blockNumber.toString()
           console.log("COMPLETED BLOCK: " + stringBlock)
           
-          setTimeout(()=>{
+          
             setProcessing(false)
             setOpenSnackBar(true)
-          },10000)
+         
           
 
       }
@@ -552,7 +553,7 @@ const handleClose = (event, reason) => {
   if (reason === 'clickaway') {
     return;
   }
-  window.location.reload(false);
+  // window.location.reload(false);
   setOpenSnackBar(false);
 };
 
@@ -1206,7 +1207,10 @@ const handleMusic =(event)=>{
      
       <Zoom in={checked}>
       <Box>
-      <UserRecurringBuys processingApp={processing} setCancelOccur={setCancelOccur} cancelOccur = {cancelOccur} balance={ethbalance} signer={signer} contract={dollarCostAverageContract} provider={provider} address={address}/> 
+      <UserRecurringBuys 
+      setUpdateAgreements={setUpdateAgreements}
+      updateAgreements={updateAgreements}
+      processingApp={processing} setCancelOccur={setCancelOccur} cancelOccur = {cancelOccur} balance={ethbalance} signer={signer} contract={dollarCostAverageContract} provider={provider} address={address}/> 
       </Box>
        </Zoom>
        
