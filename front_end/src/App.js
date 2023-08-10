@@ -319,34 +319,15 @@ const getCurrentExchangePrice = async()=>{
 
   useEffect(() => {
     if(provider !== null){
-    
-  
-     
 
-if(infuraProvider){
 //price feed contract object is made below
-try{
-      setPriceFeedContract(new ethers.Contract(smartContracts.PriceFeed.address.sepolia.ETHUSD,PriceFeedABI.sepolia,infuraProvider))  
-      setErc20Contract(new ethers.Contract(smartContracts.WETHMock.address.sepolia,ABI,infuraProvider))
-      setDuhContract(new ethers.Contract(smartContracts.Duh.address.sepolia,ABI,infuraProvider))
-      setWEth(new ethers.Contract(smartContracts.WETHMock.address.sepolia,ABI,infuraProvider))
-      setUNI(new ethers.Contract(smartContracts.UNIMock.address.sepolia,ABI,infuraProvider))
-}
-catch(err){
-  console.log(err)
-}
-}else{
-      
-
       setPriceFeedContract(new ethers.Contract(smartContracts.PriceFeed.address.sepolia.ETHUSD,PriceFeedABI.sepolia,provider))  
       setErc20Contract(new ethers.Contract(smartContracts.WETHMock.address.sepolia,ABI,provider))
       setDuhContract(new ethers.Contract(smartContracts.Duh.address.sepolia,ABI,provider))
       setWEth(new ethers.Contract(smartContracts.WETHMock.address.sepolia,ABI,provider))
       setUNI(new ethers.Contract(smartContracts.UNIMock.address.sepolia,ABI,provider))
-      }
-    }
-    
-  },[provider,infuraProvider])
+      } 
+  },[provider])
 
 
 
@@ -389,21 +370,14 @@ return ()=>clearTimeout(colorChange)
 
     const network = process.env.REACT_APP_ETHEREUM_NETWORK;
     const key = process.env.REACT_APP_INFURA_API_KEY
-    let infuraTempProvider;
-    
-    try{
-    infuraTempProvider = new ethers.providers.InfuraProvider(
+   
+    const infuraTempProvider = new ethers.providers.InfuraProvider(
       network,
       key
-    )
-    }
-  catch(err){
-  console.log(err)
-  setInfuraProvider(null)
-}
-if (infuraTempProvider){
-  setInfuraProvider(infuraProvider)
-}
+    );
+ 
+setInfuraProvider(infuraTempProvider)
+   
     
     // const Metaprovider = new ethers.providers.Web3Provider(window.ethereum);
     const tempSigner =tempProvider.getSigner();
@@ -426,21 +400,11 @@ if (infuraTempProvider){
 
    
   if(provider!== null && address !== null && address !== undefined){
-  if(infuraProvider !=null){
-    console.log("Checking with INFURA PROVIDER")
-      const ethbal = await infuraProvider.getBalance(address);
-      let valueToNumber = parseFloat(ethbal.toString())
-      let valueConverted = valueToNumber/10**18
-      setEthBalance(valueConverted)
-  }
-  else{
-    if(provider){
     const ethbal = await provider.getBalance(address);
     let valueToNumber = parseFloat(ethbal.toString())
     let valueConverted = valueToNumber/10**18
     setEthBalance(valueConverted)
-    }
-  }
+ 
     }
 
     if(provider!=null  && address!== undefined){
@@ -532,6 +496,7 @@ const amountInterval = ethers.utils.parseUnits(input)
 })
 
   let tx = await dollarCostAverageContract.connect(signer).createRecurringBuy(amountInterval,token1,token2,interval,'0x0000000000000000000000000000000000000000',quickSwapRouterAddress)
+  console.log("tx",tx)
   let hash = tx.hash
   setTxHash(hash.toString())
   isTransactionMined(hash.toString())
@@ -545,39 +510,8 @@ const amountInterval = ethers.utils.parseUnits(input)
 
 const isTransactionMined = async (transactionHash) => {
   let transactionBlockFound = false
-  if(infuraProvider){
-
-  while (transactionBlockFound === false) {
-      let tx = await infuraProvider.getTransactionReceipt(transactionHash)
-      console.log("transaction status check....")
-      try {
-          await tx.blockNumber
-      }
-      catch (error) {
-          tx = await infuraProvider.getTransactionReceipt(transactionHash)
-      }
-      finally {
-          console.log("proceeding")
-      }
 
 
-      if (tx && tx.blockNumber) {
-        
-          console.log("block number assigned.")
-          transactionBlockFound = true
-          let stringBlock = tx.blockNumber.toString()
-          console.log("COMPLETED BLOCK: " + stringBlock)
-          
-          
-            setProcessing(false)
-            setOpenSnackBar(true)
-         
-          
-
-      }
-  }
-}
-  else{
     while (transactionBlockFound === false) {
       let tx = await provider.getTransactionReceipt(transactionHash)
       console.log("transaction status check....")
@@ -601,12 +535,9 @@ const isTransactionMined = async (transactionHash) => {
           
           
             setProcessing(false)
-            setOpenSnackBar(true)
-         
-          
+            setOpenSnackBar(true)         
 
       }
-  }
   }
 }
 
@@ -661,18 +592,11 @@ else{
 const handleIconClick = ()=>{
   
   // handleModalOpen()
-if(infuraProvider){
+console.log(infuraProvider)
   const dater = new EthDater(
-  infuraProvider // Ethers provider, required.
-);
-setDater(dater)
-  }
-  else{
-    const dater = new EthDater(
-      provider // Ethers provider, required.
-    );
-    setDater(dater)
-  }
+  infuraProvider// Infura provider, required.
+  );
+  setDater(dater)
 
 }
 
@@ -811,7 +735,7 @@ const handleMusic =(event)=>{
  
 >
   <Box  sx={fountainModalStyle}>
-  <TokenFountain infuraProvider={infuraProvider?infuraProvider:provider} 
+  <TokenFountain provider={provider} 
   signer={signer} 
   address={address} 
   contract={erc20contract} 
@@ -1279,7 +1203,11 @@ const handleMusic =(event)=>{
       <UserRecurringBuys 
       setUpdateAgreements={setUpdateAgreements}
       updateAgreements={updateAgreements}
-      processingApp={processing} setCancelOccur={setCancelOccur} cancelOccur = {cancelOccur} balance={ethbalance} signer={signer} contract={dollarCostAverageContract} provider={infuraProvider?infuraProvider:provider} address={address}/> 
+      processingApp={processing} setCancelOccur={setCancelOccur} 
+      cancelOccur = {cancelOccur} balance={ethbalance} 
+      signer={signer} contract={dollarCostAverageContract} 
+      provider={provider} 
+      address={address}/> 
       </Box>
        </Zoom>
        
