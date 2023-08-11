@@ -78,9 +78,15 @@ import MusicOffIcon from '@mui/icons-material/MusicOff';
 import Tenderness from './audio/tenderness.mp3'
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import TokenFountain from './components/TokenFountain'
+
+>>>>>>> 918fa301e141e082cb1d287fc05f2dee672b6d1f
 
 const theme = createTheme({
   palette: {
@@ -179,6 +185,7 @@ const theme = createTheme({
         },
       },
     },
+
   }
 })
 <<<<<<< HEAD
@@ -197,6 +204,13 @@ const modalStyle = {
   border: '2px solid #000',
   boxShadow: 24,
   p: 4,
+};
+
+const fountainModalStyle = {
+  position: 'absolute',
+  top: '10%',
+  right: '0%',
+  width: 400,
 };
 const audio = new Audio(Tenderness)
 audio.load()
@@ -277,6 +291,20 @@ const [tokenChangeData, setTokenChangeData] = useState([])
 
 const [music, setMusic] = useState(false)
 
+const [openFountain,setOpenFountain] = useState(false)
+const [cancelOccur,setCancelOccur] = useState(false)
+const [infuraProvider, setInfuraProvider] = useState(null)
+
+const [updateAgreements,setUpdateAgreements] = useState(false)
+
+const handleCloseFountain = ()=>{
+  setOpenFountain(false)
+}
+
+const handleOpenFountain = ()=>{
+  setOpenFountain(true)
+}
+
 
 
 const renderChart = ( 
@@ -302,7 +330,8 @@ const handleChange = () => {
   setChecked((prev) => !prev);
 };
 
-  const address = useAddress();
+const address = useAddress();
+
 
 
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
@@ -372,8 +401,10 @@ const handleChange = () => {
     loadFull(main);
   },[])
 
+  
   useEffect(() => {
-    if(!dataload){
+    if(provider){
+    console.log("UPDATING ETHERS")
     updateEthers()
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -964,7 +995,6 @@ const action = (
       
 =======
     }
-    
   },[])
 
   useEffect(()=>{
@@ -990,20 +1020,22 @@ const getCurrentExchangePrice = async()=>{
 
 
   useEffect(()=>{
+  
+ if(provider !=null){
     checkAllowance()
+ }
   },[address,wethbalance])
 
   useEffect(()=>{
     let balanceCheck
-    if(signer && erc20contract && address){
+    if(signer !=null && erc20contract && address){
+    
     balanceCheck= setInterval(()=>{checkAllowance()},1000)
     }
     return ()=>clearInterval(balanceCheck)
   },[signer,erc20contract,allowance])
 
   useEffect(()=>{
-   
-
     if(allowance && typeof(allowance)=="number"){
 
       if(delayRender==true){
@@ -1028,9 +1060,10 @@ const getCurrentExchangePrice = async()=>{
   },[allowance])
 
   useEffect(() => {
-    // console.log("token",wethtoken)
+    console.log("token",wethtoken)
+    console.log("address",address)
   let tokenCheckInterval
-  if(wethtoken!==null && address!==null && address !== undefined){
+  if(wethtoken&& provider && address!==null && address !== undefined){
     try{
     checkTokenBalance()
     tokenCheckInterval = setInterval(()=>{
@@ -1048,23 +1081,14 @@ const getCurrentExchangePrice = async()=>{
 
   useEffect(() => {
     if(provider !== null){
-      //setting contract to approve spending amount, wEth in this case
-      try{
-
 
 //price feed contract object is made below
       setPriceFeedContract(new ethers.Contract(smartContracts.PriceFeed.address.sepolia.ETHUSD,PriceFeedABI.sepolia,provider))  
-
-//core contract objects for dollar cost averaging made below
       setErc20Contract(new ethers.Contract(smartContracts.WETHMock.address.sepolia,ABI,provider))
       setDuhContract(new ethers.Contract(smartContracts.Duh.address.sepolia,ABI,provider))
       setWEth(new ethers.Contract(smartContracts.WETHMock.address.sepolia,ABI,provider))
       setUNI(new ethers.Contract(smartContracts.UNIMock.address.sepolia,ABI,provider))
-      }
-      catch(err){
-      console.log(err)
-      }
-    }
+      } 
   },[provider])
 
 
@@ -1096,6 +1120,7 @@ let colorChange
 if(unicolor=="green"){
   colorChange = setTimeout(()=>{
     setUniColor("black")
+    checkAllowance()
   },2000)
 }
 return ()=>clearTimeout(colorChange)
@@ -1105,52 +1130,75 @@ return ()=>clearTimeout(colorChange)
     let tempProvider = await new ethers.providers.Web3Provider(window.ethereum);
     setProvider(tempProvider);
 
-    let tempSigner = await tempProvider.getSigner();
+    const network = process.env.REACT_APP_ETHEREUM_NETWORK;
+    const key = process.env.REACT_APP_INFURA_API_KEY
+   
+    const infuraTempProvider = new ethers.providers.InfuraProvider(
+      network,
+      key
+    );
+ 
+setInfuraProvider(infuraTempProvider)
+   
+    
+    // const Metaprovider = new ethers.providers.Web3Provider(window.ethereum);
+    const tempSigner =tempProvider.getSigner();
+    // const tempSigner = new ethers.Wallet(process.env.REACT_APP_SIGNER_PRIVATE_KEY, tempProvider);
+ 
+    
     setSigner(tempSigner);
     setDataLoad(true)
+  
 
     let dollaAverageAddress = smartContracts.DollarCostAverage.address.sepolia
     let dollaAverageAbi = smartContracts.DollarCostAverage.abi
   
-    let tempContract = await new ethers.Contract(dollaAverageAddress,dollaAverageAbi,tempProvider);
+    let tempContract = new ethers.Contract(dollaAverageAddress,dollaAverageAbi,tempProvider);
     setDollarCostAverageContract(tempContract);
+    
   }
 
   const checkTokenBalance = async ()=>{
 
-    if(provider !== null && address !== null && address !== undefined){
-      const ethbal = await provider.getBalance(address);
-      let valueToNumber = parseFloat(ethbal.toString())
-      let valueConverted = valueToNumber/10**18
-      setEthBalance(valueConverted)
+   
+  if(provider!== null && address !== null && address !== undefined){
+    const ethbal = await provider.getBalance(address);
+    let valueToNumber = parseFloat(ethbal.toString())
+    let valueConverted = valueToNumber/10**18
+    setEthBalance(valueConverted)
+ 
     }
 
-    if(wethtoken!==null && address !==null && address!== undefined){
-    // console.log("address",address)
-    var user = ethers.utils.getAddress(address)
-    var wethbal= (await wethtoken.balanceOf(user)/10**18).toString();
+    if(provider!=null  && address!== undefined){
+    // console.log("address",signer.address)
+   
+    var wethbal= (await wethtoken.balanceOf(address)/10**18).toString();
+   
     setWEthBalance(wethbal)
     }
-    if(unitoken !==null && address !==null && address!== undefined ){
-    var unibal= (await unitoken.balanceOf(user)/10**18).toString();
+
+    
+    if(provider !=null && address!== undefined ){
+    var unibal= (await unitoken.balanceOf(address)/10**18).toString();
     setUniBalance(unibal)
     }
+   
     //this is the if statement which controls the color change on amount increase
-    if(unitoken !==null && address !==null && address!== undefined ){
+    if(provider !=null&& address!== undefined){
     checkTokenIncrease(unibal,wethbal)
       }
   }
 
   const checkAllowance = async ()=>{
  
- if(address && erc20contract){
+ if(address && erc20contract && provider!=null){
 
+ 
     let allowanceAmount = await erc20contract.allowance(address,smartContracts.DollarCostAverage.address.sepolia)
     let convertedAllowance = parseFloat(allowanceAmount.toString())/10**18
-
+   
     setAllowance(convertedAllowance)
    
-    return convertedAllowance
  }
     
   }
@@ -1172,11 +1220,16 @@ return ()=>clearTimeout(colorChange)
       //first contract object made from token to spend erc20contract
       await erc20contract.connect(signer).approve(smartContracts.DollarCostAverage.address.sepolia,ethers.utils.parseEther(amount))
       setSpendingApproved(true)
-      setDisabledTextFeild(true)  
+      setDisabledTextFeild(true) 
+      
+      setDelayRender(true)
     }
     catch(err){
       console.log(err)
       setSpendingApproved(false)
+
+      setDelayRender(false)
+      setDisabledTextFeild(false)
     }
    
   }
@@ -1189,17 +1242,6 @@ return ()=>clearTimeout(colorChange)
 
   const submitAgreement = async () => {
   
-    let data = {
-      "user": address,
-      "amount": amount,
-      "token1": token1,
-      "token2": token2,
-      "interval": interval,
-      "intervalAmount": intervalAmount,
-    }
- 
-  
-
 const input = intervalAmount;
 const amountInterval = ethers.utils.parseUnits(input)
 
@@ -1216,11 +1258,11 @@ const amountInterval = ethers.utils.parseUnits(input)
 })
 
   let tx = await dollarCostAverageContract.connect(signer).createRecurringBuy(amountInterval,token1,token2,interval,'0x0000000000000000000000000000000000000000',quickSwapRouterAddress)
-
-
+  console.log("tx",tx)
   let hash = tx.hash
   setTxHash(hash.toString())
   isTransactionMined(hash.toString())
+  setUpdateAgreements(true)
   }
   catch(err){
     setProcessing(false)
@@ -1231,7 +1273,8 @@ const amountInterval = ethers.utils.parseUnits(input)
 const isTransactionMined = async (transactionHash) => {
   let transactionBlockFound = false
 
-  while (transactionBlockFound === false) {
+
+    while (transactionBlockFound === false) {
       let tx = await provider.getTransactionReceipt(transactionHash)
       console.log("transaction status check....")
       try {
@@ -1246,13 +1289,15 @@ const isTransactionMined = async (transactionHash) => {
 
 
       if (tx && tx.blockNumber) {
-         
-          setProcessing(false)
+        
           console.log("block number assigned.")
           transactionBlockFound = true
           let stringBlock = tx.blockNumber.toString()
           console.log("COMPLETED BLOCK: " + stringBlock)
-          setOpenSnackBar(true)
+          
+          
+            setProcessing(false)
+            setOpenSnackBar(true)         
 
       }
   }
@@ -1262,7 +1307,7 @@ const handleClose = (event, reason) => {
   if (reason === 'clickaway') {
     return;
   }
-  window.location.reload(false);
+  // window.location.reload(false);
   setOpenSnackBar(false);
 };
 
@@ -1283,7 +1328,7 @@ const action = (
 );
 
 const handleIntervalSpendCheck= (e)=>{
-  console.log(thresholdETHtransaction)
+
 const reg = new RegExp(/^[0-9]+([.][0-9]+)?$/);
 const emptyString = new RegExp(/^$/);
 
@@ -1307,12 +1352,13 @@ else{
 }
 
 const handleIconClick = ()=>{
-  console.log("Icon click")
+  
   // handleModalOpen()
+console.log(infuraProvider)
   const dater = new EthDater(
-    provider // Ethers provider, required.
-);
-setDater(dater)
+  infuraProvider// Infura provider, required.
+  );
+  setDater(dater)
 
 }
 
@@ -1327,12 +1373,12 @@ useEffect(()=>{
     counter++
     let dataFrame = {}
     let convertDate = new Date(element.date)
-    console.log(typeof(convertDate))
+    
     dataFrame["date"] = convertDate.getMonth() + "/"+ convertDate.getDate()
     dataFrame["amount"] = tokenQuantityBlocks[blocks.indexOf(element)]
     tokenChangeData.push(dataFrame)
     if(counter==9){
-      console.log("TOKEN CHANGE",tokenChangeData)
+
       setTokenChangeData(tokenChangeData)
       handleModalOpen(true)
     }
@@ -1350,7 +1396,6 @@ getBlockForDates()
 },[dater])
 useEffect(()=>{
 if(blocks){
-  console.log(blocks)
   getTokenQuantityPerBlock(unitoken,blocks)
 }
 },[blocks])
@@ -1360,7 +1405,7 @@ let items = []
 let counter = 0
 blocks.forEach((item)=>{
   token.balanceOf(address,{blockTag:item.block}).then((res)=>{
-    console.log(`index: ${blocks.indexOf(item)}:`,parseFloat(res.toString())/10**18)
+   
     items[blocks.indexOf(item)]=parseFloat(res.toString())/10**18
     counter++
     if(counter == 9){
@@ -1387,7 +1432,7 @@ async function getBlockForDates (){
     false // Refresh boundaries, optional. Recheck the latest block before request. By default false.
     );
   setBlocks(blocks)
-  console.log("blocks",blocks)
+
 }
 
 function getPreviousDaysDate(dayBack){
@@ -1418,7 +1463,7 @@ const handleMusic =(event)=>{
 
   return (
     <>
-      {/* {address?console.log(address):null} */}
+
       <Particles
         id="particles_stuff"
         options={particlesOptions}
@@ -1438,9 +1483,34 @@ const handleMusic =(event)=>{
       </Fab>
   }
 
+
+<Box className="tooltip" sx={{position:'fixed', right:'3%', marginTop:'1%'}}>
+<span className="tooltiptextBank" > Click For Test WETH Faucet</span>
+<Fab onClick={handleOpenFountain} color = "primary" >
+    <AttachMoneyIcon/>
+</Fab>
+</Box>
+
+<Modal
+  open={openFountain}
+  onClose = {handleCloseFountain}
+ 
+>
+  <Box  sx={fountainModalStyle}>
+  <TokenFountain provider={provider} 
+  signer={signer} 
+  address={address} 
+  contract={erc20contract} 
+  theme={theme}/>
+  </Box>
+
+
+</Modal>
+
+
       <Modal
         open={open}
-        onClose={handleClose}
+        onClose={handleModalClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -1449,8 +1519,6 @@ const handleMusic =(event)=>{
         {renderChart}
         <Typography sx={{position:'relative',left:'50px'}}>Date</Typography>
         </Box>
-     
-        
       </Modal>
     
 
@@ -1461,12 +1529,25 @@ const handleMusic =(event)=>{
           justify="center"
           style={{ minHeight: '100vh' }}
         >
+          <Slide direction="down" in={true} mountOnEnter>
+            <Box
+              sx={{
+                zIndex: 5,
+                marginTop:'2vh',
+              }}
+            >
+              <Typography fontSize="100px" color="#a939c4" fontFamily="Cherry Bomb One">
+                fluther
+              </Typography>
+            </Box>
+          </Slide>
+
           {/* CONNECT WALLET BUTTON */}
           <Slide direction="down" in={true} mountOnEnter>
             <Box 
               sx={{
                 marginBottom:'10px',
-                marginTop:'4vh',
+                marginTop:'2vh',
                 zIndex: 10,
               }}
               display="flex"
@@ -1482,12 +1563,13 @@ const handleMusic =(event)=>{
             </Box>
         </Slide>
 
+
           {/* MAIN CARD */}
           <Slide direction="left" in={true} mountOnEnter>
-          <Card 
+         <Card 
             variant="outlined"
             sx={{ 
-              alignSelf:'center',
+              
               display: 'inline-block',
               backgroundColor:theme.palette.secondary.main,
               //opacity: 0.9,
@@ -1790,8 +1872,9 @@ const handleMusic =(event)=>{
                 }}>
               </Box>
             }    
-          </Card></Slide>
-          
+          </Card>
+          </Slide>
+
           {
           wethbalance!==null && address !== null?
           <>
@@ -1857,6 +1940,7 @@ const handleMusic =(event)=>{
             </Box>
           </>:null
           }
+<<<<<<< HEAD
       
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
@@ -2756,6 +2840,9 @@ const handleMusic =(event)=>{
           }
       
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+        
+>>>>>>> 918fa301e141e082cb1d287fc05f2dee672b6d1f
       <Snackbar
         anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
         open={openSnackbar}
@@ -2779,7 +2866,7 @@ const handleMusic =(event)=>{
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         <Box >
         <FormControlLabel 
-        sx={{color:'#e000f8'}}
+        sx={{color:'white'}}
         control={<Switch checked={checked} onChange={handleChange} />}
         label="Display User Agreements"
       />
@@ -2787,18 +2874,32 @@ const handleMusic =(event)=>{
      
       <Zoom in={checked}>
       <Box>
-      <UserRecurringBuys signer={signer} contract={dollarCostAverageContract} provider={provider} address={address}/> 
+      <UserRecurringBuys 
+      setUpdateAgreements={setUpdateAgreements}
+      updateAgreements={updateAgreements}
+      processingApp={processing} setCancelOccur={setCancelOccur} 
+      cancelOccur = {cancelOccur} balance={ethbalance} 
+      signer={signer} contract={dollarCostAverageContract} 
+      provider={provider} 
+      address={address}/> 
       </Box>
        </Zoom>
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 =======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
        
+=======
+
+>>>>>>> 918fa301e141e082cb1d287fc05f2dee672b6d1f
         </Grid>      
       </ThemeProvider>
+
     </>
+        
   );
+        
 }
 
 export default App;

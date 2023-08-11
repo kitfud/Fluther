@@ -22,7 +22,8 @@ import CloseIcon from '@mui/icons-material/Close';
 
 import smartContracts from '../chain-info/smart_contracts.json'
 
-const UserRecurringBuys = ({signer,contract,provider,address}) => {
+const UserRecurringBuys = ({setUpdateAgreements,updateAgreements,processingApp,
+  setCancelOccur,balance,signer,contract,provider,address}) => {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -56,11 +57,16 @@ const [processing, setProcessing] = useState(false)
 =======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
+  const [currentDataLength, setCurrentDataLength] = useState(null)
+
+  const [cancelUpdateAgreements, setCancelUpdateAgreements] = useState(false)
+
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     window.location.reload(false);
@@ -70,9 +76,45 @@ const [processing, setProcessing] = useState(false)
 =======
     window.location.reload()
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+    // window.location.reload()
+>>>>>>> 918fa301e141e082cb1d287fc05f2dee672b6d1f
     setOpenSnackBar(false);
     
   };
+
+  useEffect(()=>{
+    let checkAgreements
+
+    if(updateAgreements){
+      checkAgreements= setInterval(()=>{
+        console.log("checking for updates")
+        logUserData()
+      },1000)
+    }
+    if(!updateAgreements){
+      clearInterval(checkAgreements)
+    }
+    return ()=>clearInterval(checkAgreements)
+
+  },[updateAgreements])
+
+  useEffect(()=>{
+    let checkCancelAgreements
+
+    if(cancelUpdateAgreements){
+      checkCancelAgreements= setInterval(()=>{
+        console.log("checking for updates")
+        logUserData()
+      },1000)
+    }
+    if(!cancelUpdateAgreements){
+      clearInterval(checkCancelAgreements)
+    }
+    return ()=>clearInterval(checkCancelAgreements)
+
+  },[cancelUpdateAgreements])
+
 
 
 
@@ -93,6 +135,7 @@ const [processing, setProcessing] = useState(false)
   );
 
     useEffect(()=>{
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 
@@ -222,6 +265,10 @@ console.log("result",result)
 =======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     if(provider!=null){
+=======
+    if(contract){
+   
+>>>>>>> 918fa301e141e082cb1d287fc05f2dee672b6d1f
     try{
     logUserData()  
     }
@@ -229,10 +276,13 @@ console.log("result",result)
     console.log(err)
     }
     }
-    },[provider,address])
+    },[provider,address,balance,contract,processingApp])
+
+
 
     useEffect(()=>{
     if(buyIdStructs){
+     
     filterData(buyIdStructs)
 }
     },[buyIdStructs])
@@ -242,6 +292,10 @@ console.log("result",result)
     const filterData = ()=>{
    
       let tableResult = []
+      if(buyIdStructs.length==0 && cancelUpdateAgreements){
+        setCancelUpdateAgreements(false)
+        setTableData(tableResult)
+      }
      
       let counter = 0
       buyIdStructs.forEach((element)=>{
@@ -255,31 +309,28 @@ console.log("result",result)
         }
         tableResult.push(tdata)
         if(counter == buyIdStructs.length){
+  
           setTableData(tableResult)
+          if(buyIdStructs.length>currentDataLength && updateAgreements){
+            setUpdateAgreements(false)
+          }
+          else if(buyIdStructs.length<currentDataLength && cancelUpdateAgreements){
+            setCancelUpdateAgreements(false)
+          }
+       
+          setCurrentDataLength(buyIdStructs.length)
+         
         }
       })
 
     }
 
-
-
-    // useEffect(()=>{
-    //   if(buyIds){
-    //     logBuyStructs()
-    //   }
-    // },[buyIds])
-
-    // const logBuyStructs = async ()=>{
-    //   let buyStructs = await contract.getRecurringBuyFromIds(buyIds)
-    //   console.log("Buy STRUCTS", buyStructs)
-    //   setBuyIdStructs(buyStructs)
-    // }
-
     const logUserData = async () => {
-     if(address){
+
+     if(contract && address){
       
       let userData = await contract.getRecurringBuysFromUser(address)
-      // console.log(userData)
+  
       let userBuyIds = userData[0]
       let userBuyStructs= userData[1]
 
@@ -293,6 +344,7 @@ console.log("result",result)
           userBuyIdsRefined.push(el)
         }
         if(counterIds==userBuyIds.length){
+          
           setBuyIds(userBuyIdsRefined)
         }
       })
@@ -305,7 +357,7 @@ console.log("result",result)
           userBuyStructsRefined.push(el)
         }
         if(counterStructs==userBuyIds.length){
-          // console.log(userBuyIdsRefined)
+     
           setBuyIdStructs(userBuyStructsRefined)
         }
       })
@@ -322,11 +374,13 @@ console.log("result",result)
         setProcessing(true)
         let tx = await contract.connect(signer).cancelRecurringPayment(id)
         let hash = tx.hash
+        setCancelUpdateAgreements(true)
         setTxHash(hash.toString())
         isTransactionMined(hash.toString())
-
+        
         }
         catch(err){
+        setCancelUpdateAgreements(false)
         setProcessing(false)
         console.log(err)
         }
@@ -359,6 +413,8 @@ console.log("result",result)
                 console.log("COMPLETED BLOCK: " + stringBlock)
                 // setReloadPage(true)
                 setOpenSnackBar(true)
+                setCancelOccur(true)
+                logUserData()
       
             }
         }
@@ -423,6 +479,7 @@ console.log("result",result)
     !processing?
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     <Card sx={{marginTop:'20px',padding:'40px'}}>
         <Box>
         <div>Current Dollar Cost Average Contracts</div>
@@ -433,6 +490,10 @@ console.log("result",result)
 =======
 =======
 >>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+    !updateAgreements?
+    !cancelUpdateAgreements?
+>>>>>>> 918fa301e141e082cb1d287fc05f2dee672b6d1f
     <Slide direction="right" in={true} mountOnEnter>
     <Card sx={{marginTop:'20px', marginBottom: "20px", padding:'0px', border:2, borderColor:"#e842fa"}}>
         <Box>
@@ -505,6 +566,7 @@ console.log("result",result)
         </TableBody>
       </Table>
     </TableContainer>
+<<<<<<< HEAD
 
 
 
@@ -520,6 +582,21 @@ console.log("result",result)
                 alignItems="center"
                 justifyContent="center" 
                 sx={{marginTop:'20px'}}> <CircularProgress/></Box>
+=======
+    </Card></Slide>:
+        <Box display="flex"
+        alignItems="center"
+        justifyContent="center" 
+        sx={{marginTop:'20px',marginBottom:'10px'}}> <CircularProgress sx={{color:"white"}}/></Box>:
+    <Box display="flex"
+        alignItems="center"
+        justifyContent="center" 
+        sx={{marginTop:'20px',marginBottom:'10px'}}> <CircularProgress sx={{color:"white"}}/></Box>:
+        <Box display="flex"
+              alignItems="center"
+              justifyContent="center" 
+              sx={{marginTop:'20px',marginBottom:'10px'}}> <CircularProgress sx={{color:"white"}}/></Box>
+>>>>>>> 918fa301e141e082cb1d287fc05f2dee672b6d1f
 }
         <Snackbar
         anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
