@@ -6,7 +6,15 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background:linear-gradient(rgb(66, 176, 250), transparent);
+<<<<<<< HEAD
+<<<<<<< HEAD
+  background-color: #02323f;
+=======
   background-color: #0041a5;
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+  background-color: #0041a5;
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 }
 
 code {

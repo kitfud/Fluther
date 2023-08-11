@@ -9,7 +9,14 @@ remappings = [
 ]
 optimizer = true
 optimezer_runs = 1000
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
 # match_path = "test/unit/*"
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+# match_path = "test/unit/*"
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 # via_ir = true
 # ffi = true
 
@@ -19,10 +26,19 @@ sepolia = "${SEPOLIA_RPC_URL}"
 [etherscan]
 sepolia = { key = "${ETHERSCAN_API_KEY}" }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 [invariant]
 runs = 500
 depth = 200
 fail_on_revert = false
 
 
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
