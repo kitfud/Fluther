@@ -107,13 +107,8 @@ interface IDollarCostAverage {
     /** @dev event for when a new recurring buy is created.
      *  @param recBuyId: new recurring buy ID.
      *  @param sender: address of the recurring buy sender.
-     *  @param buy: RecurringBuy struct with all the information of a recurring buy.
      */
-    event RecurringBuyCreated(
-        uint256 indexed recBuyId,
-        address indexed sender,
-        RecurringBuy buy
-    );
+    event RecurringBuyCreated(uint256 indexed recBuyId, address indexed sender);
 
     /** @dev event for when a recurring buy is cancelled.
      *  @param recBuyId: recurring buy ID.
@@ -189,6 +184,26 @@ interface IDollarCostAverage {
      */
     event DuhTokenSet(address indexed caller, address indexed duh);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+    /** @dev event for when a ERC20 token permission is set.
+     *  @param caller: address of the function caller.
+     *  @param token: ERC20 token address.
+     *  @param isAllowed: true if the token is allowed, false otherwise.
+     */
+    event ERC20AllowedSet(
+        address indexed caller,
+        address indexed token,
+        bool isAllowed
+    );
+
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     /// -----------------------------------------------------------------------
     /// Functions
     /// -----------------------------------------------------------------------
@@ -251,6 +266,21 @@ interface IDollarCostAverage {
      *  @param duh: new address of DUH.
      */
     function setDuh(address duh) external;
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+
+    /** @notice sets permission for the given token address.
+     *  @param token: ERC20 token address.
+     *  @param isAllowed: true if the token is allowed, false otherwise.
+     */
+    function setAllowedERC20s(address token, bool isAllowed) external;
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
     /** @notice gets the timestamp of the current block.
      *  @return uint256 value for the block timestamp.
@@ -310,6 +340,29 @@ interface IDollarCostAverage {
         uint256 endRecBuyId
     ) external view returns (RecurringBuy[] memory);
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+    /** @notice reads the permission of the given ERC20 token address.
+     *  @param token: the ERC20 token address to.
+     *  @return bool true if the token is allowed, false otherwise.
+     */
+    function getAllowedERC20s(address token) external view returns (bool);
+
+    /** @notice gets an array of {struct-RecurringBuy} for the given sender address.
+     *  @param sender: sender's address.
+     *  @return array of recurring buy IDs and array of {struct-RecurringBuy}.
+     */
+    function getRecurringBuysFromUser(
+        address sender
+    ) external view returns (uint256[] memory, RecurringBuy[] memory);
+
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     /** @notice gets if given recurring buy ID is valid.
      *  @param recurringBuyId: ID of the recurring buy.
      *  @return bool that specifies if the recurring buy is valid (true) or not (false).

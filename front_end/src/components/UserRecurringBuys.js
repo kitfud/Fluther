@@ -1,36 +1,73 @@
-import React, { isValidElement } from 'react'
+import React from 'react'
 import { useEffect,useState } from 'react'
-import {Typography,Snackbar,CircularProgress,Button,Card,Box,Paper,Table, TableBody,TableCell,TableContainer,TableHead,TableRow } from '@mui/material'
+import {Typography,Snackbar,CircularProgress,Button,Card,Box,Paper,Table, TableBody,TableCell,TableContainer,TableHead,TableRow, Slide } from '@mui/material'
 import { ethers } from 'ethers'
-import DollarCost from '../chain-info/smart_contracts.json'
 
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
 import smartContracts from '../chain-info/smart_contracts.json'
 
-const UserRecurringBuys = ({signer,contract,provider,address}) => {
+const UserRecurringBuys = ({setUpdateAgreements,updateAgreements,processingApp,
+  setCancelOccur,balance,signer,contract,provider,address}) => {
 
-    // console.log(DollarCost.DollarCostAverage.address.sepolia)
-// console.log("address",address)
-const [data, setData] = useState(null)
+
 const [tabledata,setTableData] = useState(null)
 const [processing, setProcessing] = useState(false)
 
   const [openSnackbar,setOpenSnackBar] = useState(false)
   const [txHash, setTxHash] = useState(null)
-  const [canceledIds,setCanceledIds] = useState(null)
+
  
+  const [buyIds,setBuyIds] = useState(null)
+  const [buyIdStructs,setBuyIdStructs] = useState(null)
+
+  const [currentDataLength, setCurrentDataLength] = useState(null)
+
+  const [cancelUpdateAgreements, setCancelUpdateAgreements] = useState(false)
 
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
-    window.location.reload(false);
+    // window.location.reload()
     setOpenSnackBar(false);
     
   };
+
+  useEffect(()=>{
+    let checkAgreements
+
+    if(updateAgreements){
+      checkAgreements= setInterval(()=>{
+        console.log("checking for updates")
+        logUserData()
+      },1000)
+    }
+    if(!updateAgreements){
+      clearInterval(checkAgreements)
+    }
+    return ()=>clearInterval(checkAgreements)
+
+  },[updateAgreements])
+
+  useEffect(()=>{
+    let checkCancelAgreements
+
+    if(cancelUpdateAgreements){
+      checkCancelAgreements= setInterval(()=>{
+        console.log("checking for updates")
+        logUserData()
+      },1000)
+    }
+    if(!cancelUpdateAgreements){
+      clearInterval(checkCancelAgreements)
+    }
+    return ()=>clearInterval(checkCancelAgreements)
+
+  },[cancelUpdateAgreements])
+
 
 
 
@@ -51,129 +88,101 @@ const [processing, setProcessing] = useState(false)
   );
 
     useEffect(()=>{
-
-    const loggingData = async()=>{
-    const data = await logEventData("RecurringBuyCreated",[], provider)
-    console.log("data",data)
-    setData(data)
-    }
-
-    if(provider!=null){
+    if(contract){
+   
     try{
-    loggingData()  
+    logUserData()  
     }
     catch(err){
-        console.log(err)
+    console.log(err)
     }
     }
+    },[provider,address,balance,contract,processingApp])
 
-    },[provider,address])
+
 
     useEffect(()=>{
-    if(data != undefined){
-    console.log("data",data)
-    filterData(data)
+    if(buyIdStructs){
+     
+    filterData(buyIdStructs)
 }
-    },[data])
+    },[buyIdStructs])
 
 
 
-    const filterData = (data)=>{
-        // console.log(data)
-        // console.log("data",data[16][0])
-
-        //takes off records which don't relate to events,setup of contracts and admin
-        let userData = []
-        let cancelledContracts = []
-
-        data.forEach((element)=>{
-            //the cancel event array is length 2 and the admin stuff does not start witha  string when
-            //llooking at data
-            if(typeof(element[0])!='string'& element.length==3){
-                userData.push(element)
-            }
-           
-        })
-
-        
-            data.forEach((element)=>{
-                //event structure for canclled events in length 2 and only take sender from address
-                if(typeof(element[0])!='string'& element.length==2 &element.sender==address){
-                //filter and convert big number to javascript integer
-                    cancelledContracts.push(element.recBuyId.toNumber())
-                }
-               
-            })
-           
-       
-
-        //console.log("cancelled",cancelledContracts)
-        setCanceledIds(cancelledContracts)
-        //filter to only records specific to user
-        console.log("userData",userData.buy)
-       let result =[] 
-       for(let i = 0; i<userData.length; i++){
-       if (userData[i][1]==address&& userData[i].buy){
-        result.push(userData[i])
-       }
-       }
-console.log("result",result)
-       let tableResult = []
-       result.forEach((element)=>{
-        // console.log("buy",element.buy)
-        // console.log("timeIntervalSeconds",element.buy.timeIntervalInSeconds.toNumber())
-      
-        console.log("tokenToBuy",element.buy.tokenToBuy)
-        console.log("token to spend",element.buy.tokenToSpend)
-        // console.log(element.recBuyId.toNumber())
-        
-        // console.log("amount",ethers.utils.formatEther(element.buy[1]))
-       
-        let tdata = {
-            "buyId":element.recBuyId.toNumber(),
-            "tokenToSpend":element.buy.tokenToSpend,
-            "tokenToBuy":element.buy.tokenToBuy,
-            "timeInterval":element.buy.timeIntervalInSeconds.toNumber(),
-            "amount":ethers.utils.formatEther(element.buy[1])
+    const filterData = ()=>{
+   
+      let tableResult = []
+      if(buyIdStructs.length==0 && cancelUpdateAgreements){
+        setCancelUpdateAgreements(false)
+        setTableData(tableResult)
+      }
+     
+      let counter = 0
+      buyIdStructs.forEach((element)=>{
+        counter++
+       let tdata = {
+            "buyId":buyIds[buyIdStructs.indexOf(element)].toNumber(),
+            "tokenToSpend":element.tokenToSpend,
+            "tokenToBuy":element.tokenToBuy,
+            "timeInterval":element.timeIntervalInSeconds.toNumber(),
+            "amount":ethers.utils.formatEther(element.amountToSpend)
         }
         tableResult.push(tdata)
-    
-       })
-    //    console.log("tableresult",tableResult)
-    setTableData(tableResult)
+        if(counter == buyIdStructs.length){
+  
+          setTableData(tableResult)
+          if(buyIdStructs.length>currentDataLength && updateAgreements){
+            setUpdateAgreements(false)
+          }
+          else if(buyIdStructs.length<currentDataLength && cancelUpdateAgreements){
+            setCancelUpdateAgreements(false)
+          }
+       
+          setCurrentDataLength(buyIdStructs.length)
+         
+        }
+      })
+
     }
 
+    const logUserData = async () => {
 
-    
-    const logEventData = async (eventName, filters = [], provider, setterFunction = undefined) => {
+     if(contract && address){
+      
+      let userData = await contract.getRecurringBuysFromUser(address)
+  
+      let userBuyIds = userData[0]
+      let userBuyStructs= userData[1]
 
-        // console.log("eventName",eventName)
-        // console.log("provider",provider)
-        // console.log("filters",filters)
-        // let filterABI = ["event RecurringBuyCreated ( uint256 recBuyId,address sender, tuple buy)"]
-        // console.log(DollarCost.DollarCostAverage.abi)
-        let filterABI = DollarCost.DollarCostAverage.abi
-        let iface = new ethers.utils.Interface(filterABI)
+      let userBuyIdsRefined = []
+      let userBuyStructsRefined = []
 
-        // console.log(iface)
-
-        let dollarCostAddress = DollarCost.DollarCostAverage.address.sepolia
-        // console.log(dollarCostAddress)
-        let filter = {
-            address: dollarCostAddress,
-            fromBlock:0,     
+      let counterIds = 0
+      userBuyIds.forEach((el)=>{
+        counterIds++
+        if(userBuyIds.indexOf(el) !=0){
+          userBuyIdsRefined.push(el)
         }
-        let logPromise = provider.getLogs(filter)
-        logPromise.then(function(logs){
-            let events = logs.map((log)=>{
-                return iface.parseLog(log).args
-            })
-            setData(events)
-            
-        }).catch(function(err){
-            console.log(err);
-        });
+        if(counterIds==userBuyIds.length){
+          
+          setBuyIds(userBuyIdsRefined)
+        }
+      })
 
+
+      let counterStructs = 0
+      userBuyStructs.forEach((el)=>{
+        counterStructs++
+        if(userBuyStructs.indexOf(el) !=0){
+          userBuyStructsRefined.push(el)
+        }
+        if(counterStructs==userBuyIds.length){
+     
+          setBuyIdStructs(userBuyStructsRefined)
+        }
+      })
+     }
     }
 
     const handleCancel = async (id)=>{
@@ -182,11 +191,13 @@ console.log("result",result)
         setProcessing(true)
         let tx = await contract.connect(signer).cancelRecurringPayment(id)
         let hash = tx.hash
+        setCancelUpdateAgreements(true)
         setTxHash(hash.toString())
         isTransactionMined(hash.toString())
-
+        
         }
         catch(err){
+        setCancelUpdateAgreements(false)
         setProcessing(false)
         console.log(err)
         }
@@ -219,18 +230,14 @@ console.log("result",result)
                 console.log("COMPLETED BLOCK: " + stringBlock)
                 // setReloadPage(true)
                 setOpenSnackBar(true)
+                setCancelOccur(true)
+                logUserData()
       
             }
         }
       }
     
- const removeCancelledContracts = (tableData) =>{
-    // console.log('tableData',tableData)
-    // console.log("cancelled",canceledIds)
-    let refinedData = tableData.filter(element=>!canceledIds.includes(element.buyId))
-    // console.log("refined",refinedData)
-    return refinedData
- }
+
 
  const translateToken = (row)=>{
     let translatedData = {}
@@ -273,13 +280,16 @@ console.log("result",result)
     <>
    {
     !processing?
-    <Card sx={{marginTop:'20px',padding:'40px'}}>
+    !updateAgreements?
+    !cancelUpdateAgreements?
+    <Slide direction="right" in={true} mountOnEnter>
+    <Card sx={{marginTop:'20px', marginBottom: "20px", padding:'0px', border:2, borderColor:"#e842fa"}}>
         <Box>
-        <div>Current Dollar Cost Average Contracts</div>
+
         </Box>
         <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="Current Dollar Cost Average">
-        <TableHead sx={{backgroundColor:"lightyellow"}}>
+      <Table sx={{ minWidth: 650, }} aria-label="Current Dollar Cost Average">
+        <TableHead sx={{backgroundColor:"#a7aeff"}}>
           <TableRow>
             <TableCell>buyId</TableCell>
             <TableCell align="right">Token To Spend</TableCell>
@@ -289,12 +299,12 @@ console.log("result",result)
             <TableCell align="right"></TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
-          {tabledata?(removeCancelledContracts(tabledata).map((row) => {
-            // let swap = {"tokenToBuy":"UNI","tokenToSpend":"WETH"}
-            // console.log("row",row)
+        <TableBody sx={{backgroundColor: "#ebecff"}}>
+          {tabledata?(tabledata.map((row) => {
+       
             let swap = translateToken(row)
             let time = translateTime(row)
+            let index = tabledata.indexOf(row)
             
             return(
             <TableRow
@@ -307,19 +317,25 @@ console.log("result",result)
               <TableCell align="right">{swap.tokenToBuy}</TableCell>
               <TableCell align="right">{row.amount}</TableCell>
               <TableCell align="right">{time.timeInterval}</TableCell>
-              <TableCell><Button onClick={()=>handleCancel(row.buyId)} variant='contained' color="error">Cancel</Button></TableCell>
+              <TableCell><Button onClick={()=>handleCancel(buyIds[index])} variant='contained' color="error">Cancel</Button></TableCell>
             </TableRow>)
-          })):<div></div>}
+          })):null}
         </TableBody>
       </Table>
     </TableContainer>
-
-
-
-    </Card>:<Box display="flex"
-                alignItems="center"
-                justifyContent="center" 
-                sx={{marginTop:'20px'}}> <CircularProgress/></Box>
+    </Card></Slide>:
+        <Box display="flex"
+        alignItems="center"
+        justifyContent="center" 
+        sx={{marginTop:'20px',marginBottom:'10px'}}> <CircularProgress sx={{color:"white"}}/></Box>:
+    <Box display="flex"
+        alignItems="center"
+        justifyContent="center" 
+        sx={{marginTop:'20px',marginBottom:'10px'}}> <CircularProgress sx={{color:"white"}}/></Box>:
+        <Box display="flex"
+              alignItems="center"
+              justifyContent="center" 
+              sx={{marginTop:'20px',marginBottom:'10px'}}> <CircularProgress sx={{color:"white"}}/></Box>
 }
         <Snackbar
         anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}

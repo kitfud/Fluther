@@ -1,6 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+import {Test} from "forge-std/Test.sol";
+import {Deploy} from "../../script/Deploy.s.sol";
+import {DeployMocks} from "../../script/DeployMocks.s.sol";
+import {HelperConfig} from "../../script/HelperConfig.s.sol";
+import {AutomationLayer} from "../../src/AutomationLayer.sol";
+=======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 /** @author @EWCunha
  *  @title DollarCostAverage smart contract unit test
  */
@@ -9,8 +19,12 @@ import {Test, console} from "forge-std/Test.sol";
 import {Deploy} from "../../script/Deploy.s.sol";
 import {DeployMocks} from "../../script/DeployMocks.s.sol";
 import {HelperConfig} from "../../script/HelperConfig.s.sol";
-import {AutomationLayer} from "../../src/AutomationLayer.sol";
+import {AutomationLayer, IAutomationLayer} from "../../src/AutomationLayer.sol";
 import {IDEXRouter} from "../../src/interfaces/IDEXRouter.sol";
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 import {Security} from "../../src/Security.sol";
 import {DollarCostAverage, IDollarCostAverage} from "../../src/DollarCostAverage.sol";
 import {ERC20Mock} from "@openzeppelin/contracts/mocks/ERC20Mock.sol";
@@ -27,7 +41,14 @@ contract DollarCostAverageTest is Test {
     address wrapNative;
     address signer;
     address duhToken;
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
     ERC20Mock anotherToken;
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+    ERC20Mock anotherToken;
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
     address public user = makeAddr("user");
     address public PAYMENT_INTERFACE = makeAddr("userInterface");
@@ -42,11 +63,19 @@ contract DollarCostAverageTest is Test {
     /// Events to test
     /// -----------------------------------------------------------------------
 
+<<<<<<< HEAD
+<<<<<<< HEAD
     event RecurringBuyCreated(
         uint256 indexed recBuyId,
         address indexed sender,
         IDollarCostAverage.RecurringBuy buy
     );
+=======
+    event RecurringBuyCreated(uint256 indexed recBuyId, address indexed sender);
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+    event RecurringBuyCreated(uint256 indexed recBuyId, address indexed sender);
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
     event RecurringBuyCancelled(
         uint256 indexed recBuyId,
@@ -74,6 +103,11 @@ contract DollarCostAverageTest is Test {
         bool acceptingRecurringBuys
     );
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     event FeeSet(address indexed caller, uint256 fee);
 
     event ContractFeeShareSet(address indexed caller, uint256 contractFeeShare);
@@ -85,6 +119,16 @@ contract DollarCostAverageTest is Test {
 
     event DuhTokenSet(address indexed caller, address indexed duh);
 
+    event ERC20AllowedSet(
+        address indexed caller,
+        address indexed token,
+        bool isAllowed
+    );
+
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     /// -----------------------------------------------------------------------
     /// Tests set-up
     /// -----------------------------------------------------------------------
@@ -98,17 +142,39 @@ contract DollarCostAverageTest is Test {
         config = deployer.config();
         defaultRouter = deployer.defaultRouter();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+        (address wNative, , address duh, , , , , , uint256 deployerPk) = config
+            .activeNetworkConfig();
+        wrapNative = wNative;
+        signer = vm.addr(deployerPk);
+        duhToken = duh;
+=======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         (address wNative, , , , , , , , uint256 deployerPk) = config
             .activeNetworkConfig();
         wrapNative = wNative;
         signer = vm.addr(deployerPk);
         duhToken = address(deployer.duh());
         anotherToken = new ERC20Mock();
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
         vm.deal(user, INITAL_USER_FUNDS);
         if (block.chainid == 11155111) {
             vm.prank(user);
+<<<<<<< HEAD
+<<<<<<< HEAD
+            wNative.call{value: 1 ether}("");
+=======
             wrapNative.call{value: 50 ether}("");
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+            wrapNative.call{value: 50 ether}("");
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
             DeployMocks mocksDeployer = new DeployMocks();
             mocksDeployer.run();
@@ -118,6 +184,11 @@ contract DollarCostAverageTest is Test {
             token2 = deployer.token2() == address(0)
                 ? address(mocksDeployer.uni())
                 : deployer.token2();
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
             vm.prank(signer);
             ERC20Mock(duhToken).mint(user, 50 ether);
@@ -149,6 +220,10 @@ contract DollarCostAverageTest is Test {
                 block.timestamp
             );
             vm.stopPrank();
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         } else {
             token1 = deployer.token1();
             token2 = deployer.token2();
@@ -160,6 +235,22 @@ contract DollarCostAverageTest is Test {
         ERC20Mock(token1).mint(defaultRouter, INITAL_DEX_ERC20_FUNDS);
         ERC20Mock(token2).mint(defaultRouter, INITAL_DEX_ERC20_FUNDS);
         ERC20Mock(token1).mint(user, INITAL_USER_ERC20_FUNDS);
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+
+        vm.startPrank(signer);
+        dca.setAllowedERC20s(token1, true);
+        dca.setAllowedERC20s(token2, true);
+        dca.setAllowedERC20s(wrapNative, true);
+        dca.setAllowedERC20s(address(anotherToken), true);
+        vm.stopPrank();
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     }
 
     /// -----------------------------------------------------------------------
@@ -199,6 +290,8 @@ contract DollarCostAverageTest is Test {
         vm.stopBroadcast();
     }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
     function testConstructorRevertsIfAutomationLayerAddressIs0() public {
         (, address defaultRouter_, , , , , , , ) = config.activeNetworkConfig();
         address automationLayer = address(0);
@@ -218,11 +311,23 @@ contract DollarCostAverageTest is Test {
         vm.stopBroadcast();
     }
 
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     /// -----------------------------------------------------------------------
     /// Test for: createRecurringBuy
     /// -----------------------------------------------------------------------
 
+<<<<<<< HEAD
+<<<<<<< HEAD
     function testCreateRecurringBuySuccess() public {
+=======
+    function testCreateRecurringBuySuccessAutomationNotZeroAddress() public {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+    function testCreateRecurringBuySuccessAutomationNotZeroAddress() public {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         uint256 amountToSpend = 1 ether;
         address tokenToSpend = token1;
         address tokenToBuy = token2;
@@ -246,6 +351,61 @@ contract DollarCostAverageTest is Test {
         IDollarCostAverage.RecurringBuy memory buy = dca.getRecurringBuy(
             currRecurringBuyId
         );
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        uint256[] memory ids = dca.getSenderToIds(user);
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+        uint256[] memory ids = dca.getSenderToIds(user);
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+
+        assertEq(buy.sender, user);
+        assertEq(buy.amountToSpend, amountToSpend);
+        assertEq(buy.tokenToSpend, tokenToSpend);
+        assertEq(buy.tokenToBuy, tokenToBuy);
+        assertEq(buy.timeIntervalInSeconds, timeIntervalInSeconds);
+        assertEq(buy.paymentInterface, paymentInterface);
+        assertEq(buy.dexRouter, dexRouter);
+        assertEq(buy.paymentDue, block.timestamp);
+        assertEq(buy.accountNumber, accountNumber);
+        assertEq(uint8(buy.status), uint8(IDollarCostAverage.Status.SET));
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+        assertEq(ids.length, 2);
+        assertEq(ids[0], 0);
+        assertEq(ids[1], 1);
+    }
+
+    function testCreateRecurringBuySuccessAutomationZeroAddress() public {
+        uint256 amountToSpend = 1 ether;
+        address tokenToSpend = token1;
+        address tokenToBuy = token2;
+        uint256 timeIntervalInSeconds = 2 minutes;
+        address paymentInterface = address(0);
+        address dexRouter = defaultRouter;
+        vm.prank(signer);
+        dca.setAutomationLayer(address(0));
+
+        vm.prank(user);
+        dca.createRecurringBuy(
+            amountToSpend,
+            tokenToSpend,
+            tokenToBuy,
+            timeIntervalInSeconds,
+            paymentInterface,
+            dexRouter
+        );
+
+        uint256 currRecurringBuyId = dca.getNextRecurringBuyId() - 1;
+        uint256 accountNumber = 0;
+
+        IDollarCostAverage.RecurringBuy memory buy = dca.getRecurringBuy(
+            currRecurringBuyId
+        );
         uint256[] memory ids = dca.getSenderToIds(user);
 
         assertEq(buy.sender, user);
@@ -261,6 +421,10 @@ contract DollarCostAverageTest is Test {
         assertEq(ids.length, 2);
         assertEq(ids[0], 0);
         assertEq(ids[1], 1);
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     }
 
     function testCreateRecurringBuyEvent() public {
@@ -275,6 +439,8 @@ contract DollarCostAverageTest is Test {
         path[1] = tokenToBuy;
         uint256 nextRecurringBuyId = dca.getNextRecurringBuyId();
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         IDollarCostAverage.RecurringBuy memory buy = IDollarCostAverage
             .RecurringBuy(
                 user,
@@ -293,6 +459,14 @@ contract DollarCostAverageTest is Test {
 
         vm.expectEmit(true, true, false, true, address(dca));
         emit RecurringBuyCreated(nextRecurringBuyId, user, buy);
+=======
+        vm.expectEmit(true, true, false, true, address(dca));
+        emit RecurringBuyCreated(nextRecurringBuyId, user);
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+        vm.expectEmit(true, true, false, true, address(dca));
+        emit RecurringBuyCreated(nextRecurringBuyId, user);
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
         vm.prank(user);
         dca.createRecurringBuy(
@@ -356,7 +530,15 @@ contract DollarCostAverageTest is Test {
         );
     }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
     function testCreateRecurringBuyRevertsIfEitherTokenIs0() public {
+=======
+    function testCreateRecurringBuyRevertsIfEitherTokenIsInvalid() public {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+    function testCreateRecurringBuyRevertsIfEitherTokenIsInvalid() public {
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         uint256 amountToSpend = 1 ether;
         address tokenToSpend = address(0);
         address tokenToBuy = token2;
@@ -392,6 +574,31 @@ contract DollarCostAverageTest is Test {
             paymentInterface,
             dexRouter
         );
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+
+        tokenToSpend = token1;
+        tokenToBuy = token1;
+
+        vm.prank(user);
+        vm.expectRevert(
+            IDollarCostAverage.DollarCostAverage__InvalidTokenAddresses.selector
+        );
+        dca.createRecurringBuy(
+            amountToSpend,
+            tokenToSpend,
+            tokenToBuy,
+            timeIntervalInSeconds,
+            paymentInterface,
+            dexRouter
+        );
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     }
 
     function testCreateRecurringBuyRevertsIfTimeIntervalIs0() public {
@@ -464,24 +671,111 @@ contract DollarCostAverageTest is Test {
         _;
     }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
     function testCancelRecurringPaymentSuccess()
+=======
+    function testCancelRecurringPaymentSuccessAutomationNotZeroAddress()
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+    function testCancelRecurringPaymentSuccessAutomationNotZeroAddress()
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+        public
+        createRecurringBuy(token1, token2, address(0))
+    {
+        uint256 currRecurringBuyId = dca.getNextRecurringBuyId() - 1;
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+        uint256[] memory idsBefore = dca.getSenderToIds(user);
+
+        IDollarCostAverage.RecurringBuy memory buyBefore = dca.getRecurringBuy(
+            currRecurringBuyId
+        );
+        IAutomationLayer.Account memory accountBefore = automation.getAccount(
+            buyBefore.accountNumber
+        );
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+
+        vm.prank(user);
+        dca.cancelRecurringPayment(currRecurringBuyId);
+
+<<<<<<< HEAD
+<<<<<<< HEAD
+        IDollarCostAverage.RecurringBuy memory buy = dca.getRecurringBuy(
+            currRecurringBuyId
+        );
+
+        assertEq(uint8(buy.status), uint8(IDollarCostAverage.Status.CANCELLED));
+=======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+        IDollarCostAverage.RecurringBuy memory buyAfter = dca.getRecurringBuy(
+            currRecurringBuyId
+        );
+        IAutomationLayer.Account memory accountAfter = automation.getAccount(
+            buyAfter.accountNumber
+        );
+
+        uint256[] memory idsAfter = dca.getSenderToIds(user);
+
+        assertEq(uint8(buyBefore.status), uint8(IDollarCostAverage.Status.SET));
+        assertEq(
+            uint8(accountBefore.status),
+            uint8(IAutomationLayer.Status.SET)
+        );
+        assertEq(
+            uint8(buyAfter.status),
+            uint8(IDollarCostAverage.Status.CANCELLED)
+        );
+        assertEq(
+            uint8(accountAfter.status),
+            uint8(IAutomationLayer.Status.CANCELLED)
+        );
+        assertEq(idsAfter.length, idsBefore.length - 1);
+    }
+
+    function testCancelRecurringPaymentSuccessAutomationZeroAddress()
         public
         createRecurringBuy(token1, token2, address(0))
     {
         uint256 currRecurringBuyId = dca.getNextRecurringBuyId() - 1;
         uint256[] memory idsBefore = dca.getSenderToIds(user);
+        vm.prank(signer);
+        dca.setAutomationLayer(address(0));
+
+        IDollarCostAverage.RecurringBuy memory buyBefore = dca.getRecurringBuy(
+            currRecurringBuyId
+        );
 
         vm.prank(user);
         dca.cancelRecurringPayment(currRecurringBuyId);
 
-        IDollarCostAverage.RecurringBuy memory buy = dca.getRecurringBuy(
+        IDollarCostAverage.RecurringBuy memory buyAfter = dca.getRecurringBuy(
             currRecurringBuyId
+        );
+        IAutomationLayer.Account memory account = automation.getAccount(
+            buyAfter.accountNumber
         );
 
         uint256[] memory idsAfter = dca.getSenderToIds(user);
 
-        assertEq(uint8(buy.status), uint8(IDollarCostAverage.Status.CANCELLED));
+        assertEq(uint8(buyBefore.status), uint8(IDollarCostAverage.Status.SET));
+        assertEq(
+            uint8(buyAfter.status),
+            uint8(IDollarCostAverage.Status.CANCELLED)
+        );
+        assertEq(uint8(account.status), uint8(IAutomationLayer.Status.SET));
         assertEq(idsAfter.length, idsBefore.length - 1);
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     }
 
     function testCancelRecurringPaymentEvent()
@@ -540,8 +834,18 @@ contract DollarCostAverageTest is Test {
     /// Test for: trigger
     /// -----------------------------------------------------------------------
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+    modifier transferFundsApproves() {
+        vm.startPrank(user);
+=======
     modifier transferFundsApproves(address sender) {
         vm.startPrank(sender);
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+    modifier transferFundsApproves(address sender) {
+        vm.startPrank(sender);
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         ERC20Mock(token1).approve(defaultRouter, type(uint256).max);
         ERC20Mock(token1).approve(address(dca), type(uint256).max);
         ERC20Mock(wrapNative).approve(defaultRouter, type(uint256).max);
@@ -550,13 +854,29 @@ contract DollarCostAverageTest is Test {
         _;
     }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+    function testTriggerSuccess()
+=======
     function testTriggerSuccessWhenCallerIsSender()
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+    function testTriggerSuccessWhenCallerIsSender()
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         public
         createRecurringBuy(token1, token2, address(0))
         createRecurringBuy(token1, token2, PAYMENT_INTERFACE)
         createRecurringBuy(wrapNative, token2, address(0))
         createRecurringBuy(token1, wrapNative, address(0))
+<<<<<<< HEAD
+<<<<<<< HEAD
+        transferFundsApproves
+=======
         transferFundsApproves(user)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+        transferFundsApproves(user)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     {
         // paymentInterface = address(0)
         uint256 currRecurringBuyId = dca.getNextRecurringBuyId() - 4;
@@ -668,6 +988,17 @@ contract DollarCostAverageTest is Test {
         );
         assertGt(tokenToBuyBalanceAfter, tokenToBuyBalanceBefore);
         assertEq(buy.paymentDue, currTimestamp + buy.timeIntervalInSeconds);
+<<<<<<< HEAD
+<<<<<<< HEAD
+    }
+
+    function testTrasnferFundsEvent()
+        public
+        createRecurringBuy(token1, token2, address(0))
+        transferFundsApproves
+=======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
         // tokenToSpend not token1 or token2
         anotherToken.mint(user, INITAL_USER_FUNDS);
@@ -909,10 +1240,62 @@ contract DollarCostAverageTest is Test {
         assertEq(buy.paymentDue, currTimestamp + buy.timeIntervalInSeconds);
     }
 
+    function testTriggerSuccessAutomationLayerIsZeroAddress()
+        public
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, PAYMENT_INTERFACE)
+        createRecurringBuy(wrapNative, token2, address(0))
+        createRecurringBuy(token1, wrapNative, address(0))
+        transferFundsApproves(user)
+    {
+        vm.prank(signer);
+        dca.setAutomationLayer(address(0));
+
+        address owner = dca.owner();
+        uint256 currRecurringBuyId = dca.getNextRecurringBuyId() - 4;
+
+        uint256 tokenToSpendBalanceBefore = ERC20Mock(token1).balanceOf(user);
+        uint256 tokenToBuyBalanceBefore = ERC20Mock(token2).balanceOf(user);
+        uint256 automantionBalanceBefore = ERC20Mock(token1).balanceOf(
+            address(automation)
+        );
+        uint256 ownerBalanceBefore = ERC20Mock(token1).balanceOf(owner);
+
+        vm.prank(user);
+        dca.trigger(currRecurringBuyId);
+
+        uint256 tokenToSpendBalanceAfter = ERC20Mock(token1).balanceOf(user);
+        uint256 tokenToBuyBalanceAfter = ERC20Mock(token2).balanceOf(user);
+        uint256 automantionBalanceAfter = ERC20Mock(token1).balanceOf(
+            address(automation)
+        );
+        uint256 ownerBalanceAfter = ERC20Mock(token1).balanceOf(owner);
+
+        IDollarCostAverage.RecurringBuy memory buy = dca.getRecurringBuy(
+            currRecurringBuyId
+        );
+
+        uint256 fee = (buy.amountToSpend * 100) / 10000;
+        uint256 currTimestamp = dca.getCurrentBlockTimestamp();
+
+        assertEq(
+            tokenToSpendBalanceAfter,
+            tokenToSpendBalanceBefore - (buy.amountToSpend - fee / 2)
+        );
+        assertGt(tokenToBuyBalanceAfter, tokenToBuyBalanceBefore);
+        assertEq(buy.paymentDue, currTimestamp + buy.timeIntervalInSeconds);
+        assertEq(automantionBalanceAfter, automantionBalanceBefore);
+        assertTrue(ownerBalanceAfter > ownerBalanceBefore);
+    }
+
     function testTriggerEvent()
         public
         createRecurringBuy(token1, token2, address(0))
         transferFundsApproves(user)
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     {
         uint256 currRecurringBuyId = dca.getNextRecurringBuyId() - 1;
 
@@ -931,7 +1314,15 @@ contract DollarCostAverageTest is Test {
     function testTriggerRevertsIfStatusIsNotSetOrIfPaymentIsNotDue()
         public
         createRecurringBuy(token1, token2, address(0))
+<<<<<<< HEAD
+<<<<<<< HEAD
+        transferFundsApproves
+=======
         transferFundsApproves(user)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+        transferFundsApproves(user)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     {
         uint256 currRecurringBuyId = dca.getNextRecurringBuyId() - 1;
 
@@ -954,7 +1345,15 @@ contract DollarCostAverageTest is Test {
     function testTriggerRevertsIfContractPaused()
         public
         createRecurringBuy(token1, token2, address(0))
+<<<<<<< HEAD
+<<<<<<< HEAD
+        transferFundsApproves
+=======
         transferFundsApproves(user)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+        transferFundsApproves(user)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     {
         uint256 currRecurringBuyId = dca.getNextRecurringBuyId() - 1;
 
@@ -1009,6 +1408,8 @@ contract DollarCostAverageTest is Test {
         dca.setAutomationLayer(newAutomationLayerAddress);
     }
 
+<<<<<<< HEAD
+<<<<<<< HEAD
     function testSetAutomationLayerRevertsIfGivenAddressIs0() public {
         address newAutomationLayerAddress = address(0);
 
@@ -1021,6 +1422,10 @@ contract DollarCostAverageTest is Test {
         dca.setAutomationLayer(newAutomationLayerAddress);
     }
 
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     function testSetAutomationLayerRevertsIfCallerNotAllowed() public {
         address newAutomationLayerAddress = makeAddr("newAutomationLayer");
 
@@ -1148,6 +1553,11 @@ contract DollarCostAverageTest is Test {
     }
 
     /// -----------------------------------------------------------------------
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     /// Test for: setFee
     /// -----------------------------------------------------------------------
 
@@ -1342,6 +1752,66 @@ contract DollarCostAverageTest is Test {
     }
 
     /// -----------------------------------------------------------------------
+    /// Test for: setAllowedERC20s
+    /// -----------------------------------------------------------------------
+
+    function testSetAllowedERC20sSuccess() public {
+        address newDuh = makeAddr("duh");
+
+        address duhBefore = dca.getDuh();
+
+        vm.prank(signer);
+        dca.setDuh(newDuh);
+
+        address duhAfter = dca.getDuh();
+
+        assertEq(duhBefore, address(duhToken));
+        assertEq(duhAfter, newDuh);
+    }
+
+    function testSetAllowedERC20sEvent() public {
+        address newDuh = makeAddr("duh");
+
+        vm.expectEmit(true, false, false, true, address(dca));
+        emit DuhTokenSet(signer, newDuh);
+
+        vm.prank(signer);
+        dca.setDuh(newDuh);
+    }
+
+    function testSetAllowedERC20sRevertsIfCallerNotAllowed() public {
+        address newDuh = makeAddr("duh");
+
+        vm.prank(user);
+        vm.expectRevert(Security.Security__NotAllowed.selector);
+        dca.setDuh(newDuh);
+    }
+
+    function testSetAllowedERC20sRevertsIfContractPaused() public {
+        address newDuh = makeAddr("duh");
+
+        vm.startPrank(signer);
+        dca.pause();
+        vm.expectRevert("Pausable: paused");
+        dca.setDuh(newDuh);
+        vm.stopPrank();
+    }
+
+    function testSetAllowedERC20sRevertsIfTokenIsAddress0() public {
+        address newDuh = address(0);
+
+        vm.prank(signer);
+        vm.expectRevert(
+            IDollarCostAverage.DollarCostAverage__InvalidTokenAddresses.selector
+        );
+        dca.setDuh(newDuh);
+    }
+
+    /// -----------------------------------------------------------------------
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     /// Test for: getNextRecurringBuyId
     /// -----------------------------------------------------------------------
 
@@ -1381,7 +1851,15 @@ contract DollarCostAverageTest is Test {
     function testCheckTriggerSuccess()
         public
         createRecurringBuy(token1, token2, address(0))
+<<<<<<< HEAD
+<<<<<<< HEAD
+        transferFundsApproves
+=======
         transferFundsApproves(user)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+        transferFundsApproves(user)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     {
         uint256 recurringBuyId = dca.getNextRecurringBuyId() - 1;
         bool canAutomate = dca.checkTrigger(recurringBuyId);
@@ -1406,7 +1884,15 @@ contract DollarCostAverageTest is Test {
     function testCheckTriggerFalsePath2()
         public
         createRecurringBuy(token1, token2, address(0))
+<<<<<<< HEAD
+<<<<<<< HEAD
+        transferFundsApproves
+=======
         transferFundsApproves(user)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+        transferFundsApproves(user)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     {
         uint256 recurringBuyId = dca.getNextRecurringBuyId() - 1;
 
@@ -1591,7 +2077,15 @@ contract DollarCostAverageTest is Test {
         createRecurringBuy(token1, token2, address(0))
         createRecurringBuy(token1, token2, address(0))
         createRecurringBuy(token1, token2, address(0))
+<<<<<<< HEAD
+<<<<<<< HEAD
+        transferFundsApproves
+=======
         transferFundsApproves(user)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+        transferFundsApproves(user)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     {
         vm.prank(user);
         dca.cancelRecurringPayment(2);
@@ -1611,7 +2105,15 @@ contract DollarCostAverageTest is Test {
         createRecurringBuy(token1, token2, address(0))
         createRecurringBuy(token1, token2, address(0))
         createRecurringBuy(token1, token2, address(0))
+<<<<<<< HEAD
+<<<<<<< HEAD
+        transferFundsApproves
+=======
         transferFundsApproves(user)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+        transferFundsApproves(user)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     {
         vm.prank(user);
         dca.cancelRecurringPayment(2);
@@ -1628,6 +2130,11 @@ contract DollarCostAverageTest is Test {
     }
 
     /// -----------------------------------------------------------------------
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     /// Test for: getFee
     /// -----------------------------------------------------------------------
 
@@ -1687,6 +2194,19 @@ contract DollarCostAverageTest is Test {
     }
 
     /// -----------------------------------------------------------------------
+    /// Test for: getAllowedERC20s
+    /// -----------------------------------------------------------------------
+
+    function testGetAllowedERC20s() public {
+        assertTrue(dca.getAllowedERC20s(token1));
+        assertTrue(!dca.getAllowedERC20s(msg.sender));
+    }
+
+    /// -----------------------------------------------------------------------
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     /// Test for: isRecurringBuyValid
     /// -----------------------------------------------------------------------
 
@@ -1699,7 +2219,15 @@ contract DollarCostAverageTest is Test {
         createRecurringBuy(token1, token2, address(0))
         createRecurringBuy(token1, token2, address(0))
         createRecurringBuy(token1, token2, address(0))
+<<<<<<< HEAD
+<<<<<<< HEAD
+        transferFundsApproves
+=======
         transferFundsApproves(user)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+        transferFundsApproves(user)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     {
         uint256 recurringBuyId = 1;
         bool isValid = dca.isRecurringBuyValid(recurringBuyId);
@@ -1716,7 +2244,15 @@ contract DollarCostAverageTest is Test {
         createRecurringBuy(token1, token2, address(0))
         createRecurringBuy(token1, token2, address(0))
         createRecurringBuy(token1, token2, address(0))
+<<<<<<< HEAD
+<<<<<<< HEAD
+        transferFundsApproves
+=======
         transferFundsApproves(user)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+        transferFundsApproves(user)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     {
         uint256 recurringBuyId = 1;
 
@@ -1737,7 +2273,15 @@ contract DollarCostAverageTest is Test {
         createRecurringBuy(token1, token2, address(0))
         createRecurringBuy(token1, token2, address(0))
         createRecurringBuy(token1, token2, address(0))
+<<<<<<< HEAD
+<<<<<<< HEAD
+        transferFundsApproves
+=======
         transferFundsApproves(user)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+        transferFundsApproves(user)
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     {
         uint256 recurringBuyId = 1;
 
@@ -1798,4 +2342,57 @@ contract DollarCostAverageTest is Test {
 
         assertEq(isValid, false);
     }
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+
+    /// -----------------------------------------------------------------------
+    /// Test for: getRecurringBuysFromUser
+    /// -----------------------------------------------------------------------
+
+    function testGetRecurringBuysFromUser()
+        public
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+        createRecurringBuy(token1, token2, address(0))
+    {
+        (
+            uint256[] memory recBuyIds,
+            IDollarCostAverage.RecurringBuy[] memory recBuys
+        ) = dca.getRecurringBuysFromUser(user);
+
+        assertEq(recBuys.length, recBuyIds.length);
+        assertEq(
+            uint8(recBuys[0].status),
+            uint8(IDollarCostAverage.Status.UNSET)
+        );
+        assertEq(
+            uint8(recBuys[1].status),
+            uint8(IDollarCostAverage.Status.SET)
+        );
+        assertEq(
+            uint8(recBuys[2].status),
+            uint8(IDollarCostAverage.Status.SET)
+        );
+        assertEq(
+            uint8(recBuys[3].status),
+            uint8(IDollarCostAverage.Status.SET)
+        );
+        assertEq(
+            uint8(recBuys[4].status),
+            uint8(IDollarCostAverage.Status.SET)
+        );
+        assertEq(
+            uint8(recBuys[5].status),
+            uint8(IDollarCostAverage.Status.SET)
+        );
+    }
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 }

@@ -35,8 +35,8 @@ contract HelperConfig is Script {
         0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
 
     constructor() {
-        if (block.chainid == 11155111) {
-            activeNetworkConfig = getSepoliaConfig();
+        if (block.chainid == 11155111 || block.chainid == 59140) {
+            activeNetworkConfig = getTestnetConfig();
         } else if (block.chainid == 1 || block.chainid == 137) {
             activeNetworkConfig = getMainnetConfig();
         } else {
@@ -63,10 +63,16 @@ contract HelperConfig is Script {
             });
     }
 
-    function getSepoliaConfig() internal view returns (NetworkConfig memory) {
+    function getTestnetConfig() internal view returns (NetworkConfig memory) {
+        address wrapNative = address(0);
+        if (block.chainid == 11155111) {
+            wrapNative = 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9; //0xD0dF82dE051244f04BfF3A8bB1f62E1cD39eED92
+        } else if (block.chainid == 59140) {
+            wrapNative = 0x2C1b868d6596a18e32E61B901E4060C872647b6C;
+        }
         return
             NetworkConfig({
-                wrapNative: 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9, //0xD0dF82dE051244f04BfF3A8bB1f62E1cD39eED92,
+                wrapNative: wrapNative,
                 defaultRouter: 0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008,
                 // duhToken: DevOpsTools.get_most_recent_deployment(
                 //     "Duh",

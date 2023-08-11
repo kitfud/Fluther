@@ -1,4 +1,11 @@
 {
+    "PriceFeed": {
+        "address": {
+            "sepolia": {
+                "ETHUSD": "0xD46A6bC8a7219AE21E2f9DaF93eEce945fdBA623"
+            }
+        }
+    },
     "Liquidity": {
         "address": {
             "sepolia": "0xD3Ce19025A1762fAf5F013D052cAF6721ca6C1CF"
@@ -16,7 +23,7 @@
     },
     "DollarCostAverage": {
         "address": {
-            "sepolia": "0xf55E52bEb2EBa42AB68e66Dd50305F8F7D51082B"
+            "sepolia": "0xf0EF015fDeFB728840a7407521b1a9806aff0ef2"
         },
         "abi": [
             {
@@ -250,6 +257,31 @@
                         "type": "address"
                     },
                     {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "token",
+                        "type": "address"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "bool",
+                        "name": "isAllowed",
+                        "type": "bool"
+                    }
+                ],
+                "name": "ERC20AllowedSet",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "address",
+                        "name": "caller",
+                        "type": "address"
+                    },
+                    {
                         "indexed": false,
                         "internalType": "uint256",
                         "name": "fee",
@@ -349,74 +381,6 @@
                         "internalType": "address",
                         "name": "sender",
                         "type": "address"
-                    },
-                    {
-                        "components": [
-                            {
-                                "internalType": "address",
-                                "name": "sender",
-                                "type": "address"
-                            },
-                            {
-                                "internalType": "uint256",
-                                "name": "amountToSpend",
-                                "type": "uint256"
-                            },
-                            {
-                                "internalType": "address",
-                                "name": "tokenToSpend",
-                                "type": "address"
-                            },
-                            {
-                                "internalType": "address",
-                                "name": "tokenToBuy",
-                                "type": "address"
-                            },
-                            {
-                                "internalType": "uint256",
-                                "name": "timeIntervalInSeconds",
-                                "type": "uint256"
-                            },
-                            {
-                                "internalType": "address",
-                                "name": "paymentInterface",
-                                "type": "address"
-                            },
-                            {
-                                "internalType": "address",
-                                "name": "dexRouter",
-                                "type": "address"
-                            },
-                            {
-                                "internalType": "uint256",
-                                "name": "paymentDue",
-                                "type": "uint256"
-                            },
-                            {
-                                "internalType": "uint256",
-                                "name": "accountNumber",
-                                "type": "uint256"
-                            },
-                            {
-                                "internalType": "address[]",
-                                "name": "path",
-                                "type": "address[]"
-                            },
-                            {
-                                "internalType": "uint256",
-                                "name": "index",
-                                "type": "uint256"
-                            },
-                            {
-                                "internalType": "enum IDollarCostAverage.Status",
-                                "name": "status",
-                                "type": "uint8"
-                            }
-                        ],
-                        "indexed": false,
-                        "internalType": "struct IDollarCostAverage.RecurringBuy",
-                        "name": "buy",
-                        "type": "tuple"
                     }
                 ],
                 "name": "RecurringBuyCreated",
@@ -546,6 +510,25 @@
                     }
                 ],
                 "name": "getAllowed",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "token",
+                        "type": "address"
+                    }
+                ],
+                "name": "getAllowedERC20s",
                 "outputs": [
                     {
                         "internalType": "bool",
@@ -822,6 +805,92 @@
                         "type": "address"
                     }
                 ],
+                "name": "getRecurringBuysFromUser",
+                "outputs": [
+                    {
+                        "internalType": "uint256[]",
+                        "name": "",
+                        "type": "uint256[]"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "address",
+                                "name": "sender",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "amountToSpend",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "tokenToSpend",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "tokenToBuy",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "timeIntervalInSeconds",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "paymentInterface",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "dexRouter",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "paymentDue",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "accountNumber",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "address[]",
+                                "name": "path",
+                                "type": "address[]"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "index",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "enum IDollarCostAverage.Status",
+                                "name": "status",
+                                "type": "uint8"
+                            }
+                        ],
+                        "internalType": "struct IDollarCostAverage.RecurringBuy[]",
+                        "name": "",
+                        "type": "tuple[]"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "sender",
+                        "type": "address"
+                    }
+                ],
                 "name": "getSenderToIds",
                 "outputs": [
                     {
@@ -1050,6 +1119,24 @@
                     }
                 ],
                 "name": "setAllowed",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "token",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isAllowed",
+                        "type": "bool"
+                    }
+                ],
+                "name": "setAllowedERC20s",
                 "outputs": [],
                 "stateMutability": "nonpayable",
                 "type": "function"
