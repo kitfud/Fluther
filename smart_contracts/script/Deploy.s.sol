@@ -46,7 +46,6 @@ contract Deploy is Script {
         token2 = token2_;
         defaultRouter = defaultRouter_;
         duh = Duh(duhToken);
-
         vm.startBroadcast(deployerKey);
         if (DEPLOY_DUH) {
             duh = new Duh();
@@ -55,6 +54,7 @@ contract Deploy is Script {
 
         if (DEPLOY_AUTOMATION) {
             automation = new AutomationLayer(
+                address(duh) == address(0) ? duhToken : address(duh),
                 duhToken,
                 minimumDuh,
                 address(0),
@@ -77,6 +77,7 @@ contract Deploy is Script {
                 defaultRouter,
                 address(automation),
                 wrapNative,
+                address(duh) == address(0) ? duhToken : address(duh),
                 duhToken
             );
         }
