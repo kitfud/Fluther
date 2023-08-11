@@ -231,8 +231,10 @@ const address = useAddress();
 
   
   useEffect(() => {
+    if(provider){
     console.log("UPDATING ETHERS")
     updateEthers()
+    }
   },[])
 
   useEffect(()=>{
@@ -801,9 +803,10 @@ const handleMusic =(event)=>{
             </Box>
         </Slide>
 
+
           {/* MAIN CARD */}
           <Slide direction="left" in={true} mountOnEnter>
-          <Card 
+         <Card 
             variant="outlined"
             sx={{ 
               
@@ -1109,8 +1112,9 @@ const handleMusic =(event)=>{
                 }}>
               </Box>
             }    
-          </Card></Slide>
-          
+          </Card>
+          </Slide>
+
           {
           wethbalance!==null && address !== null?
           <>
@@ -1176,7 +1180,7 @@ const handleMusic =(event)=>{
             </Box>
           </>:null
           }
-      
+        
       <Snackbar
         anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
         open={openSnackbar}
@@ -1210,11 +1214,14 @@ const handleMusic =(event)=>{
       address={address}/> 
       </Box>
        </Zoom>
-       
+
         </Grid>      
       </ThemeProvider>
+
     </>
+        
   );
+        
 }
 
 export default App;
