@@ -231,10 +231,10 @@ const address = useAddress();
 
   
   useEffect(() => {
-    if(provider){
+  
     console.log("UPDATING ETHERS")
     updateEthers()
-    }
+    
   },[])
 
   useEffect(()=>{
