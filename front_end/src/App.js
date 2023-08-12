@@ -118,6 +118,8 @@ const fountainModalStyle = {
   right: '0%',
   width: 400,
 };
+
+//audio from benfreesounds-> https://www.bensound.com/
 const audio = new Audio(Tenderness)
 audio.load()
 
@@ -234,6 +236,7 @@ const address = useAddress();
     
     console.log("UPDATING ETHERS")
     updateEthers()
+    
     
   },[])
 
@@ -804,7 +807,9 @@ const handleMusic =(event)=>{
         </Slide>
 
 
+
           {/* MAIN CARD */}
+          {address?
           <Slide direction="left" in={true} mountOnEnter>
          <Card 
             variant="outlined"
@@ -1113,10 +1118,10 @@ const handleMusic =(event)=>{
               </Box>
             }    
           </Card>
-          </Slide>
-
+          </Slide>:null
+}
           {
-          wethbalance!==null && address !== null?
+          wethbalance!==null && address !== null && address?
           <>
             <Box 
               sx={{
@@ -1194,13 +1199,16 @@ const handleMusic =(event)=>{
           <Typography color="black">Success! Click for Transaction:${txHash} on Etherscan</Typography>
         </a>
         </Snackbar>
+
+    {address?
         <Box >
         <FormControlLabel 
         sx={{color:'white'}}
         control={<Switch checked={checked} onChange={handleChange} />}
         label="Display User Agreements"
       />
-        </Box>
+        </Box>:null
+}
      
       <Zoom in={checked}>
       <Box>
