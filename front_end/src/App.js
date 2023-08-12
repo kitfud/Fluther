@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import './App.css';
-import { ConnectWallet } from "@thirdweb-dev/react";
-import { useAddress } from "@thirdweb-dev/react";
+import { ConnectWallet,useAddress,useChainId,useConnectionStatus} from "@thirdweb-dev/react";
 import { ThemeProvider, createTheme } from '@mui/material';
+import TestNetPrompt from './components/TestNetPrompt';
+
 import {Snackbar,
   CircularProgress, 
   Grid, 
@@ -46,6 +47,8 @@ import Tenderness from './audio/tenderness.mp3'
 
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import TokenFountain from './components/TokenFountain'
+import LandingPageElement from './components/LandingPageElement';
+
 
 
 const theme = createTheme({
@@ -124,6 +127,13 @@ const audio = new Audio(Tenderness)
 audio.load()
 
 function App() {
+
+  const chainId = useChainId()
+
+
+  //Sepolia chain ID 11155111
+  const workingChain = 11155111
+
   const [amount, setAmount] = useState("")
   const [token1,setToken1] = useState("")
   const [token2,setToken2] = useState("")
@@ -231,17 +241,33 @@ const address = useAddress();
     loadFull(main);
   },[])
 
+  const [appfullyrendered, setAppFullyRendered] = useState(null)
   
   useEffect(() => {
+  
     
+    if(address && chainId==workingChain){
     console.log("UPDATING ETHERS")
     updateEthers()
-    
+    setAppFullyRendered(true)
+    }
     
   },[])
 
   useEffect(()=>{
-if(pricefeedcontract){
+//to reload the page if user shifts wallet network when app loaded well first time
+    if(appfullyrendered && chainId !=workingChain){
+      window.location.reload()
+    }
+
+if(address && chainId==workingChain){
+  updateEthers()
+  setAppFullyRendered(true)
+}
+  },[chainId])
+
+  useEffect(()=>{
+if(pricefeedcontract && address && chainId==workingChain){
 getCurrentExchangePrice()
 }
   },[pricefeedcontract])
@@ -263,7 +289,9 @@ const getCurrentExchangePrice = async()=>{
 
 
   useEffect(()=>{
-  
+  if(chainId==workingChain){
+  updateEthers()
+  }
  if(provider !=null){
     checkAllowance()
  }
@@ -271,7 +299,7 @@ const getCurrentExchangePrice = async()=>{
 
   useEffect(()=>{
     let balanceCheck
-    if(signer !=null && erc20contract && address){
+    if(signer !=null && erc20contract && address && chainId==workingChain){
     
     balanceCheck= setInterval(()=>{checkAllowance()},1000)
     }
@@ -303,10 +331,9 @@ const getCurrentExchangePrice = async()=>{
   },[allowance])
 
   useEffect(() => {
-    console.log("token",wethtoken)
-    console.log("address",address)
+  
   let tokenCheckInterval
-  if(wethtoken&& provider && address!==null && address !== undefined){
+  if(wethtoken&& provider && address!==null && address !== undefined && chainId==workingChain){
     try{
     checkTokenBalance()
     tokenCheckInterval = setInterval(()=>{
@@ -323,7 +350,7 @@ const getCurrentExchangePrice = async()=>{
 
 
   useEffect(() => {
-    if(provider !== null){
+    if(provider !== null && address && chainId==workingChain){
 
 //price feed contract object is made below
       setPriceFeedContract(new ethers.Contract(smartContracts.PriceFeed.address.sepolia.ETHUSD,PriceFeedABI.sepolia,provider))  
@@ -381,14 +408,11 @@ return ()=>clearTimeout(colorChange)
       key
     );
  
-setInfuraProvider(infuraTempProvider)
+    setInfuraProvider(infuraTempProvider)
    
     
-    // const Metaprovider = new ethers.providers.Web3Provider(window.ethereum);
-    const tempSigner =tempProvider.getSigner();
-    // const tempSigner = new ethers.Wallet(process.env.REACT_APP_SIGNER_PRIVATE_KEY, tempProvider);
  
-    
+    const tempSigner =tempProvider.getSigner(); 
     setSigner(tempSigner);
     setDataLoad(true)
   
@@ -705,8 +729,9 @@ const handleMusic =(event)=>{
 
 
   return (
-    <>
 
+    <>
+    
       <Particles
         id="particles_stuff"
         options={particlesOptions}
@@ -727,19 +752,23 @@ const handleMusic =(event)=>{
   }
 
 
+{address && chainId==workingChain?
 <Box className="tooltip" sx={{position:'fixed', right:'3%', marginTop:'1%'}}>
 <span className="tooltiptextBank" > Click For Test WETH Faucet</span>
 <Fab onClick={handleOpenFountain} color = "primary" >
     <AttachMoneyIcon/>
 </Fab>
-</Box>
+</Box>:null
+}
 
 <Modal
   open={openFountain}
   onClose = {handleCloseFountain}
  
 >
+  
   <Box  sx={fountainModalStyle}>
+ 
   <TokenFountain provider={provider} 
   signer={signer} 
   address={address} 
@@ -747,10 +776,7 @@ const handleMusic =(event)=>{
   theme={theme}/>
   </Box>
 
-
 </Modal>
-
-
       <Modal
         open={open}
         onClose={handleModalClose}
@@ -810,6 +836,7 @@ const handleMusic =(event)=>{
 
           {/* MAIN CARD */}
           {address?
+          chainId==workingChain?
           <Slide direction="left" in={true} mountOnEnter>
          <Card 
             variant="outlined"
@@ -1118,10 +1145,12 @@ const handleMusic =(event)=>{
               </Box>
             }    
           </Card>
-          </Slide>:null
+          </Slide>:<TestNetPrompt/>
+          :
+          <LandingPageElement/>
 }
           {
-          wethbalance!==null && address !== null && address?
+          wethbalance!==null && address !== null && address && chainId==11155111?
           <>
             <Box 
               sx={{
@@ -1200,7 +1229,7 @@ const handleMusic =(event)=>{
         </a>
         </Snackbar>
 
-    {address?
+    {address && chainId==11155111?
         <Box >
         <FormControlLabel 
         sx={{color:'white'}}
@@ -1219,7 +1248,10 @@ const handleMusic =(event)=>{
       cancelOccur = {cancelOccur} balance={ethbalance} 
       signer={signer} contract={dollarCostAverageContract} 
       provider={provider} 
-      address={address}/> 
+      address={address}
+      chainId={chainId}
+      workingChain={workingChain}
+      /> 
       </Box>
        </Zoom>
 
@@ -1227,9 +1259,10 @@ const handleMusic =(event)=>{
       </ThemeProvider>
 
     </>
-        
-  );
-        
+  
+
+  )
+ 
 }
 
 export default App;

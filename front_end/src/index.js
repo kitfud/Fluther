@@ -5,12 +5,15 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { ThirdwebProvider } from "@thirdweb-dev/react";
 
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 const activeChain = "ethereum";
 
 root.render(
+
   <React.StrictMode>
-      <ThirdwebProvider activeChain={activeChain}>
+      <ThirdwebProvider  activeChain={activeChain}>
+     
       <App />
     </ThirdwebProvider>
   </React.StrictMode>

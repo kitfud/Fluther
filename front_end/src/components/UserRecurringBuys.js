@@ -9,7 +9,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import smartContracts from '../chain-info/smart_contracts.json'
 
 const UserRecurringBuys = ({setUpdateAgreements,updateAgreements,processingApp,
-  setCancelOccur,balance,signer,contract,provider,address}) => {
+  setCancelOccur,balance,signer,contract,provider,address,chainId,workingChain
+}) => {
 
 
 const [tabledata,setTableData] = useState(null)
@@ -148,7 +149,7 @@ const [processing, setProcessing] = useState(false)
 
     const logUserData = async () => {
 
-     if(contract && address){
+     if(contract && address && chainId ==workingChain){
       
       let userData = await contract.getRecurringBuysFromUser(address)
   
