@@ -1,8 +1,13 @@
 //import required dependencies
 
 const { automationLayerABI } = require("./ABIs/automationLayerABI");
+<<<<<<< HEAD
 const { sequencerABI } = require("./ABIs/nodeSequencerABI")
 const { dollarCostAverageABI } = require("./ABIs/flutherNode4ABI.js")
+=======
+const {sequencerABI} = require("./ABIs/nodeSequencerABI")
+const {dollarCostAverageABI} = require("./ABIs/flutherNode4ABI.js")
+>>>>>>> 056901f7367c7206390fe5850b20458cb8adb7f8
 const { Contract, ethers } = require("ethers");
 require("dotenv").config();
 
@@ -32,7 +37,11 @@ const timer = (ms) => new Promise((res) => setTimeout(res, ms));
 
 const init = async () => {
   //search each vault to detemine if it is near liquidation and contains a minimum balance to make it worthwhile
+<<<<<<< HEAD
   var dollarCostAverageContract = new ethers.Contract(dollarCostAverageContractAddress, dollarCostAverageABI, signer)
+=======
+var dollarCostAverageContract = new ethers.Contract(dollarCostAverageContractAddress, dollarCostAverageABI, signer)
+>>>>>>> 056901f7367c7206390fe5850b20458cb8adb7f8
   var automationLayerContract = new ethers.Contract(
     automationLayerContractAddress,
     automationLayerABI,
@@ -49,6 +58,7 @@ const init = async () => {
   console.log(getNextRecurringBuyId.toString())
 
 
+<<<<<<< HEAD
   let account = -1;
   while (account < getNextRecurringBuyId - 1) {
     account = account + 1;
@@ -107,6 +117,66 @@ const init = async () => {
       }
     }
   }
+=======
+    let account = -1;
+    while (account < getNextRecurringBuyId - 1) {
+      account = account + 1;
+
+      console.log("account", account);
+      let checkSimpleAutomation;
+      try {
+        checkSimpleAutomation = await dollarCostAverageContract.checkTrigger(account);
+      } catch (error) {
+        console.log("cannot checkSimpleAutomation", account);
+        checkSimpleAutomation = false;
+      }
+      console.log("checkSimpleAutomation", checkSimpleAutomation);
+      if (checkSimpleAutomation == true) {
+   
+          let estimateGas;
+          try {
+            estimateGas = await
+            dollarCostAverageContract.estimateGas.trigger(account)
+            ;
+          } catch (error) {
+            estimateGas == 0;
+            console.log("simpleAutomation Fails", account);
+          }
+
+         const maxFeePerGas = (await provider.getGasPrice()) * 2
+  if (estimateGas > 0){
+          
+
+          const tx = {
+            maxFeePerGas: maxFeePerGas,
+            maxPriorityFeePerGas: maxFeePerGas,
+            gasLimit: estimateGas *2,
+            nonce: await provider.getTransactionCount(wallet.address, "pending"),
+          };
+
+ 
+          const simpleAutomation = await dollarCostAverageContract.trigger(account, tx);
+          console.log("simpleAutomation", account);
+          const receipt = await simpleAutomation.wait();
+
+          if (receipt && receipt.blockNumber && receipt.status === 1) {
+            // 0 - failed, 1 - success
+            console.log(
+              ` Transaction https://sepolia.etherscan.io/tx/${receipt.transactionHash} mined, status success`
+            );
+          } else if (receipt && receipt.blockNumber && receipt.status === 0) {
+            console.log(
+              ` Transaction https://sepolia.etherscan.io/tx/${receipt.transactionHash} mined, status failed`
+            );
+          } else {
+            console.log(
+              ` Transaction https://sepolia.etherscan.io/tx/${receipt.transactionHash} not mined`
+            );
+          }
+        }
+      }
+    }
+>>>>>>> 056901f7367c7206390fe5850b20458cb8adb7f8
 
   await timer(60000);
   init();

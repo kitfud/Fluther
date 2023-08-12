@@ -237,6 +237,7 @@ const address = useAddress();
     console.log("UPDATING ETHERS")
     updateEthers()
     
+    
   },[])
 
   useEffect(()=>{
