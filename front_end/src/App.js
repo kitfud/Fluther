@@ -752,7 +752,7 @@ const handleMusic =(event)=>{
   }
 
 
-{address?
+{address && chainId==workingChain?
 <Box className="tooltip" sx={{position:'fixed', right:'3%', marginTop:'1%'}}>
 <span className="tooltiptextBank" > Click For Test WETH Faucet</span>
 <Fab onClick={handleOpenFountain} color = "primary" >
