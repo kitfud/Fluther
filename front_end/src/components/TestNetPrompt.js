@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState,useEffect } from 'react';
-import { Button,Box } from '@mui/material';
+import { Button, Box, Typography, Card } from '@mui/material';
 import {ethers} from 'ethers'
 
 const TestNetPrompt = () => {
@@ -43,16 +43,46 @@ const changeChainID = async ()=>{
 }
 
 
-  return (<>
-  <div>This is a TestNet APP- Connect TO Sepolia Network. </div>
-  <div>Edit this prompt is in components file</div>
-
-  <Box><Button variant="contained" 
-  onClick={switchNetwork}
-  color="success">CLICK TO CHANGE NETWORK</Button></Box>
-  </>
-    
-    
+  return (
+    <>
+      <Box height="100vh"
+        sx={{
+          zIndex:1,
+          display:"flex",
+          flexDirection:"column",
+          alignItems:"center",
+          backgroundColor:"",
+          width:"50%",
+        }}
+      >
+        <Card
+          sx={{
+            display:"flex",
+            flexDirection:"column",
+            justifyContent:"center",
+            alignItems:"center",
+            zIndex:2,
+            backgroundColor:"white",
+            height:"40%",
+            width:"100%",
+            border:2,
+          }}
+        >
+          <Typography>
+            <h1><center>fluther is an app built using the Sepolia test network.</center></h1>
+            <h2><center>Your wallet is not currently connected to the Sepolia test network.</center></h2>
+            <h2><center>Please click the button below to connect to Sepolia.</center></h2>
+          </Typography>
+          <Button
+            variant="contained" 
+            onClick={switchNetwork}
+            color="success"
+          >
+            Connect to Sepolia testnet
+          </Button>
+        </Card>
+      </Box>
+    </>
   )
 }
 
