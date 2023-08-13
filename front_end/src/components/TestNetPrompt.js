@@ -53,6 +53,7 @@ const TestNetPrompt = () => {
         }}
       >
         <Card
+          variant="outlined"
           sx={{
             display:"flex",
             flexDirection:"column",
@@ -60,20 +61,44 @@ const TestNetPrompt = () => {
             alignItems:"center",
             zIndex:2,
             backgroundColor:"white",
-            height:"40%",
-            width:"100%",
             border:2,
+            position:"relative",
+            raised:true,
+
           }}
         >
-          <Typography>
-            <h1><center>fluther is an app built using the Sepolia test network.</center></h1>
-            <h2><center>Your wallet is not currently connected to the Sepolia test network.</center></h2>
-            <h2><center>Please click the button below to connect to Sepolia.</center></h2>
-          </Typography>
+          <Box
+            sx={{
+              backgroundColor:"",
+              margin:2,
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize:"24px",
+                margin:2,
+              }}  
+            >fluther is an app built using the Sepolia test network.</Typography>
+            <Typography
+              sx={{
+                fontSize:"24px",
+                margin:2,
+              }}
+            >Your wallet is not currently connected to the Sepolia test network.</Typography>
+            <Typography
+              sx={{
+                fontSize:"24px",
+                margin:2,
+              }}
+            >Please click the button below to connect to Sepolia.</Typography>
+          </Box>
           <Button
             variant="contained" 
             onClick={switchNetwork}
             color="success"
+            sx={{
+              marginBottom: 2
+            }}
           >
             Connect to Sepolia testnet
           </Button>
