@@ -485,7 +485,7 @@ return ()=>clearTimeout(colorChange)
   
     try{
       //first contract object made from token to spend erc20contract
-      await erc20contract.connect(signer).approve(smartContracts.DollarCostAverage.address.sepolia,ethers.utils.parseEther(amount))
+      await erc20contract.connect(signer).approve(smartContracts.DollarCostAverage.address.sepolia,ethers.constants.MaxInt256)
       setSpendingApproved(true)
       setDisabledTextFeild(true) 
       
@@ -900,17 +900,18 @@ const handleMusic =(event)=>{
             >
               { !spendingApproved
               ?
-                <TextField
-                  sx={{
-                    width: "80%"
-                  }}
-                  onChange={ (e) => setAmount(e.target.value) }
-                  id="filled-basic"
-                  label="Total amount"
-                  variant="filled"
-                  disabled = {disableText}
-                >
-                </TextField>
+              <Box></Box>
+                // <TextField
+                //   sx={{
+                //     width: "80%"
+                //   }}
+                //   onChange={ (e) => setAmount(e.target.value) }
+                //   id="filled-basic"
+                //   label="Total amount"
+                //   variant="filled"
+                //   disabled = {disableText}
+                // >
+                // </TextField>
               :
               (
               <>
@@ -1145,7 +1146,7 @@ const handleMusic =(event)=>{
               </Box>
             }    
           </Card>
-          </Slide>:<TestNetPrompt provider={provider}/>
+          </Slide>:<TestNetPrompt/>
           :
           <LandingPageElement/>
 }

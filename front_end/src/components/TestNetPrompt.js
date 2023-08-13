@@ -3,7 +3,7 @@ import { useState,useEffect } from 'react';
 import { Button,Box } from '@mui/material';
 import {ethers} from 'ethers'
 
-const TestNetPrompt = ({provider}) => {
+const TestNetPrompt = () => {
 
 
 const switchNetwork = (event)=>{
@@ -16,14 +16,9 @@ return
 }
 }
 
-useEffect(()=>{
-console.log("PROVIDER",provider)
-},[provider])
+
 
 const changeChainID = async ()=>{
-   const networkInteger =  11155111
-   const hexaddress = ethers.utils.hexlify(networkInteger)
-   console.log("HEX",hexaddress)
 
     try {
         await window.ethereum.request({
