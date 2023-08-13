@@ -32,6 +32,7 @@ import UserRecurringBuys from './components/UserRecurringBuys';
 import ETHicon from './img/ETH.png'
 import WETHicon from './img/wETH.png'
 import UNIicon from './img/UNIicon.jpg'
+import FlutherLogo from './img/FlutherLogoWhite.png'
 
 import Particles from "react-particles"
 import { loadFull } from "tsparticles";
@@ -736,30 +737,65 @@ const handleMusic =(event)=>{
         id="particles_stuff"
         options={particlesOptions}
         init={particlesInit}
+        zIndex="-10"
       />
     
       
       <ThemeProvider theme={theme}>
 
+      <Slide direction="down" in={true} mountOnEnter>
+            <Box
+              sx={{
+                zIndex: 1,
+                backgroundColor:"",
+                opacity:"",
+                display:"flex",
+                flexDirection:"row",
+                justifyContent:"space-between",
+                alignItems: "center",
+                width:"100%",
+                height:"130px",
+                position:"relative",
+
+              }}
+            >
+            <Box sx={{backgroundColor:"", border:"", borderColor:"", marginLeft:"1%",}}>
+              <img src={FlutherLogo} height="120px" width=""/>
+            </Box>
+            
+<Box
+  sx={{
+    display:"flex",
+    flexDirection:"row-reverse",
+    justifyContent:"flex-start",
+    backgroundColor:"",
+    width:"20%",
+    marginRight:"1%",
+    alignItems:"flex-begin",
+  }}
+>
 {
   music?
-      (<Fab onClick={handleMusic} sx={{position:'fixed', marginLeft:'3%',marginTop:'1%'}} color="primary" aria-label="add">
-        <MusicNoteIcon />
+      (<Fab onClick={handleMusic} sx={{position:'', marginRight:'10%',marginTop:''}} color="primary" aria-label="add">
+        <MusicNoteIcon sx={{zIndex:"1"}} />
       </Fab>):
-      <Fab onClick={handleMusic} sx={{position:'fixed', marginLeft:'3%',marginTop:'1%'}} color="primary" aria-label="add">
-      <MusicOffIcon />
+      <Fab onClick={handleMusic} sx={{position:'', marginRight:'10%',marginTop:''}} color="primary" aria-label="add">
+      <MusicOffIcon sx={{zIndex:"1"}}/>
       </Fab>
   }
 
 
 {address && chainId==workingChain?
-<Box className="tooltip" sx={{position:'fixed', right:'3%', marginTop:'1%'}}>
+<Box className="tooltip" sx={{position:'', right:'10%', marginTop:'', zIndex:"1"}}>
 <span className="tooltiptextBank" > Click For Test WETH Faucet</span>
 <Fab onClick={handleOpenFountain} color = "primary" >
     <AttachMoneyIcon/>
 </Fab>
 </Box>:null
 }
+</Box>
+</Box>
+</Slide>
 
 <Modal
   open={openFountain}
@@ -777,6 +813,7 @@ const handleMusic =(event)=>{
   </Box>
 
 </Modal>
+
       <Modal
         open={open}
         onClose={handleModalClose}
@@ -798,25 +835,14 @@ const handleMusic =(event)=>{
           justify="center"
           style={{ minHeight: '100vh' }}
         >
-          <Slide direction="down" in={true} mountOnEnter>
-            <Box
-              sx={{
-                zIndex: 5,
-                marginTop:'2vh',
-              }}
-            >
-              <Typography fontSize="100px" color="#a939c4" fontFamily="Cherry Bomb One">
-                fluther
-              </Typography>
-            </Box>
-          </Slide>
+          
 
           {/* CONNECT WALLET BUTTON */}
           <Slide direction="down" in={true} mountOnEnter>
             <Box 
               sx={{
                 marginBottom:'10px',
-                marginTop:'2vh',
+                marginTop:'1vh',
                 zIndex: 10,
               }}
               display="flex"
@@ -1255,6 +1281,23 @@ const handleMusic =(event)=>{
       /> 
       </Box>
        </Zoom>
+
+      <Box sx={{
+        display:"flex",
+        flexDirection:"row",
+        alignItems:"center",
+        justifyContent:"center",
+        backgroundColor:"black",
+        opacity:"80%",
+        width:"100%",
+        height:"100px",
+        zIndex:5,
+      
+
+      }}>
+        <Typography color="white">footer placeholder</Typography>
+        
+      </Box>
 
         </Grid>      
       </ThemeProvider>
