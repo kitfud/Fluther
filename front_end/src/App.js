@@ -246,7 +246,7 @@ const address = useAddress();
   useEffect(() => {
   
     
-    if(address && chainId==workingChain){
+    if(address ){
     console.log("UPDATING ETHERS")
     updateEthers()
     setAppFullyRendered(true)
@@ -260,7 +260,7 @@ const address = useAddress();
       window.location.reload()
     }
 
-if(address && chainId==workingChain){
+if(address){
   updateEthers()
   setAppFullyRendered(true)
 }
@@ -1145,7 +1145,7 @@ const handleMusic =(event)=>{
               </Box>
             }    
           </Card>
-          </Slide>:<TestNetPrompt/>
+          </Slide>:<TestNetPrompt provider={provider}/>
           :
           <LandingPageElement/>
 }
