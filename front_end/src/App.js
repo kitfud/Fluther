@@ -835,13 +835,13 @@ const handleMusic =(event)=>{
       </Modal>
     
 
-        <Grid container
-       
+        <Grid
+          container
           spacing={0}
           direction="column"
           alignItems="center"
           justifyContent="center"
-          
+          width="100%"
         >
           
 
