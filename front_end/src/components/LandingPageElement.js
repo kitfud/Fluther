@@ -11,7 +11,7 @@ const LandingPageElement = () => {
       alignItems="center"
     >
 
-    <Card sx={{width:'50%',height:'50vh'}}>
+    <Card >
         <Grid
       container
       justifyContent="center"
