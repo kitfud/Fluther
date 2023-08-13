@@ -1,5 +1,6 @@
 import React from 'react'
 import { Box, Card, Typography } from "@mui/material"
+
 const LandingPageElement = () => {
   return (
     <>
@@ -34,10 +35,7 @@ const LandingPageElement = () => {
               <li>Invest with automated purchases.</li>
               <li>Live your life.</li>
             </ul>
-
             <h2><center>Click the 'Connect Wallet' button to begin.</center></h2>
-            
-            
           </Typography>
         </Card>
       </Box>
