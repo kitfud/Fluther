@@ -49,6 +49,7 @@ import Tenderness from './audio/tenderness.mp3'
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import TokenFountain from './components/TokenFountain'
 import LandingPageElement from './components/LandingPageElement';
+import Footer from './components/Footer';
 
 
 
@@ -744,10 +745,12 @@ const handleMusic =(event)=>{
       <ThemeProvider theme={theme}>
 
       <Slide direction="down" in={true} mountOnEnter>
-            <Box
+    
+    
+    <Box
               sx={{
+             
                 zIndex: 1,
-                backgroundColor:"",
                 opacity:"",
                 display:"flex",
                 flexDirection:"row",
@@ -794,6 +797,10 @@ const handleMusic =(event)=>{
 </Box>:null
 }
 </Box>
+
+
+
+
 </Box>
 </Slide>
 
@@ -829,11 +836,12 @@ const handleMusic =(event)=>{
     
 
         <Grid container
+       
           spacing={0}
           direction="column"
           alignItems="center"
-          justify="center"
-          style={{ minHeight: '100vh' }}
+          justifyContent="center"
+          
         >
           
 
@@ -926,18 +934,7 @@ const handleMusic =(event)=>{
             >
               { !spendingApproved
               ?
-              <Box></Box>
-                // <TextField
-                //   sx={{
-                //     width: "80%"
-                //   }}
-                //   onChange={ (e) => setAmount(e.target.value) }
-                //   id="filled-basic"
-                //   label="Total amount"
-                //   variant="filled"
-                //   disabled = {disableText}
-                // >
-                // </TextField>
+              null
               :
               (
               <>
@@ -1282,56 +1279,7 @@ const handleMusic =(event)=>{
       </Box>
        </Zoom>
 
-      <Box
-        sx={{
-          display:"flex",
-          flexDirection:"row",
-          alignItems:"center",
-          justifyContent:"flex-start",
-          backgroundColor:"black",
-          opacity:"80%",
-          width:"100%",
-          height:"200px",
-          zIndex:5,
-          positon: "absolute",
-          bottom: 0,
-        }}
-      >
-        <Box 
-          sx={{
-            display:"flex",
-            flexDirection:"row-reverse",
-            justifyContent:"space-around",
-            alignItems:"center",
-            width:"50%",
-            background:"",
-            marginLeft:"10%"
-          }}
-        >
-          <Button variant="contained">
-            Sign up
-          </Button>
-          <TextField
-            id="filled-basic"
-            label="Email address"
-            variant="filled"
-            
-            sx={{
-              backgroundColor:"",
-            }} 
-          />
-          
-          
-          <Typography color="white">
-            <h1>
-              Float with fluther
-            </h1>
-            <p>
-              Sign up with your email to recieve news and updates.
-            </p>
-          </Typography>
-        </Box>
-      </Box>
+     <Footer/>
 
         </Grid>      
       </ThemeProvider>
