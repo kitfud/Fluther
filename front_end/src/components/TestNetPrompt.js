@@ -60,8 +60,10 @@ const TestNetPrompt = () => {
             justifyContent:"center",
             alignItems:"center",
             zIndex:2,
-            backgroundColor:"white",
+            backgroundColor:"black",
+            opacity:"75%",
             border:2,
+            borderColor:"white",
             position:"relative",
             raised:true,
 
@@ -74,18 +76,21 @@ const TestNetPrompt = () => {
             }}
           >
             <Typography
+              color="white"
               sx={{
                 fontSize:"24px",
                 margin:2,
               }}  
             >fluther is an app built using the Sepolia test network.</Typography>
             <Typography
+              color="white"
               sx={{
                 fontSize:"24px",
                 margin:2,
               }}
             >Your wallet is not currently connected to the Sepolia test network.</Typography>
             <Typography
+              color="white"
               sx={{
                 fontSize:"24px",
                 margin:2,
@@ -97,7 +102,8 @@ const TestNetPrompt = () => {
             onClick={switchNetwork}
             color="success"
             sx={{
-              marginBottom: 2
+              marginBottom: 2,
+              zIndex:5,
             }}
           >
             Connect to Sepolia testnet
