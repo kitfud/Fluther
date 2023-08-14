@@ -99,23 +99,17 @@ Frontend developers are incentivized to build their own UX on top of the Fluther
 
 A user who has set up a Fluther recurring buy only needs to submit a single transaction. The initial transaction outlines the parameters for each recurring buy including the tokens to be swapped, the amount to swap, and how much time must pass between swaps. All subsequent transactions are automated with `flutherNode.js` located in the `Automation_Nodes` folder.  The following steps outline how to run a fluther node:
   1. cd into the `Automation_Nodes` folder, and from your command line install `ethers 5.6.1` (some newer versions do not work properly)
-
-    ```
-    npm install ethers@5.6.1 --save    
-    ```
-
+   
+    npm install ethers@5.6.1 --save 
+    
   2. Update global `.env` file with Infura websocket for appropriate chain (`SEPOLIA_WSS`), and signer private key (`TEST_ACCOUNT`)
   3. Optionally install `pm2` globally. 
-
-    ```
-    npm install pm2 -g
-    ```
+    
+    npm install pm2 -g    
 
   4. exit out of the automation nodes folder and start the node with `pm2`. 
-  
-    ```
-    pm2 start Automation_Nodes/flutherNode.js
-    ```
+      
+    pm2 start Automation_Nodes/flutherNode.js    
    
 ### Troubleshooting `flutherNode.js`
 
