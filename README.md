@@ -117,7 +117,7 @@ Make sure the `dollarCostAverageContractAddress` is the correct contract address
         
 ## Automation Layer & Further Development
 
-As previously mentioned, the `AutomationLayer.sol` and `NodeSequencer.sol` smart contracts are not yet functional, but they are in the next steps plan. These two smart contracts enable the management of the automation nodes, so that they don't waste funds by competing with each other on triggering the payments. Furthermore, they are also designed in a more generic way, being able to be used with any other smart contract that follows the `IAutomateceContract.sol` interface pattern, as illustrated in the figure below.
+As previously mentioned, the `AutomationLayer.sol` and `NodeSequencer.sol` smart contracts are not yet functional, but they are in the next steps plan. These two smart contracts enable the management of the automation nodes, so that they don't waste funds by competing with each other on triggering the payments. Furthermore, they are also designed in a more generic way, being able to be used with any other smart contract that follows the `IAutomatedContract.sol` interface pattern, as illustrated in the figure below.
 
 ![Automation Structure](readme_images/automation_structure.png)
 
