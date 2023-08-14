@@ -1,19 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 /** @author @EWCunha
  *  @title AutomationLayer smart contract unit test
  */
 
-<<<<<<< HEAD
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
-=======
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 import {Test, console} from "forge-std/Test.sol";
 import {Deploy} from "../../script/Deploy.s.sol";
 import {DeployMocks} from "../../script/DeployMocks.s.sol";
@@ -164,21 +155,12 @@ contract AutomationLayerTest is Test {
         ERC20Mock(token1).mint(defaultRouter, INITAL_DEX_ERC20_FUNDS);
         ERC20Mock(token2).mint(defaultRouter, INITAL_DEX_ERC20_FUNDS);
         ERC20Mock(token1).mint(user, INITAL_USER_ERC20_FUNDS);
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
         vm.startPrank(signer);
         dca.setAllowedERC20s(token1, true);
         dca.setAllowedERC20s(token2, true);
         dca.setAllowedERC20s(wNative, true);
         vm.stopPrank();
-<<<<<<< HEAD
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
-=======
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     }
 
     /// -----------------------------------------------------------------------
@@ -459,11 +441,6 @@ contract AutomationLayerTest is Test {
         automation.triggerAutomation(accountNumber);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     function testTriggerAutomationShouldTakeNextBlocksIfCurrentBlockIsLastBlock()
         public
         createRecurringBuy(user)
@@ -491,10 +468,6 @@ contract AutomationLayerTest is Test {
         automation.triggerAutomation(accountNumber);
     }
 
-<<<<<<< HEAD
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
-=======
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     function testTriggerAutomationRevertsIfCallerDoesNotHaveEnoughDuhToken()
         public
         createRecurringBuy(user)
@@ -628,11 +601,6 @@ contract AutomationLayerTest is Test {
         automation.triggerBatchAutomation(accountNumbers);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     function testTriggerBatchAutomationShouldTakeNextBlocksIfCurrentBlockIsLastBlock()
         public
         createRecurringBuy(user)
@@ -674,10 +642,6 @@ contract AutomationLayerTest is Test {
         automation.triggerBatchAutomation(accountNumbers);
     }
 
-<<<<<<< HEAD
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
-=======
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     function testTriggerBatchAutomationRevertsIfCallerDoesNotHaveEnoughDuhToken()
         public
         createRecurringBuy(user)
@@ -986,18 +950,9 @@ contract AutomationLayerTest is Test {
 
         uint256 autoFeeBefore = automation.getAutomationFee();
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
         vm.prank(signer);
         automation.setAllowed(oracleAddress, true);
 
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
-=======
-        vm.prank(signer);
-        automation.setAllowed(oracleAddress, true);
-
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         vm.prank(oracleAddress);
         automation.setAutomationFee(newAutoFee);
 
@@ -1011,18 +966,9 @@ contract AutomationLayerTest is Test {
         address oracleAddress = automation.getOracleAddress();
         uint256 newAutoFee = 0.1 ether;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
         vm.prank(signer);
         automation.setAllowed(oracleAddress, true);
 
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
-=======
-        vm.prank(signer);
-        automation.setAllowed(oracleAddress, true);
-
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         vm.prank(oracleAddress);
         vm.expectEmit(true, false, false, true, address(automation));
         emit AutomationFeeSet(oracleAddress, newAutoFee);
@@ -1033,17 +979,7 @@ contract AutomationLayerTest is Test {
         uint256 newAutoFee = 0.1 ether;
 
         vm.prank(user);
-<<<<<<< HEAD
-<<<<<<< HEAD
-        vm.expectRevert(
-            IAutomationLayer.AutomationLayer__CallerNotOracle.selector
-        );
-=======
         vm.expectRevert(Security.Security__NotAllowed.selector);
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
-=======
-        vm.expectRevert(Security.Security__NotAllowed.selector);
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         automation.setAutomationFee(newAutoFee);
     }
 
@@ -1117,13 +1053,6 @@ contract AutomationLayerTest is Test {
     {
         uint256 accountNumber = automation.getNextAccountNumber() - 1;
         uint256 recurringBuyId = automation.getAccount(accountNumber).id;
-<<<<<<< HEAD
-<<<<<<< HEAD
-        console.log(automation.getSequencerAddress());
-=======
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
-=======
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         address anotherUser = makeAddr("anotherUser");
 
         vm.prank(anotherUser);
@@ -1298,11 +1227,6 @@ contract AutomationLayerTest is Test {
 
         assertTrue(accept);
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
     /// -----------------------------------------------------------------------
     /// Test for: prospectPayment
@@ -1342,8 +1266,4 @@ contract AutomationLayerTest is Test {
 
         assertTrue(payment > 0);
     }
-<<<<<<< HEAD
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
-=======
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 }

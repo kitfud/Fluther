@@ -38,3 +38,7 @@ smart_contracts/docs/
 
 # Dotenv file
 smart_contracts/.env
+
+# misc
+notes.txt
+node_modules
