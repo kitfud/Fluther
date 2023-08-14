@@ -31,10 +31,10 @@ Sit back and let the tokens swaps amass with Fluther.
 
 Landing View           |  Upon Connect Wallet
 :-------------------------:|:-------------------------:
-![](readme_images/thirdWebConnect.png)  |  ![](readme_images/thirdWebConnect2.png)
+![](readme_images/thirdWebConnect.png)  |  ![](readme_images/ThirdWebConnect2.png)
 
 <p align="center">
-<img src="readme_images/thirdWebConnect3.png">
+<img src="readme_images/ThirdWebConnect3.png">
 </p>
 
 - <ins>Connect To Sepolia Network Action:</ins> Users may not be connected to the Sepolia testnet on arrival to the dApp. To accomidate this possiblity we have a view which renders (when not connected to Sepolia) which will present the user with a button to direct connect to the sepolia testnet. Using window.ethereum, as described in the MetaMask sdk we were able to make this accessiblity possible. 
