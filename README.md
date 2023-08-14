@@ -1,43 +1,94 @@
 # Fluther: _A Decentralized Dollar Cost Averaging Solution_
 
 ## Summary
-Fluther is a decentralized dApp for creating recurring token buys over time (AKA dollar-cost averaging). A user can interface with an intuitive UI to log recurring investments, approve amounts for automated spending, view the investment over time, and cancel recurring investments whenever desired, while only paying only a single transaction fee. 
+Fluther is a decentralized dApp for creating recurring token buys over time (aka. dollar-cost averaging). A user can interface with an intuitive UI to log recurring investments, approve amounts for automated spending, view the investment over time, and cancel recurring investments whenever desired, while only paying only a single transaction fee. 
 
 ## dApp Problem Statement
 While dollar cost averaging is a functionality that exists on multiple centralized trading exchanges- there is a need for a decentralized method that makes use of native Web3 DEXs. Automating recurring buys has been complicated due to the push rather than pull nature of blockchain transactions. This means that a user that would want to make a recurring buy would manually have to sign transactions with their wallet for each buy. 
 
-Fluther overcomes this automation problem by running automation nodes that submit the transactions on behave of users, but only when the predefined parameters have been met. This creates for the user a seamless, gasless dollar-cost average investing experience, while always maintaining 100% control of their funds.
+Fluther overcomes this automation problem by running automation nodes that submit the transactions on behalf of users, but only when the predefined parameters have been met. This creates, for the user- a seamless, gasless dollar-cost average investing experience, while always maintaining 100% control of their funds.
 
 ## Dollar Coast Averaging Definition
 Dollar-cost averaging is the practice of spending a fixed quantity of one token for the swap of another over time. The idea with this practice is that over the long term, an investor removes the subjective interpretation of when to buy by abiding by a simple rule set. Specifically, invest a certain amount across intervals within a fixed time period. 
 
-The practice of dollar cost averaging is helpful for reducing the effects of market volatility on investments and gives investors peace of mind through a strict rule set therefore, reducing subjectivity. 
+The practice of dollar cost averaging is helpful for reducing the effects of market volatility on investments and gives investors peace of mind through a strict rule set. 
 
 ## Fluther?
 A fluther is a group of jellyfish. Jellyfish have no centralized brain; instead, they have a distributed nervous system. Their bodies are engineered for simplicity, reliability, and function. 
 
 Groups of jellyfish, moreover, are decentralized in their leadership. Jellyfish float together - flow together - through the ocean and make their way as a unified whole. Jellyfish live life untethered from centralization in all they do. 
 
+<p align="center">
+<img  width="50%" src="readme_images/FlutherLogoWhite.png">
+</p>
+
 The dApp Fluther, aims to present a similiarly decentralized means for 'flowing' through the realm of Web3 financial investment. Like a jellyfish that floats effortlessly through the ocean; a user can set a recurring investment and let the automation layer trigger the investment 'buys' by employing a simple rule set. 
 
-Sit back and let the tokens swaps amass via Fluther. 
+Sit back and let the tokens swaps amass with Fluther. 
 
 ## Flutter dApp UX Features
-- Web3 Connect Button via ThirdWeb
+- <ins>Web3 Connect Button via ThirdWeb:</ins> ThirdWeb provides the connect button which allows a use to potentially connect with more than just MetaMask (though our dApp is built primarily for MetaMask users). Upon connecting the button transforms into an element which presents the network connection logo as well as the amount of test net token on hand. 
 
-- Spending Approval View
+Landing View           |  Upon Connect Wallet
+:-------------------------:|:-------------------------:
+![](readme_images/thirdWebConnect.png)  |  ![](readme_images/thirdWebConnect2.png)
 
-- Token Amount Display
+<p align="center">
+<img src="readme_images/thirdWebConnect3.png">
+</p>
 
-- Token Investment Visualization
+- <ins>Connect To Sepolia Network Action:</ins> Users may not be connected to the Sepolia testnet on arrival to the dApp. To accomidate this possiblity we have a view which renders (when not connected to Sepolia) which will present the user with a button to direct connect to the sepolia testnet. Using window.ethereum, as described in the MetaMask sdk we were able to make this accessiblity possible. 
 
-- Display User Agreements Dashboard
+<p align="center">
+<img  width="50%" src="readme_images/ConnectNetwork.png">
+</p>
 
-- Dollar Cost Average Maker
+- <ins>Spending Approval View:</ins> As with many on chain protocols, a user needs to pre-approve spending within our dApp. We get this out of the way early, with a user having to approve at least 100 worth of wETH to begin creating dollar cost average agreements. This approval amount can be changed at any point through button actions later on in the dApp. As dollar cost average swaps accor this approval amount will decrease dynamically.
 
-- Mock WETH Token Distribution (Floating Action Button)
+<p align="center">
+<img  width="50%" src="readme_images/ApproveSpendingMenu.png">
+</p>
 
-- Music Embelishment (Floating Action Button)
+
+
+- <ins>Token Amount Display:</ins> The fluther dApp displays a user's token in real-time. For the purpose of our prototype we have built the application to only support the swap of tokens from WETH to UNI so these are the only tokens on view, at present. When the UNI token grows over time; the text will flash green for a period signalling a dynamic growth. 
+
+<p align="center">
+<img  width="50%" src="readme_images/TokenAmountDisplay.png">
+</p>
+
+- <ins>Dollar Cost Average Maker:</ins> The main card element within the application presents users with feilds needed to create a recurring token swap (dollar cost average), once all the feilds are filled a green "Submit Agreement" button appears to process the information. 
+
+
+<p align="center">
+<img  width="30%" src="readme_images/DollarCostAverageMaker.png">
+</p>
+
+- <ins>Display User Agreements Dashboard:</ins> A toggle switch at the bottom of the main card allows a user to view all of the Dollar Cost Average agreements made and cancel them as needed.  
+
+<p align="center">
+<img  width="50%" src="readme_images/DisplayUserAgreements.png">
+</p>
+
+- <ins>Mock WETH Token Distribution (Floating Action Button):</ins> To use the test application we have created a floating action button which, when clicked, opens a modal where a user can request test WETH token (used specifically for this dApp). The modal menu also has buttons which allow a user to insert the custom tokens directly into their MetaMask wallet. A convenient functionality made possible by the MetaMask SDK. 
+
+Token Fountain Icon           |  Token Fountain Distribution View
+:-------------------------:|:-------------------------:
+![](readme_images/MockWETHtokenDistribution1.png)  |  ![](readme_images/MockWETHtokenDistribution2.png)
+
+- <ins>Token Investment Visualization:</ins> If a user hovers over the UNI swap token icon they will see a modal prompting for click. Upon click, a visualization appears which charts a user's token growth over time. This data visualization is built off of an Infura Provider object- ensuring reliablity and security with the data pulled for past block timestamp/in relation to token amounts held- to produce the impressive visualization, as a whole. 
+
+Icon to UNI token Visualizaton           |  Token Growth Chart
+:-------------------------:|:-------------------------:
+![](readme_images/TokenVisualization1.png)  |  ![](readme_images/TokenVisualization2.png)
+
+
+- <ins>Music Embelishment (Floating Action Button):</ins> At the top right of the dApp a user can click on button to play some music. This tranquil music provides a tame backdrop for a user to introspect on on as features load or if they wish to watch their token quantities tick up over time. Music credit goes to--> https://www.bensound.com/. The hot track is: Tenderness.mp3.
+
+<p align="center">
+<img  width="25%" src="readme_images/FloatingMusic.png">
+</p>
+
 
 ## Running the dApp locally
 To run the dApp locally, an Infura API key is needed. Follow [these instructions](https://www.infura.io/) to create your own API key with Infura. After downloading this repository, create a `.env` file in the `front_end` folder. Copy and paste your created API token in the file with the variable names as follows, replacing in `<INFURA_API_KEY>` and `<PRIVATE_KEY>` with your own details:
@@ -57,7 +108,9 @@ npm start
 ```
 
 ## Live Deployment
-TBD->Click Link to Be Deployed [HERE]
+You can try out dollar cost averaging on the testnet! Since a token faucent is embedded into our dApp all you need is [MetaMask wallet](https://metamask.io/download/) and some [Sepolia test ETH](https://sepoliafaucet.com/). 
+
+Click Here to test live deployment--> [HERE](https://fluther.netlify.app/)
 
 ## Smart Contract Patterns
 
@@ -148,16 +201,16 @@ It is the goal of the Fluther team to eventually fully decentralize the Fluther 
 
 ## Tools and Frameworks used
 - <strong>Infura</strong>:
-The Fluther dApp makes full use of the Infura API for defining a provider object. This is for making calls to the blockchain to recieve the most up date information on token amounts, dollar cost average contract deployments + cancellations as well as getting confirmation transactions on chain for the distribution of test token. 
+The Fluther dApp makes full use of the Infura API for defining a provider object. This is for making calls to the blockchain to recieve the most up date information on token amounts over time. Infura is used, in particular, for the token visualization feature where a chart is produced of token/time when a user clicks the UNI token logo. 
 
 - <strong>MetaMask SDK</strong>:
-Fluther dApp incorperates the MetaMask SDK via the dApp logo being detected on connection with wallet. Furthermore, integration comes from how MetaMask injects itself into the browser via window.ethereum; as described in the SDK, Fluther's test token distrubtion (Floating Action Button) can auto add test tokens to a user's MetaMask without the manual insertion of a token info which can be prone to error. 
+Fluther dApp incorperates the MetaMask SDK via the dApp logo being detected on connection with wallet. Furthermore, integration comes from how MetaMask injects itself into the browser via window.ethereum; as described in the SDK, Fluther's test token distrubtion (Floating Action Button) can auto add test tokens to a user's MetaMask without the manual insertion of a token info which can be prone to error. We have also used the SDK to change the user's networkwork via button (to Sepolia) on click- if they are connected to any other network when using Fluther. 
 
 - <strong>Ethers.js</strong>:
 Ethers.js is used as a utility library for converting amounts between on chain values and those consumed on the front end. Furthermore, to keep the 'signer' object dynamic (per app usage)- a provider object from Ethers.js Web3 is created to write state changes to the blockchain. 
 
 - <strong>ThirdWeb</strong>:
-As a nod to Web3 builders, Fluther as appropraited the Web3 connect button to allow users to connect with multiple wallets aside from MetaMask. The user's blockchain address is parsed from this element and used throughtout the dApp. 
+As a nod to Web3 builders, Fluther as appropraited the Web3 connect button to allow users to connect with multiple wallets aside from MetaMask. The user's blockchain address is parsed from this element and used throughtout the dApp. Third web is also used to detect a change in networkID if a user is to toggle this within dApp. 
 
 - <strong>Foundry</strong>: All smart contracts from Fluther were developed and deployed using Foundry framework. Unit tests as well as stateless and stateful fuzz tests were created and executed using this framework.
 
