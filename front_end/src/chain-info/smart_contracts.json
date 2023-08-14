@@ -381,6 +381,69 @@
                         "internalType": "address",
                         "name": "sender",
                         "type": "address"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "address",
+                                "name": "sender",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "amountToSpend",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "tokenToSpend",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "tokenToBuy",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "timeIntervalInSeconds",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "paymentInterface",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "address",
+                                "name": "dexRouter",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "paymentDue",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "accountNumber",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "address[]",
+                                "name": "path",
+                                "type": "address[]"
+                            },
+                            {
+                                "internalType": "enum IDollarCostAverage.Status",
+                                "name": "status",
+                                "type": "uint8"
+                            }
+                        ],
+                        "indexed": false,
+                        "internalType": "struct IDollarCostAverage.RecurringBuy",
+                        "name": "buy",
+                        "type": "tuple"
                     }
                 ],
                 "name": "RecurringBuyCreated",
@@ -1297,6 +1360,11 @@
             },
             {
                 "inputs": [],
+                "name": "AutomationLayer__CallerNotOracle",
+                "type": "error"
+            },
+            {
+                "inputs": [],
                 "name": "AutomationLayer__InvalidAccountNumber",
                 "type": "error"
             },
@@ -1328,6 +1396,11 @@
             {
                 "inputs": [],
                 "name": "AutomationLayer__OriginNotNode",
+                "type": "error"
+            },
+            {
+                "inputs": [],
+                "name": "AutomationLayer__UserDoesNotHaveEnoughBalanceAndOrAllowance",
                 "type": "error"
             },
             {

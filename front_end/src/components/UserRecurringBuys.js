@@ -1,5 +1,15 @@
+<<<<<<< HEAD
+<<<<<<< HEAD
+import React, { isValidElement } from 'react'
+import { useEffect, useState } from 'react'
+import { Typography, Snackbar, CircularProgress, Button, Card, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import { ethers } from 'ethers'
+import DollarCost from '../chain-info/smart_contracts.json'
+=======
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 import React from 'react'
-import { useEffect,useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Typography,
   Snackbar,
@@ -15,8 +25,12 @@ import {
   TableHead,
   TableRow,
   Slide
- } from '@mui/material'
+} from '@mui/material'
 import { ethers } from 'ethers'
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
@@ -26,7 +40,7 @@ import smartContracts from '../chain-info/smart_contracts.json'
 const UserRecurringBuys = ({
   setUpdateAgreements,
   updateAgreements,
-  processingApp,  
+  processingApp,
   setCancelOccur,
   balance,
   signer,
@@ -37,14 +51,18 @@ const UserRecurringBuys = ({
   workingChain
 }) => {
 
-  const [tabledata,setTableData] = useState(null)
+  const [tabledata, setTableData] = useState(null)
   const [processing, setProcessing] = useState(false)
 
-  const [openSnackbar,setOpenSnackBar] = useState(false)
+  const [openSnackbar, setOpenSnackBar] = useState(false)
   const [txHash, setTxHash] = useState(null)
- 
-  const [buyIds,setBuyIds] = useState(null)
-  const [buyIdStructs,setBuyIdStructs] = useState(null)
+
+  const [buyIds, setBuyIds] = useState(null)
+  const [buyIdStructs, setBuyIdStructs] = useState(null)
+<<<<<<< HEAD
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
 
   const [currentDataLength, setCurrentDataLength] = useState(null)
 
@@ -52,43 +70,55 @@ const UserRecurringBuys = ({
 
 
   const handleClose = (event, reason) => {
-    if(reason === 'clickaway') {
+    if (reason === 'clickaway') {
       return;
     }
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+    window.location.reload(false);
+=======
+    window.location.reload()
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
+    window.location.reload()
+>>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
+=======
     // window.location.reload()
+>>>>>>> 918fa301e141e082cb1d287fc05f2dee672b6d1f
     setOpenSnackBar(false);
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     let checkAgreements
 
-    if(updateAgreements){
-      checkAgreements= setInterval(()=>{
+    if (updateAgreements) {
+      checkAgreements = setInterval(() => {
         console.log("checking for updates")
         logUserData()
-      },1000)
+      }, 1000)
     }
-    if(!updateAgreements){
+    if (!updateAgreements) {
       clearInterval(checkAgreements)
     }
-    return ()=>clearInterval(checkAgreements)
+    return () => clearInterval(checkAgreements)
 
-  },[updateAgreements])
+  }, [updateAgreements])
 
-  useEffect(()=>{
+  useEffect(() => {
     let checkCancelAgreements
 
-    if(cancelUpdateAgreements){
-      checkCancelAgreements= setInterval(()=>{
+    if (cancelUpdateAgreements) {
+      checkCancelAgreements = setInterval(() => {
         console.log("checking for updates")
         logUserData()
-      },1000)
+      }, 1000)
     }
-    if(!cancelUpdateAgreements){
+    if (!cancelUpdateAgreements) {
       clearInterval(checkCancelAgreements)
     }
-    return ()=>clearInterval(checkCancelAgreements)
-  },[cancelUpdateAgreements])
+    return () => clearInterval(checkCancelAgreements)
+  }, [cancelUpdateAgreements])
 
   const action = (
     <React.Fragment>
@@ -110,93 +140,93 @@ const UserRecurringBuys = ({
     </React.Fragment>
   );
 
-  useEffect(()=>{
-    if(contract){
-      try{
-        logUserData()  
+  useEffect(() => {
+    if (contract) {
+      try {
+        logUserData()
       }
-      catch(err){
+      catch (err) {
         console.log(err)
       }
     }
-  },[provider,address,balance,contract,processingApp])
+  }, [provider, address, balance, contract, processingApp])
 
-  useEffect(()=>{
-    if(buyIdStructs){   
+  useEffect(() => {
+    if (buyIdStructs) {
       filterData(buyIdStructs)
     }
-  },[buyIdStructs])
+  }, [buyIdStructs])
 
-  const filterData = ()=>{ 
+  const filterData = () => {
     let tableResult = []
-    if(buyIdStructs.length==0 && cancelUpdateAgreements){
+    if (buyIdStructs.length == 0 && cancelUpdateAgreements) {
       setCancelUpdateAgreements(false)
       setTableData(tableResult)
     }
-     
+
     let counter = 0
-    buyIdStructs.forEach((element)=>{
+    buyIdStructs.forEach((element) => {
       counter++
       let tdata = {
-          "buyId":buyIds[buyIdStructs.indexOf(element)].toNumber(),
-          "tokenToSpend":element.tokenToSpend,
-          "tokenToBuy":element.tokenToBuy,
-          "timeInterval":element.timeIntervalInSeconds.toNumber(),
-          "amount":ethers.utils.formatEther(element.amountToSpend)
+        "buyId": buyIds[buyIdStructs.indexOf(element)].toNumber(),
+        "tokenToSpend": element.tokenToSpend,
+        "tokenToBuy": element.tokenToBuy,
+        "timeInterval": element.timeIntervalInSeconds.toNumber(),
+        "amount": ethers.utils.formatEther(element.amountToSpend)
       }
       tableResult.push(tdata)
-      if(counter == buyIdStructs.length){  
+      if (counter == buyIdStructs.length) {
         setTableData(tableResult)
-        if(buyIdStructs.length>currentDataLength && updateAgreements){
+        if (buyIdStructs.length > currentDataLength && updateAgreements) {
           setUpdateAgreements(false)
         }
-        else if(buyIdStructs.length<currentDataLength && cancelUpdateAgreements){
+        else if (buyIdStructs.length < currentDataLength && cancelUpdateAgreements) {
           setCancelUpdateAgreements(false)
-        } 
-        
+        }
+
         setCurrentDataLength(buyIdStructs.length)
-         
+
       }
     })
   }
 
   const logUserData = async () => {
-    if(contract && address && chainId ==workingChain){
+    if (contract && address && chainId == workingChain) {
       let userData = await contract.getRecurringBuysFromUser(address)
-  
+
       let userBuyIds = userData[0]
-      let userBuyStructs= userData[1]
+      let userBuyStructs = userData[1]
 
       let userBuyIdsRefined = []
       let userBuyStructsRefined = []
 
       let counterIds = 0
-      userBuyIds.forEach((el)=>{
+      userBuyIds.forEach((el) => {
         counterIds++
-        if(userBuyIds.indexOf(el) !=0){
+        if (userBuyIds.indexOf(el) != 0) {
           userBuyIdsRefined.push(el)
         }
-        if(counterIds==userBuyIds.length){
+        if (counterIds == userBuyIds.length) {
           setBuyIds(userBuyIdsRefined)
         }
       })
 
       let counterStructs = 0
-      userBuyStructs.forEach((el)=>{
+      userBuyStructs.forEach((el) => {
         counterStructs++
-        if(userBuyStructs.indexOf(el) !=0){
+        if (userBuyStructs.indexOf(el) != 0) {
           userBuyStructsRefined.push(el)
         }
-        if(counterStructs==userBuyIds.length){     
+        if (counterStructs == userBuyIds.length) {
           setBuyIdStructs(userBuyStructsRefined)
         }
       })
     }
   }
 
-  const handleCancel = async (id)=>{
-    if(signer){
-      try{
+  const handleCancel = async (id) => {
+    if (signer) {
+      try {
         setProcessing(true)
         let tx = await contract.connect(signer).cancelRecurringPayment(id)
         let hash = tx.hash
@@ -204,7 +234,7 @@ const UserRecurringBuys = ({
         setTxHash(hash.toString())
         isTransactionMined(hash.toString())
       }
-      catch(err){
+      catch (err) {
         setCancelUpdateAgreements(false)
         setProcessing(false)
         console.log(err)
@@ -213,21 +243,21 @@ const UserRecurringBuys = ({
   }
 
   const isTransactionMined = async (transactionHash) => {
-    let transactionBlockFound = false    
+    let transactionBlockFound = false
     while (transactionBlockFound === false) {
       let tx = await provider.getTransactionReceipt(transactionHash)
       console.log("transaction status check....")
-      try{
+      try {
         await tx.blockNumber
       }
-      catch(error){
+      catch (error) {
         tx = await provider.getTransactionReceipt(transactionHash)
       }
-      finally{
-          console.log("proceeding")
+      finally {
+        console.log("proceeding")
       }
 
-      if(tx && tx.blockNumber){
+      if (tx && tx.blockNumber) {
         setProcessing(false)
         console.log("block number assigned.")
         transactionBlockFound = true
@@ -240,38 +270,38 @@ const UserRecurringBuys = ({
       }
     }
   }
-    
-  const translateToken = (row)=>{
+
+  const translateToken = (row) => {
     let translatedData = {}
-    if(row.tokenToBuy == smartContracts.UNIMock.address.sepolia){
-      translatedData["tokenToBuy"] ="UNI"
+    if (row.tokenToBuy == smartContracts.UNIMock.address.sepolia) {
+      translatedData["tokenToBuy"] = "UNI"
     }
-    else if (row.tokenToBuy == smartContracts.WETHMock.address.sepolia){
-      translatedData["tokenToBuy"]="WETH"        
+    else if (row.tokenToBuy == smartContracts.WETHMock.address.sepolia) {
+      translatedData["tokenToBuy"] = "WETH"
     }
 
-    if(row.tokenToSpend == smartContracts.UNIMock.address.sepolia){
-      translatedData["tokenToSpend"] ="UNI"
+    if (row.tokenToSpend == smartContracts.UNIMock.address.sepolia) {
+      translatedData["tokenToSpend"] = "UNI"
     }
-    else if (row.tokenToSpend == smartContracts.WETHMock.address.sepolia){
-      translatedData["tokenToSpend"]="WETH"        
+    else if (row.tokenToSpend == smartContracts.WETHMock.address.sepolia) {
+      translatedData["tokenToSpend"] = "WETH"
     }
     return translatedData
   }
 
-  const translateTime=(row)=>{
+  const translateTime = (row) => {
     let returnData = {}
-    if(row.timeInterval==300){
+    if (row.timeInterval == 300) {
       returnData["timeInterval"] = "5 Minutes"
     }
-    else if (row.timeInterval==86400){
+    else if (row.timeInterval == 86400) {
       returnData["timeInterval"] = "Daily"
-    } 
-    else if (row.timeInterval==604800){
+    }
+    else if (row.timeInterval == 604800) {
       returnData["timeInterval"] = "Weekly"
-    } 
-    else if (row.timeInterval==2419200){
-      returnData["timeInterval"] = "Monthly" 
+    }
+    else if (row.timeInterval == 2419200) {
+      returnData["timeInterval"] = "Monthly"
     }
     return returnData
   }
@@ -280,11 +310,11 @@ const UserRecurringBuys = ({
     <>
       {
         !processing
-        ?
-          !updateAgreements
           ?
-            !cancelUpdateAgreements
+          !updateAgreements
             ?
+            !cancelUpdateAgreements
+              ?
               <Slide
                 direction="right"
                 in={true}
@@ -292,18 +322,18 @@ const UserRecurringBuys = ({
               >
                 <Card
                   sx={{
-                    marginTop:'20px',
+                    marginTop: '20px',
                     marginBottom: "20px",
-                    padding:'0px',
-                    border:2,
-                    borderColor:"#e842fa"
+                    padding: '0px',
+                    border: 2,
+                    borderColor: "#e842fa"
                   }}
                 >
                   <Box>
                   </Box>
                   <TableContainer component={Paper}>
                     <Table sx={{ minWidth: 650, }} aria-label="Current Dollar Cost Average">
-                      <TableHead sx={{backgroundColor:"#a7aeff"}}>
+                      <TableHead sx={{ backgroundColor: "#a7aeff" }}>
                         <TableRow>
                           <TableCell>buyId</TableCell>
                           <TableCell align="right">Token To Spend</TableCell>
@@ -320,12 +350,12 @@ const UserRecurringBuys = ({
                       >
                         {
                           tabledata
-                          ?
+                            ?
                             (tabledata.map((row) => {
                               let swap = translateToken(row)
                               let time = translateTime(row)
                               let index = tabledata.indexOf(row)
-                              return(
+                              return (
                                 <TableRow
                                   key={row.buyId}
                                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -337,7 +367,7 @@ const UserRecurringBuys = ({
                                   <TableCell align="right">{time.timeInterval}</TableCell>
                                   <TableCell>
                                     <Button
-                                      onClick={()=>handleCancel(buyIds[index])}
+                                      onClick={() => handleCancel(buyIds[index])}
                                       variant='contained'
                                       color="error"
                                     >
@@ -347,7 +377,7 @@ const UserRecurringBuys = ({
                                 </TableRow>
                               )
                             }))
-                          :
+                            :
                             null
                         }
                       </TableBody>
@@ -355,41 +385,41 @@ const UserRecurringBuys = ({
                   </TableContainer>
                 </Card>
               </Slide>
-            :
+              :
               <Box
                 display="flex"
                 alignItems="center"
-                justifyContent="center" 
+                justifyContent="center"
                 sx={{
-                  marginTop:'20px',
-                  marginBottom:'10px'
+                  marginTop: '20px',
+                  marginBottom: '10px'
                 }}
               >
-                <CircularProgress sx={{color:"white"}}/>
+                <CircularProgress sx={{ color: "white" }} />
               </Box>
-          :
+            :
             <Box
               display="flex"
               alignItems="center"
-              justifyContent="center" 
+              justifyContent="center"
               sx={{
-                marginTop:'20px',
-                marginBottom:'10px'
+                marginTop: '20px',
+                marginBottom: '10px'
               }}
             >
-              <CircularProgress sx={{color:"white"}}/>
+              <CircularProgress sx={{ color: "white" }} />
             </Box>
-        :
+          :
           <Box
             display="flex"
             alignItems="center"
-            justifyContent="center" 
+            justifyContent="center"
             sx={{
-              marginTop:'20px',
-              marginBottom:'10px'
+              marginTop: '20px',
+              marginBottom: '10px'
             }}
           >
-            <CircularProgress sx={{color:"white"}}/>
+            <CircularProgress sx={{ color: "white" }} />
           </Box>
       }
       <Snackbar
@@ -403,7 +433,7 @@ const UserRecurringBuys = ({
         message=""
         action={action}
         sx={{
-          backgroundColor:"white"
+          backgroundColor: "white"
         }}
       >
         <a target="_blank" href={`https://sepolia.etherscan.io/tx/${txHash}`}>

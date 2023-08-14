@@ -132,7 +132,7 @@ var dollarCostAverageContract = new ethers.Contract(dollarCostAverageContractAdd
       }
       console.log("checkSimpleAutomation", checkSimpleAutomation);
       if (checkSimpleAutomation == true) {
-   
+
           let estimateGas;
           try {
             estimateGas = await
@@ -145,7 +145,7 @@ var dollarCostAverageContract = new ethers.Contract(dollarCostAverageContractAdd
 
          const maxFeePerGas = (await provider.getGasPrice()) * 2
   if (estimateGas > 0){
-          
+
 
           const tx = {
             maxFeePerGas: maxFeePerGas,
@@ -154,7 +154,7 @@ var dollarCostAverageContract = new ethers.Contract(dollarCostAverageContractAdd
             nonce: await provider.getTransactionCount(wallet.address, "pending"),
           };
 
- 
+
           const simpleAutomation = await dollarCostAverageContract.trigger(account, tx);
           console.log("simpleAutomation", account);
           const receipt = await simpleAutomation.wait();

@@ -79,15 +79,7 @@ contract NodeSequencer is INodeSequencer, Security {
      *  @param node: the address of the node.
      */
     function __checkNodeBlockNumberRange(address node) private view {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        if (!(s_nodes[node].endBlockNumber < block.number)) {
-=======
         if (s_nodes[node].endBlockNumber > block.number) {
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
-=======
-        if (s_nodes[node].endBlockNumber > block.number) {
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
             revert NodeSequencer__NodeCannotTakeBlockNumbers();
         }
     }
@@ -124,29 +116,10 @@ contract NodeSequencer is INodeSequencer, Security {
     ) Security(msg.sender) {
         __validateTimePeriodForNode(timePeriodForNode);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-        minimumDuh = 0;
-        blockNumberRange = 1000;
-        duh = 0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174; //USDC on Polygon
-        //duh = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2; //WETH on Ethereum
-=======
-=======
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
-=======
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         s_timePeriodForNode = timePeriodForNode;
         s_startBlockNumber = block.number;
         s_automationLayer = IAutomationLayer(automationLayer);
         s_acceptingNewNodes = true;
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 8e582c487af948970f76f7e24a1ca4aeefdebf0b
-=======
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
-=======
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
     }
 
     /// -----------------------------------------------------------------------
@@ -165,18 +138,8 @@ contract NodeSequencer is INodeSequencer, Security {
         __checkNodeStatus(msg.sender, false);
         __onlyEOA();
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-        uint256 startBlockNumber;
-        uint256 endBlockNumber;
-=======
         uint256 startBlockNumber = 0;
         uint256 endBlockNumber = 0;
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
-=======
-        uint256 startBlockNumber = 0;
-        uint256 endBlockNumber = 0;
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         if (__hasDuhFunds(msg.sender)) {
             startBlockNumber = s_startBlockNumber;
             startBlockNumber = startBlockNumber == block.number
@@ -416,15 +379,7 @@ contract NodeSequencer is INodeSequencer, Security {
         uint256 endBlockNumber,
         address node
     ) private returns (uint256, uint256) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        uint256 takenStartBlockNumber;
-=======
         uint256 takenStartBlockNumber = 0;
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
-=======
-        uint256 takenStartBlockNumber = 0;
->>>>>>> dd81a9a1b1d5c6e876efecc1801ee01b7f2a1028
         for (uint256 ii = startBlockNumber; ii < endBlockNumber + 1; ++ii) {
             if (s_blockNumberToNode[ii] == address(0)) {
                 s_blockNumberToNode[ii] = node;
