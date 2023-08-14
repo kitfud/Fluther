@@ -75,18 +75,6 @@ contract AutomationLayer is IAutomationLayer, Security {
         }
     }
 
-    /** @dev checks if given user has enough DUH balance and gave enough allowance to the automation layer contract.
-     *  @param user: address of the user.
-     */
-    function __hasEnoughBalanceAndAllowance(address user) private view {
-        if (
-            IERC20(s_duh).balanceOf(user) < s_automationFee &&
-            IERC20(s_duh).allowance(user, address(this)) < s_automationFee
-        ) {
-            revert AutomationLayer__UserDoesNotHaveEnoughBalanceAndOrAllowance();
-        }
-    }
-
     /// -----------------------------------------------------------------------
     /// Constructor
     /// -----------------------------------------------------------------------
@@ -197,10 +185,14 @@ contract AutomationLayer is IAutomationLayer, Security {
 
         Account memory account = s_accounts[accountNumber];
 
-        __hasEnoughBalanceAndAllowance(account.user);
-
         __performAutomation(accountNumber, true);
-        __transferDuhToken(account.user, msg.sender, s_automationFee, true);
+        __transferERC20(
+            s_duh,
+            address(this),
+            msg.sender,
+            IERC20(s_duh).balanceOf(address(this)),
+            true
+        );
         __takeNextBlockNumbers(msg.sender);
 
         emit AutomationDone(
@@ -223,19 +215,17 @@ contract AutomationLayer is IAutomationLayer, Security {
         __isCurrentNode();
 
         bool[] memory success = new bool[](accountNumbers.length);
-        bool transferSuccess;
         for (uint256 ii = 0; ii < accountNumbers.length; ++ii) {
-            transferSuccess = __transferDuhToken(
-                s_accounts[accountNumbers[ii]].user,
-                msg.sender,
-                s_automationFee,
-                false
-            );
-            success[ii] = transferSuccess
-                ? __performAutomation(accountNumbers[ii], false)
-                : false;
+            success[ii] = __performAutomation(accountNumbers[ii], false);
         }
 
+        __transferERC20(
+            s_duh,
+            address(this),
+            msg.sender,
+            IERC20(s_duh).balanceOf(address(this)),
+            true
+        );
         __takeNextBlockNumbers(msg.sender);
 
         emit BatchAutomationDone(msg.sender, accountNumbers, success);
@@ -389,25 +379,6 @@ contract AutomationLayer is IAutomationLayer, Security {
         return false;
     }
 
-    /** @dev Transfers DUH token. Uses Security's __transferERC20() internal function.
-     *  @param from: address from which the tokens will be transferred.
-     *  @param to: address to which the tokens will be transferred.
-     *  @param amount: amount of tokens to transfer.
-     *  @param revert_: true if the function should revert, false otherwise.
-     *  @return true if the transfer was successful, false otherwise.
-     */
-    function __transferDuhToken(
-        address from,
-        address to,
-        uint256 amount,
-        bool revert_
-    ) private returns (bool) {
-        if (amount > 0) {
-            return __transferERC20(s_duh, from, to, amount, revert_);
-        }
-        return true;
-    }
-
     /** @dev Assign next available range of block numbers to current node
      *  @param nodeAddress: the address of the node.
      */
@@ -418,7 +389,7 @@ contract AutomationLayer is IAutomationLayer, Security {
                 .getNode(nodeAddress)
                 .endBlockNumber;
 
-            if (block.number == nodeEndBlockNumber) {
+            if (!(block.number < nodeEndBlockNumber)) {
                 sequencer.takeNextBlockNumbers(nodeAddress);
             }
         }
@@ -445,9 +416,6 @@ contract AutomationLayer is IAutomationLayer, Security {
         return
             isNextNode &&
             !(IERC20(s_duh).balanceOf(node) < s_minimumDuh) &&
-            !(IERC20(s_duh).balanceOf(account.user) < s_automationFee) &&
-            !(IERC20(s_duh).allowance(account.user, address(this)) <
-                s_automationFee) &&
             IAutomatedContract(account.automatedContract).checkTrigger(
                 account.id
             );
@@ -528,6 +496,28 @@ contract AutomationLayer is IAutomationLayer, Security {
         returns (bool)
     {
         return s_acceptingNewAccounts;
+    }
+
+    /// @inheritdoc IAutomationLayer
+    function prospectPayment(
+        uint256 accountNumber
+    ) external view override(IAutomationLayer) returns (uint256) {
+        Account memory account = s_accounts[accountNumber];
+        return
+            IAutomatedContract(account.automatedContract)
+                .prospectAutomationPayment(account.id);
+    }
+
+    /// @inheritdoc IAutomationLayer
+    function prospectPaymentBatch(
+        uint256[] calldata accountNumbers
+    ) external view override(IAutomationLayer) returns (uint256 payment) {
+        Account memory account;
+        for (uint256 ii = 0; ii < accountNumbers.length; ++ii) {
+            account = s_accounts[accountNumbers[ii]];
+            payment += IAutomatedContract(account.automatedContract)
+                .prospectAutomationPayment(account.id);
+        }
     }
 
     /// -----------------------------------------------------------------------
