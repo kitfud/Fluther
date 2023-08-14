@@ -9,6 +9,7 @@ const LandingPageElement = () => {
         container
         justifyContent="center"
         alignItems="center"
+      
       >
         <Card
           sx={{

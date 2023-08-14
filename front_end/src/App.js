@@ -1199,7 +1199,7 @@ const handleMusic =(event)=>{
           </Card>
           </Slide>:<TestNetPrompt/>
           :
-          <LandingPageElement/>
+          <LandingPageElement />
 }
           {
           wethbalance!==null && address !== null && address && chainId==11155111?

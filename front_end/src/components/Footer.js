@@ -2,6 +2,11 @@ import React from 'react'
 import { Box,Typography,Button,TextField } from '@mui/material'
 
 const Footer = () => {
+
+const handleEmailSignup =()=>{
+    alert("NO EMAIL SIGNUP AVAILABLE. CHECK BACK LATER AND TRY AGAIN.")
+}
+
   return (
     <>
      <Box
@@ -32,7 +37,7 @@ const Footer = () => {
             marginBottom:"2%",
           }}
         >
-          <Button variant="contained">
+          <Button onClick={handleEmailSignup} variant="contained">
             Sign up
           </Button>
           <TextField
