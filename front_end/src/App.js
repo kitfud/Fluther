@@ -881,15 +881,15 @@ const handleMusic =(event)=>{
               //opacity: 0.9,
             }}
           >
-            <Box width='100%'
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
+            <Box
+              width='100%'
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
             >
             <Typography
               color='#bf00e8'
               component="h1"
-            
               sx={{
                 fontSize: 20,
                 fontWeight: 700,
@@ -901,29 +901,57 @@ const handleMusic =(event)=>{
             </Box>
            
 
-              {!spendingApproved?
-            <Box
-              alignItems="center"
-              justifyContent="center">
-                {
-                allowance>=100?
-                <Box component="div" display="block">
-                <Button variant="contained" onClick={handleReturn} >Return To Dollar Cost Average Maker</Button>
-                </Box>:null
-                }
-               <Box    alignItems="center"
-              justifyContent="center" display="flex">
-               <Typography padding={'2px'}  color='#bf00e8'
-              component="h1"
-            
-              sx={{
-                fontSize: 10,
-                fontWeight: 700,
-                padding: 2
-              }}>Current Spending Limit:{allowance}</Typography>
-               </Box>
-           
-            </Box>:null
+              {
+                !spendingApproved
+                ?
+                  <Box
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    {
+                      allowance >= 100
+                      ?
+                        <Box component="div" display="block">
+                          <Button variant="contained" onClick={handleReturn} >Return To Dollar Cost Average Maker</Button>
+                        </Box>
+                      :
+                        null
+                    }
+              <Box
+                alignItems="center"
+                justifyContent="center"
+                display="flex"
+                flexDirection="column"
+              >
+                <Typography
+                  padding={'2px'}
+                  color="#bf00e8"
+                  component="h2"
+                  sx={{
+                    fontSize: 14,
+                    fontWeight: 700,
+                    padding: 2,
+                  }}
+                >
+                  Spending limit must be initialized to more than 100.
+                </Typography>
+
+                <Typography 
+                  padding={'2px'}
+                  color='#bf00e8'
+                  component="h1"
+                  sx={{
+                    fontSize: 14,
+                    fontWeight: 700,
+                    marginBottom: 2,
+                  }}
+                >
+                  Current Spending Limit:{allowance}
+                </Typography>
+              </Box>
+            </Box>
+          :
+            null
 }
 
             {/* TOTAL AMOUNT BOX FIELD */}  
@@ -944,7 +972,7 @@ const handleMusic =(event)=>{
                       <Box sx={{ width: '100%' }}>
                         <LinearProgress/>
                         <Box backgroundColor="lightBlue">
-                          <Typography>Allowance Approved. Values Will Update Shortly.</Typography>
+                          <Typography>Updating Values...</Typography>
                         </Box> 
                       </Box>
                     :
@@ -1019,7 +1047,7 @@ const handleMusic =(event)=>{
                       variant="contained"
                       color="success"
                     >
-                      Approve Spending Amount
+                      Set Spending Limit
                     </Button>
                   </Box>
                 </>
