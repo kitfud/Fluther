@@ -16,7 +16,7 @@ The practice of dollar cost averaging is helpful for reducing the effects of mar
 ## Fluther?
 A fluther is a group of jellyfish. Jellyfish have no centralized brain; instead, they have a distributed nervous system. Their bodies are engineered for simplicity, reliability, and function. 
 
-Groups of jellyfish, moreover, are decentralized in their leadership. Jellyfish float together- flow together- through the ocean and make their way as a unified whole. Jellyfish live life untethered from centralization in all they do. 
+Groups of jellyfish, moreover, are decentralized in their leadership. Jellyfish float together - flow together - through the ocean and make their way as a unified whole. Jellyfish live life untethered from centralization in all they do. 
 
 The dApp Fluther, aims to present a similiarly decentralized means for 'flowing' through the realm of Web3 financial investment. Like a jellyfish that floats effortlessly through the ocean; a user can set a recurring investment and let the automation layer trigger the investment 'buys' by employing a simple rule set. 
 
@@ -40,7 +40,7 @@ Sit back and let the tokens swaps amass via Fluther.
 - Music Embelishment (Floating Action Button)
 
 ## Running the dApp locally
-To run the dApp locally,an Infura API key is needed. Follow [these instructions](https://www.infura.io/) to create your own API key with Infura. After downloading this repository, create a `.env` file in the `front_end` folder. Copy and paste your created API token in the file with the variable names as follows, replacing in <INFURA_API_KEY> and <PRIVATE_KEY> with your own details:
+To run the dApp locally,an Infura API key is needed. Follow [these instructions](https://www.infura.io/) to create your own API key with Infura. After downloading this repository, create a `.env` file in the `front_end` folder. Copy and paste your created API token in the file with the variable names as follows, replacing in `<INFURA_API_KEY>` and `<PRIVATE_KEY>` with your own details:
 
 `REACT_APP_ETHEREUM_NETWORK = "sepolia"`  
 `REACT_APP_INFURA_API_KEY = "<INFURA_API_KEY>"`  
@@ -97,23 +97,29 @@ Frontend developers are incentivized to build their own UX on top of the Fluther
   
 ## Automation via FlutherNode
 
-A user who has set up a Fluther recurring buy only needs to submit a single transaction. The initial transaction outlines the parameters for each recurring buy including the tokens to be swapped, the amount to swap, and how much time must pass between swaps. All subsequent transactions are automated with flutherNode.js located in the Automation_Nodes folder.  The following steps outline how to run a fluther node:
-  1. cd into the Automation_Nodes folder, and from your command line install ethers 5.6.1 (some newer versions do not work properly)
+A user who has set up a Fluther recurring buy only needs to submit a single transaction. The initial transaction outlines the parameters for each recurring buy including the tokens to be swapped, the amount to swap, and how much time must pass between swaps. All subsequent transactions are automated with `flutherNode.js` located in the `Automation_Nodes` folder.  The following steps outline how to run a fluther node:
+  1. cd into the `Automation_Nodes` folder, and from your command line install `ethers 5.6.1` (some newer versions do not work properly)
+
     ```
     npm install ethers@5.6.1 --save    
     ```
-  2. Update global .env file with Infura websocket for appropriate chain (SEPOLIA_WSS), and signer private key (TEST_ACCOUNT)
-  3. Optionally install pm2 globally. 
+
+  2. Update global `.env` file with Infura websocket for appropriate chain (`SEPOLIA_WSS`), and signer private key (`TEST_ACCOUNT`)
+  3. Optionally install `pm2` globally. 
+
     ```
-    npm install pm2 -g    
+    npm install pm2 -g
     ```
-  4. exit out of the automation nodes folder and start the node with pm2. 
+
+  4. exit out of the automation nodes folder and start the node with `pm2`. 
+  
     ```
     pm2 start Automation_Nodes/flutherNode.js
     ```
    
-troubleshooting flutherNode.js
-Make sure the dollarCostAverageContractAddress is the correct contract address for the chain you are automating.
+### Troubleshooting `flutherNode.js`
+
+Make sure the `dollarCostAverageContractAddress` is the correct contract address for the chain you are automating.
         
 ## Automation Layer & Further Development
 
