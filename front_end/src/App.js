@@ -487,10 +487,9 @@ return ()=>clearTimeout(colorChange)
   
     try{
       //first contract object made from token to spend erc20contract
-      await erc20contract.connect(signer).approve(smartContracts.DollarCostAverage.address.sepolia,ethers.constants.MaxInt256)
+      const amount = await erc20contract.connect(signer).approve(smartContracts.DollarCostAverage.address.sepolia,ethers.constants.MaxInt256)
       setSpendingApproved(true)
       setDisabledTextFeild(true) 
-      
       setDelayRender(true)
     }
     catch(err){
