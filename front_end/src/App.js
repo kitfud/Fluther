@@ -911,7 +911,13 @@ const handleMusic =(event)=>{
                     {
                       allowance >= 100
                       ?
-                        <Box component="div" display="block">
+                        <Box component="div"
+                        alignItems="center"
+                justifyContent="center"
+                display="flex"
+                flexDirection="column"
+                       
+                        >
                           <Button variant="contained" onClick={handleReturn} >Return To Dollar Cost Average Maker</Button>
                         </Box>
                       :
@@ -972,7 +978,7 @@ const handleMusic =(event)=>{
                       <Box sx={{ width: '100%' }}>
                         <LinearProgress/>
                         <Box backgroundColor="lightBlue">
-                          <Typography>Updating Values...</Typography>
+                          <Typography>Updating Approval Amount...</Typography>
                         </Box> 
                       </Box>
                     :

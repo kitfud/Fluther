@@ -19,7 +19,7 @@
     "ethereum-block-by-date": "^1.4.9",
     "ethers": "^5",
     "material-icons": "^1.13.9",
-    "particles.js": "^2.0.0",
+   
     "react": "^18.2",
     "react-dom": "^18.2",
     "react-particles": "^2.11.0",
