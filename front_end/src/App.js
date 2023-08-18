@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import './App.css';
-import { ConnectWallet } from "@thirdweb-dev/react";
-import { useAddress } from "@thirdweb-dev/react";
+import { ConnectWallet,useAddress,useChainId,useConnectionStatus} from "@thirdweb-dev/react";
 import { ThemeProvider, createTheme } from '@mui/material';
+import TestNetPrompt from './components/TestNetPrompt';
+
 import {Snackbar,
   CircularProgress, 
   Grid, 
@@ -31,6 +32,7 @@ import UserRecurringBuys from './components/UserRecurringBuys';
 import ETHicon from './img/ETH.png'
 import WETHicon from './img/wETH.png'
 import UNIicon from './img/UNIicon.jpg'
+import FlutherLogo from './img/FlutherLogoWhite.png'
 
 import Particles from "react-particles"
 import { loadFull } from "tsparticles";
@@ -46,6 +48,9 @@ import Tenderness from './audio/tenderness.mp3'
 
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import TokenFountain from './components/TokenFountain'
+import LandingPageElement from './components/LandingPageElement';
+import Footer from './components/Footer';
+
 
 
 const theme = createTheme({
@@ -118,10 +123,19 @@ const fountainModalStyle = {
   right: '0%',
   width: 400,
 };
+
+//audio from benfreesounds-> https://www.bensound.com/
 const audio = new Audio(Tenderness)
 audio.load()
 
 function App() {
+
+  const chainId = useChainId()
+
+
+  //Sepolia chain ID 11155111
+  const workingChain = 11155111
+
   const [amount, setAmount] = useState("")
   const [token1,setToken1] = useState("")
   const [token2,setToken2] = useState("")
@@ -229,16 +243,33 @@ const address = useAddress();
     loadFull(main);
   },[])
 
+  const [appfullyrendered, setAppFullyRendered] = useState(null)
   
   useEffect(() => {
+  
     
+    if(address ){
     console.log("UPDATING ETHERS")
     updateEthers()
+    setAppFullyRendered(true)
+    }
     
   },[])
 
   useEffect(()=>{
-if(pricefeedcontract){
+//to reload the page if user shifts wallet network when app loaded well first time
+    if(appfullyrendered && chainId !=workingChain){
+      window.location.reload()
+    }
+
+if(address){
+  updateEthers()
+  setAppFullyRendered(true)
+}
+  },[chainId])
+
+  useEffect(()=>{
+if(pricefeedcontract && address && chainId==workingChain){
 getCurrentExchangePrice()
 }
   },[pricefeedcontract])
@@ -260,7 +291,9 @@ const getCurrentExchangePrice = async()=>{
 
 
   useEffect(()=>{
-  
+  if(chainId==workingChain){
+  updateEthers()
+  }
  if(provider !=null){
     checkAllowance()
  }
@@ -268,7 +301,7 @@ const getCurrentExchangePrice = async()=>{
 
   useEffect(()=>{
     let balanceCheck
-    if(signer !=null && erc20contract && address){
+    if(signer !=null && erc20contract && address && chainId==workingChain){
     
     balanceCheck= setInterval(()=>{checkAllowance()},1000)
     }
@@ -300,10 +333,9 @@ const getCurrentExchangePrice = async()=>{
   },[allowance])
 
   useEffect(() => {
-    console.log("token",wethtoken)
-    console.log("address",address)
+  
   let tokenCheckInterval
-  if(wethtoken&& provider && address!==null && address !== undefined){
+  if(wethtoken&& provider && address!==null && address !== undefined && chainId==workingChain){
     try{
     checkTokenBalance()
     tokenCheckInterval = setInterval(()=>{
@@ -320,7 +352,7 @@ const getCurrentExchangePrice = async()=>{
 
 
   useEffect(() => {
-    if(provider !== null){
+    if(provider !== null && address && chainId==workingChain){
 
 //price feed contract object is made below
       setPriceFeedContract(new ethers.Contract(smartContracts.PriceFeed.address.sepolia.ETHUSD,PriceFeedABI.sepolia,provider))  
@@ -378,14 +410,11 @@ return ()=>clearTimeout(colorChange)
       key
     );
  
-setInfuraProvider(infuraTempProvider)
+    setInfuraProvider(infuraTempProvider)
    
     
-    // const Metaprovider = new ethers.providers.Web3Provider(window.ethereum);
-    const tempSigner =tempProvider.getSigner();
-    // const tempSigner = new ethers.Wallet(process.env.REACT_APP_SIGNER_PRIVATE_KEY, tempProvider);
  
-    
+    const tempSigner =tempProvider.getSigner(); 
     setSigner(tempSigner);
     setDataLoad(true)
   
@@ -458,10 +487,9 @@ setInfuraProvider(infuraTempProvider)
   
     try{
       //first contract object made from token to spend erc20contract
-      await erc20contract.connect(signer).approve(smartContracts.DollarCostAverage.address.sepolia,ethers.utils.parseEther(amount))
+      const amount = await erc20contract.connect(signer).approve(smartContracts.DollarCostAverage.address.sepolia,ethers.constants.MaxInt256)
       setSpendingApproved(true)
       setDisabledTextFeild(true) 
-      
       setDelayRender(true)
     }
     catch(err){
@@ -702,41 +730,87 @@ const handleMusic =(event)=>{
 
 
   return (
-    <>
 
+    <>
+    
       <Particles
         id="particles_stuff"
         options={particlesOptions}
         init={particlesInit}
+        zIndex="-10"
       />
     
       
       <ThemeProvider theme={theme}>
 
+      <Slide direction="down" in={true} mountOnEnter>
+    
+    
+    <Box
+              sx={{
+             
+                zIndex: 1,
+                opacity:"",
+                display:"flex",
+                flexDirection:"row",
+                justifyContent:"space-between",
+                alignItems: "center",
+                width:"100%",
+                height:"130px",
+                position:"relative",
+
+              }}
+            >
+            <Box sx={{backgroundColor:"", border:"", borderColor:"", marginLeft:"1%",}}>
+              <img src={FlutherLogo} height="120px" width=""/>
+            </Box>
+            
+<Box
+  sx={{
+    display:"flex",
+    flexDirection:"row-reverse",
+    justifyContent:"flex-start",
+    backgroundColor:"",
+    width:"20%",
+    marginRight:"1%",
+    alignItems:"flex-begin",
+  }}
+>
 {
   music?
-      (<Fab onClick={handleMusic} sx={{position:'fixed', marginLeft:'3%',marginTop:'1%'}} color="primary" aria-label="add">
-        <MusicNoteIcon />
+      (<Fab onClick={handleMusic} sx={{position:'', marginRight:'10%',marginTop:''}} color="primary" aria-label="add">
+        <MusicNoteIcon sx={{zIndex:"1"}} />
       </Fab>):
-      <Fab onClick={handleMusic} sx={{position:'fixed', marginLeft:'3%',marginTop:'1%'}} color="primary" aria-label="add">
-      <MusicOffIcon />
+      <Fab onClick={handleMusic} sx={{position:'', marginRight:'10%',marginTop:''}} color="primary" aria-label="add">
+      <MusicOffIcon sx={{zIndex:"1"}}/>
       </Fab>
   }
 
 
-<Box className="tooltip" sx={{position:'fixed', right:'3%', marginTop:'1%'}}>
+{address && chainId==workingChain?
+<Box className="tooltip" sx={{position:'', right:'10%', marginTop:'', zIndex:"1"}}>
 <span className="tooltiptextBank" > Click For Test WETH Faucet</span>
 <Fab onClick={handleOpenFountain} color = "primary" >
     <AttachMoneyIcon/>
 </Fab>
+</Box>:null
+}
 </Box>
+
+
+
+
+</Box>
+</Slide>
 
 <Modal
   open={openFountain}
   onClose = {handleCloseFountain}
  
 >
+  
   <Box  sx={fountainModalStyle}>
+ 
   <TokenFountain provider={provider} 
   signer={signer} 
   address={address} 
@@ -744,9 +818,7 @@ const handleMusic =(event)=>{
   theme={theme}/>
   </Box>
 
-
 </Modal>
-
 
       <Modal
         open={open}
@@ -762,32 +834,22 @@ const handleMusic =(event)=>{
       </Modal>
     
 
-        <Grid container
+        <Grid
+          container
           spacing={0}
           direction="column"
           alignItems="center"
-          justify="center"
-          style={{ minHeight: '100vh' }}
+          justifyContent="center"
+          width="100%"
         >
-          <Slide direction="down" in={true} mountOnEnter>
-            <Box
-              sx={{
-                zIndex: 5,
-                marginTop:'2vh',
-              }}
-            >
-              <Typography fontSize="100px" color="#a939c4" fontFamily="Cherry Bomb One">
-                fluther
-              </Typography>
-            </Box>
-          </Slide>
+          
 
           {/* CONNECT WALLET BUTTON */}
           <Slide direction="down" in={true} mountOnEnter>
             <Box 
               sx={{
                 marginBottom:'10px',
-                marginTop:'2vh',
+                marginTop:'1vh',
                 zIndex: 10,
               }}
               display="flex"
@@ -804,7 +866,10 @@ const handleMusic =(event)=>{
         </Slide>
 
 
+
           {/* MAIN CARD */}
+          {address?
+          chainId==workingChain?
           <Slide direction="left" in={true} mountOnEnter>
          <Card 
             variant="outlined"
@@ -815,15 +880,15 @@ const handleMusic =(event)=>{
               //opacity: 0.9,
             }}
           >
-            <Box width='100%'
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
+            <Box
+              width='100%'
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
             >
             <Typography
               color='#bf00e8'
               component="h1"
-            
               sx={{
                 fontSize: 20,
                 fontWeight: 700,
@@ -835,29 +900,63 @@ const handleMusic =(event)=>{
             </Box>
            
 
-              {!spendingApproved?
-            <Box
-              alignItems="center"
-              justifyContent="center">
-                {
-                allowance>=100?
-                <Box component="div" display="block">
-                <Button variant="contained" onClick={handleReturn} >Return To Dollar Cost Average Maker</Button>
-                </Box>:null
-                }
-               <Box    alignItems="center"
-              justifyContent="center" display="flex">
-               <Typography padding={'2px'}  color='#bf00e8'
-              component="h1"
-            
-              sx={{
-                fontSize: 10,
-                fontWeight: 700,
-                padding: 2
-              }}>Current Spending Limit:{allowance}</Typography>
-               </Box>
-           
-            </Box>:null
+              {
+                !spendingApproved
+                ?
+                  <Box
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    {
+                      allowance >= 100
+                      ?
+                        <Box component="div"
+                        alignItems="center"
+                justifyContent="center"
+                display="flex"
+                flexDirection="column"
+                       
+                        >
+                          <Button variant="contained" onClick={handleReturn} >Return To Dollar Cost Average Maker</Button>
+                        </Box>
+                      :
+                        null
+                    }
+              <Box
+                alignItems="center"
+                justifyContent="center"
+                display="flex"
+                flexDirection="column"
+              >
+                <Typography
+                  padding={'2px'}
+                  color="#bf00e8"
+                  component="h2"
+                  sx={{
+                    fontSize: 14,
+                    fontWeight: 700,
+                    padding: 2,
+                  }}
+                >
+                  Spending limit must be initialized to more than 100.
+                </Typography>
+
+                <Typography 
+                  padding={'2px'}
+                  color='#bf00e8'
+                  component="h1"
+                  sx={{
+                    fontSize: 14,
+                    fontWeight: 700,
+                    marginBottom: 2,
+                  }}
+                >
+                  Current Spending Limit:{allowance}
+                </Typography>
+              </Box>
+            </Box>
+          :
+            null
 }
 
             {/* TOTAL AMOUNT BOX FIELD */}  
@@ -868,17 +967,7 @@ const handleMusic =(event)=>{
             >
               { !spendingApproved
               ?
-                <TextField
-                  sx={{
-                    width: "80%"
-                  }}
-                  onChange={ (e) => setAmount(e.target.value) }
-                  id="filled-basic"
-                  label="Total amount"
-                  variant="filled"
-                  disabled = {disableText}
-                >
-                </TextField>
+              null
               :
               (
               <>
@@ -888,7 +977,7 @@ const handleMusic =(event)=>{
                       <Box sx={{ width: '100%' }}>
                         <LinearProgress/>
                         <Box backgroundColor="lightBlue">
-                          <Typography>Allowance Approved. Values Will Update Shortly.</Typography>
+                          <Typography>Updating Approval Amount...</Typography>
                         </Box> 
                       </Box>
                     :
@@ -963,7 +1052,7 @@ const handleMusic =(event)=>{
                       variant="contained"
                       color="success"
                     >
-                      Approve Spending Amount
+                      Set Spending Limit
                     </Button>
                   </Box>
                 </>
@@ -1113,10 +1202,12 @@ const handleMusic =(event)=>{
               </Box>
             }    
           </Card>
-          </Slide>
-
+          </Slide>:<TestNetPrompt/>
+          :
+          <LandingPageElement />
+}
           {
-          wethbalance!==null && address !== null?
+          wethbalance!==null && address !== null && address && chainId==11155111?
           <>
             <Box 
               sx={{
@@ -1194,13 +1285,16 @@ const handleMusic =(event)=>{
           <Typography color="black">Success! Click for Transaction:${txHash} on Etherscan</Typography>
         </a>
         </Snackbar>
+
+    {address && chainId==11155111?
         <Box >
         <FormControlLabel 
         sx={{color:'white'}}
         control={<Switch checked={checked} onChange={handleChange} />}
         label="Display User Agreements"
       />
-        </Box>
+        </Box>:null
+}
      
       <Zoom in={checked}>
       <Box>
@@ -1211,17 +1305,23 @@ const handleMusic =(event)=>{
       cancelOccur = {cancelOccur} balance={ethbalance} 
       signer={signer} contract={dollarCostAverageContract} 
       provider={provider} 
-      address={address}/> 
+      address={address}
+      chainId={chainId}
+      workingChain={workingChain}
+      /> 
       </Box>
        </Zoom>
+
+     <Footer/>
 
         </Grid>      
       </ThemeProvider>
 
     </>
-        
-  );
-        
+  
+
+  )
+ 
 }
 
 export default App;

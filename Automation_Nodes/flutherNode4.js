@@ -32,6 +32,7 @@ const timer = (ms) => new Promise((res) => setTimeout(res, ms));
 
 const init = async () => {
   //search each vault to detemine if it is near liquidation and contains a minimum balance to make it worthwhile
+
   var dollarCostAverageContract = new ethers.Contract(dollarCostAverageContractAddress, dollarCostAverageABI, signer)
   var automationLayerContract = new ethers.Contract(
     automationLayerContractAddress,
@@ -47,7 +48,6 @@ const init = async () => {
 
   const getNextRecurringBuyId = await dollarCostAverageContract.getNextRecurringBuyId()
   console.log(getNextRecurringBuyId.toString())
-
 
   let account = -1;
   while (account < getNextRecurringBuyId - 1) {
